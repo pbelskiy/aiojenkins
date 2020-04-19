@@ -11,8 +11,12 @@ def test_build_job():
     asyncio.run(jenkins.build_job('test', dict(arg=1)))
 
 
-def test_stop_job():
-    asyncio.run(jenkins.stop_job('test', 1))
+def test_stop_build():
+    asyncio.run(jenkins.stop_build('test', 1))
+
+
+def test_delete_build():
+    asyncio.run(jenkins.delete_build('test', 2))
 
 
 def test_get_job_info():

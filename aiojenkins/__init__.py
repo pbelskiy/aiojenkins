@@ -43,8 +43,11 @@ class Jenkins:
         data = urlencode(parameters)
         await self._request('POST', f'/job/{name}/buildWithParameters?{data}')
 
-    async def stop_job(self, name: str, build_id: int) -> None:
+    async def stop_build(self, name: str, build_id: int) -> None:
         await self._request('POST', f'/job/{name}/{build_id}/stop')
+
+    async def delete_build(self, name: str, build_id: int) -> None:
+        await self._request('POST', f'/job/{name}/{build_id}/doDelete')
 
     async def get_job_info(self, name: str) -> dict:
         response = await self._request('GET', f'/job/{name}/api/json')
