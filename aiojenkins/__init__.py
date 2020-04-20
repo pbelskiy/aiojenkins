@@ -20,9 +20,25 @@ class Jenkins:
         if login and password:
             self.auth = aiohttp.BasicAuth(login, password)
 
+    async def _get_crumb(self) -> dict:
+        async with aiohttp.ClientSession() as session:
+            response = await session.get(
+                urljoin(self.host, 'crumbIssuer/api/json'),
+                auth=self.auth
+            )
+
+        data = await response.json()
+        return {data['crumbRequestField']: data['crumb']}
+
     async def _request(self, method: str, path: str, **kwargs):
         if self.auth and not kwargs.get('auth'):
             kwargs['auth'] = self.auth
+
+        headers = await self._get_crumb()
+        if 'headers' in kwargs:
+            kwargs['headers'].update(headers)
+        else:
+            kwargs['headers'] = headers
 
         try:
             async with aiohttp.ClientSession() as session:
@@ -37,7 +53,25 @@ class Jenkins:
         if response.status == 404:
             raise JenkinsNotFoundError
 
+        if response.status in (401, 403, 500):
+            raise JenkinsError(
+                f'Request error [{response.status}], ' +
+                f'probably authentication problem:\n{await response.text()}'
+            )
+
         return response
+
+    async def create_job(self, name: str, config: str) -> None:
+        headers = {'Content-Type': 'text/xml'}
+        params = {'name': name}
+        await self._request('POST', '/createItem',
+            params=params,
+            data=config,
+            headers=headers
+        )
+
+    async def delete_job(self, name: str) -> None:
+        await self._request('POST', f'/job/{name}/doDelete')
 
     async def build_job(self, name: str, parameters: dict=None) -> None:
         data = urlencode(parameters)
