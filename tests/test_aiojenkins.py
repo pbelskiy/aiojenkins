@@ -59,6 +59,10 @@ def test_create_job():
     asyncio.run(jenkins.create_job(TEST_JOB_NAME, TEST_CONFIG_XML))
 
 
+def test_get_job_config():
+    asyncio.run(jenkins.get_job_config(TEST_JOB_NAME))
+
+
 def test_build_job():
     asyncio.run(jenkins.build_job(TEST_JOB_NAME, dict(arg=1, delay=0)))
 

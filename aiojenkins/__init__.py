@@ -70,6 +70,10 @@ class Jenkins:
             headers=headers
         )
 
+    async def get_job_config(self, name: str) -> str:
+        response = await self._request('GET', f'/job/{name}/config.xml')
+        return await response.text()
+
     async def delete_job(self, name: str) -> None:
         await self._request('POST', f'/job/{name}/doDelete')
 
