@@ -81,16 +81,22 @@ class Jenkins:
             headers=headers
         )
 
-    async def get_job_config(self, name: str) -> str:
-        response = await self._request('GET', f'/job/{name}/config.xml')
-        return await response.text()
+    async def build_job(self, name: str, parameters: dict=None) -> None:
+        data = urlencode(parameters)
+        await self._request('POST', f'/job/{name}/buildWithParameters?{data}')
 
     async def delete_job(self, name: str) -> None:
         await self._request('POST', f'/job/{name}/doDelete')
 
-    async def build_job(self, name: str, parameters: dict=None) -> None:
-        data = urlencode(parameters)
-        await self._request('POST', f'/job/{name}/buildWithParameters?{data}')
+    async def enable_job(self, name: str) -> None:
+        await self._request('POST', f'/job/{name}/enable')
+
+    async def disable_job(self, name: str) -> None:
+        await self._request('POST', f'/job/{name}/disable')
+
+    async def get_job_config(self, name: str) -> str:
+        response = await self._request('GET', f'/job/{name}/config.xml')
+        return await response.text()
 
     async def stop_build(self, name: str, build_id: int) -> None:
         await self._request('POST', f'/job/{name}/{build_id}/stop')

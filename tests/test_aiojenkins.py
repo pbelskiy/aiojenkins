@@ -67,6 +67,14 @@ def test_build_job():
     asyncio.run(jenkins.build_job(TEST_JOB_NAME, dict(arg=1, delay=0)))
 
 
+def test_disable_job():
+    asyncio.run(jenkins.disable_job(TEST_JOB_NAME))
+
+
+def test_enable_job():
+    asyncio.run(jenkins.enable_job(TEST_JOB_NAME))
+
+
 def test_stop_build():
     asyncio.run(jenkins.stop_build(TEST_JOB_NAME, 1))
 
