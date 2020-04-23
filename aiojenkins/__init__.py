@@ -16,29 +16,40 @@ class Jenkins:
     def __init__(self, host, login=None, password=None):
         self.host = host
         self.auth = None
+        self.crumb = None
 
         if login and password:
             self.auth = aiohttp.BasicAuth(login, password)
 
     async def _get_crumb(self) -> dict:
+        if self.crumb is False:
+            return None
+
+        if self.crumb:
+            return self.crumb
+
         async with aiohttp.ClientSession() as session:
             response = await session.get(
                 urljoin(self.host, 'crumbIssuer/api/json'),
                 auth=self.auth
             )
 
+        if response.status == 404:
+            self.crumb = False
+            return None
+
         data = await response.json()
-        return {data['crumbRequestField']: data['crumb']}
+        self.crumb = {data['crumbRequestField']: data['crumb']}
+        return self.crumb
 
     async def _request(self, method: str, path: str, **kwargs):
         if self.auth and not kwargs.get('auth'):
             kwargs['auth'] = self.auth
 
-        headers = await self._get_crumb()
-        if 'headers' in kwargs:
-            kwargs['headers'].update(headers)
-        else:
-            kwargs['headers'] = headers
+        kwargs.setdefault('headers', {})
+        crumb = await self._get_crumb()
+        if crumb:
+            kwargs['headers'].update(crumb)
 
         try:
             async with aiohttp.ClientSession() as session:
