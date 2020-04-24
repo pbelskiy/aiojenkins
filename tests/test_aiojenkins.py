@@ -3,6 +3,8 @@
 import os
 import asyncio
 
+import pytest
+
 from aiojenkins import Jenkins, JenkinsNotFoundError
 
 jenkins = Jenkins(
@@ -48,52 +50,64 @@ sleep 1000</command>
 TEST_JOB_NAME = 'test'
 
 
-def test_delete_job():
+@pytest.mark.asyncio
+async def test_delete_job():
     try:
-        asyncio.run(jenkins.delete_job(TEST_JOB_NAME))
+        await jenkins.delete_job(TEST_JOB_NAME)
     except JenkinsNotFoundError:
         ...
 
 
-def test_create_job():
-    asyncio.run(jenkins.create_job(TEST_JOB_NAME, TEST_CONFIG_XML))
+@pytest.mark.asyncio
+async def test_create_job():
+    await jenkins.create_job(TEST_JOB_NAME, TEST_CONFIG_XML)
 
 
-def test_get_job_config():
-    asyncio.run(jenkins.get_job_config(TEST_JOB_NAME))
+@pytest.mark.asyncio
+async def test_get_job_config():
+    await jenkins.get_job_config(TEST_JOB_NAME)
 
 
-def test_build_job():
-    asyncio.run(jenkins.build_job(TEST_JOB_NAME, dict(arg=1, delay=0)))
+@pytest.mark.asyncio
+async def test_build_job():
+    await jenkins.build_job(TEST_JOB_NAME, dict(arg=1, delay=0))
 
 
-def test_disable_job():
-    asyncio.run(jenkins.disable_job(TEST_JOB_NAME))
+@pytest.mark.asyncio
+async def test_disable_job():
+    await jenkins.disable_job(TEST_JOB_NAME)
 
 
-def test_enable_job():
-    asyncio.run(jenkins.enable_job(TEST_JOB_NAME))
+@pytest.mark.asyncio
+async def test_enable_job():
+    await jenkins.enable_job(TEST_JOB_NAME)
 
 
-def test_stop_build():
-    asyncio.run(jenkins.stop_build(TEST_JOB_NAME, 1))
+@pytest.mark.asyncio
+async def test_stop_build():
+    await jenkins.stop_build(TEST_JOB_NAME, 1)
 
 
-def test_get_job_info():
-    asyncio.run(jenkins.get_job_info(TEST_JOB_NAME))
+@pytest.mark.asyncio
+async def test_get_job_info():
+    await jenkins.get_job_info(TEST_JOB_NAME)
 
 
-def test_get_build_info():
-    asyncio.run(jenkins.get_build_info(TEST_JOB_NAME, 1))
+@pytest.mark.asyncio
+async def test_get_build_info():
+    await jenkins.get_build_info(TEST_JOB_NAME, 1)
 
 
-def test_delete_build():
-    asyncio.run(jenkins.delete_build(TEST_JOB_NAME, 1))
+@pytest.mark.asyncio
+async def test_delete_build():
+    await jenkins.delete_build(TEST_JOB_NAME, 1)
 
 
-def test_get_status():
-    asyncio.run(jenkins.get_nodes())
+@pytest.mark.asyncio
+async def test_get_status():
+    await jenkins.get_status()
 
 
-def test_get_nodes():
-    asyncio.run(jenkins.get_nodes())
+@pytest.mark.asyncio
+async def test_get_nodes():
+    await jenkins.get_nodes()
