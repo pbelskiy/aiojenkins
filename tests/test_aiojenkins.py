@@ -38,8 +38,7 @@ TEST_CONFIG_XML = """<?xml version='1.0' encoding='UTF-8'?>
   <concurrentBuild>false</concurrentBuild>
   <builders>
     <hudson.tasks.Shell>
-      <command>echo test $arg
-sleep 1000</command>
+      <command></command>
     </hudson.tasks.Shell>
   </builders>
   <publishers/>
@@ -70,12 +69,18 @@ async def test_get_job_config():
 
 @pytest.mark.asyncio
 async def test_build_job():
-    await jenkins.build_job(TEST_JOB_NAME, dict(arg=1, delay=0))
+    await jenkins.build_job(TEST_JOB_NAME, dict(delay=0))
 
 
 @pytest.mark.asyncio
 async def test_disable_job():
     await jenkins.disable_job(TEST_JOB_NAME)
+
+
+@pytest.mark.asyncio
+async def test_disable_unavailable_job():
+    with pytest.raises(JenkinsNotFoundError):
+        await jenkins.disable_job('unavailable')
 
 
 @pytest.mark.asyncio
