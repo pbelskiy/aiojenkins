@@ -5,7 +5,7 @@ with open('README.md') as readme_file:
 
 setup_args = dict(
     name='aiojenkins',
-    version='0.1.1',
+    version='0.1.2',
     description='Asynchronous library of Jenkins API endpoints based on aiohttp',
     long_description_content_type='text/markdown',
     long_description=README,
