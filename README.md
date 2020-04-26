@@ -2,6 +2,20 @@
 
 ![Tests](https://github.com/pbelskiy/aiojenkins/workflows/Python%20package/badge.svg)
 
-Initial version of aiojenkins
+Asynchronous python library of Jenkins API endpoints based on aiohttp 🥳
 
-Work is in progress
+Initial version of aiojenkins. Public API is still unstable (work is in progress)
+
+### Examples
+
+Start new build:
+```python
+import asyncio
+import aiojenkins
+
+async def example():
+    jenkins = aiojenkins.Jenkins('http://your_server/jenkins', 'login', 'password')
+    await jenkins.build_job('job_name', dict(parameter='test'))
+
+asyncio.run(example())
+```
