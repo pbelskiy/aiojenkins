@@ -70,6 +70,7 @@ async def test_get_job_config():
 @pytest.mark.asyncio
 async def test_build_job():
     await jenkins.build_job(TEST_JOB_NAME, dict(delay=0))
+    await jenkins.build_job(TEST_JOB_NAME)
 
 
 @pytest.mark.asyncio

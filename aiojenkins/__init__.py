@@ -82,7 +82,7 @@ class Jenkins:
         )
 
     async def build_job(self, name: str, parameters: dict=None) -> None:
-        data = urlencode(parameters)
+        data = urlencode(parameters) if parameters else None
         await self._request('POST', f'/job/{name}/buildWithParameters?{data}')
 
     async def delete_job(self, name: str) -> None:
