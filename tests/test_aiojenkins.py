@@ -117,3 +117,37 @@ async def test_get_status():
 @pytest.mark.asyncio
 async def test_get_nodes():
     await jenkins.get_nodes()
+
+
+@pytest.mark.asyncio
+async def test_get_node_info():
+    info = await jenkins.get_node_info('(master)')
+    assert isinstance(info, dict)
+    info = await jenkins.get_node_info('master')
+    assert isinstance(info, dict)
+
+
+@pytest.mark.asyncio
+async def test_is_node_exists():
+    is_exists = await jenkins.is_node_exists('master')
+    assert is_exists is True
+
+    is_exists = await jenkins.is_node_exists('random_empty_node')
+    assert is_exists is False
+
+    is_exists = await jenkins.is_node_exists('')
+    assert is_exists is False
+
+
+@pytest.mark.asyncio
+async def test_disable_node():
+    await jenkins.disable_node('master')
+    info = await jenkins.get_node_info('master')
+    assert info['offline'] is True
+
+
+@pytest.mark.asyncio
+async def test_enable_node():
+    await jenkins.enable_node('master')
+    info = await jenkins.get_node_info('master')
+    assert info['offline'] is False

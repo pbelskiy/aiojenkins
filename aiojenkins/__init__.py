@@ -72,6 +72,13 @@ class Jenkins:
 
         return response
 
+    @staticmethod
+    def _normalize_node_name(name: str) -> str:
+        # embedded node `master` actually have brackets in HTTP requests
+        if name == 'master':
+            return '(master)'
+        return name
+
     async def create_job(self, name: str, config: str) -> None:
         headers = {'Content-Type': 'text/xml'}
         params = {'name': name}
@@ -120,3 +127,37 @@ class Jenkins:
         response = await self._request('GET', '/computer/api/json')
         response = await response.json()
         return {v['displayName']: v for v in response['computer']}
+
+    async def get_node_info(self, name: str) -> dict:
+        name = self._normalize_node_name(name)
+        response = await self._request('GET', f'/computer/{name}/api/json')
+        return await response.json()
+
+    async def is_node_exists(self, name: str) -> bool:
+        if name == '':
+            return False
+
+        try:
+            await self.get_node_info(name)
+        except JenkinsNotFoundError:
+            return False
+        return True
+
+    async def disable_node(self, name: str, message: str='') -> None:
+        info = await self.get_node_info(name)
+        if info['offline']:
+            return
+
+        name = self._normalize_node_name(name)
+        params = {'offlineMessage': message}
+        await self._request('POST', f'/computer/{name}/toggleOffline',
+            params=params
+        )
+
+    async def enable_node(self, name: str) -> None:
+        info = await self.get_node_info(name)
+        if not info['offline']:
+            return
+
+        name = self._normalize_node_name(name)
+        await self._request('POST', f'/computer/{name}/toggleOffline')
