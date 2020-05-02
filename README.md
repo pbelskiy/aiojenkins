@@ -1,6 +1,7 @@
 # aiojenkins
 
 ![Tests](https://github.com/pbelskiy/aiojenkins/workflows/Python%20package/badge.svg)
+[![Coverage Status](https://coveralls.io/repos/github/pbelskiy/aiojenkins/badge.svg?branch=master)](https://coveralls.io/github/pbelskiy/aiojenkins?branch=master)
 ![PyPI - Downloads](https://img.shields.io/pypi/dm/aiojenkins?color=1&label=Downloads)
 
 Asynchronous python library of Jenkins API endpoints based on aiohttp 🥳
