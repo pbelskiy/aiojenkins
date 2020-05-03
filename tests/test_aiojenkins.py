@@ -141,13 +141,15 @@ async def test_is_node_exists():
 
 @pytest.mark.asyncio
 async def test_disable_node():
-    await jenkins.disable_node('master')
-    info = await jenkins.get_node_info('master')
-    assert info['offline'] is True
+    for _ in range(2):
+        await jenkins.disable_node('master')
+        info = await jenkins.get_node_info('master')
+        assert info['offline'] is True
 
 
 @pytest.mark.asyncio
 async def test_enable_node():
-    await jenkins.enable_node('master')
-    info = await jenkins.get_node_info('master')
-    assert info['offline'] is False
+    for _ in range(2):
+        await jenkins.enable_node('master')
+        info = await jenkins.get_node_info('master')
+        assert info['offline'] is False
