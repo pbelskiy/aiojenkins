@@ -69,6 +69,7 @@ async def test_get_job_config():
 
 @pytest.mark.asyncio
 async def test_build_job():
+    await jenkins.enable_node('master')
     await jenkins.build_job(TEST_JOB_NAME, dict(delay=0))
     await jenkins.build_job(TEST_JOB_NAME)
 
@@ -153,3 +154,14 @@ async def test_enable_node():
         await jenkins.enable_node('master')
         info = await jenkins.get_node_info('master')
         assert info['offline'] is False
+
+
+@pytest.mark.asyncio
+async def test_update_node_offline_reason():
+    await jenkins.update_node_offline_reason('master', 'maintenance1')
+    info = await jenkins.get_node_info('master')
+    assert info['offlineCauseReason'] == 'maintenance1'
+
+    await jenkins.update_node_offline_reason('master', 'maintenance2')
+    info = await jenkins.get_node_info('master')
+    assert info['offlineCauseReason'] == 'maintenance2'

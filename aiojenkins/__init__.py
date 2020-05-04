@@ -161,3 +161,9 @@ class Jenkins:
 
         name = self._normalize_node_name(name)
         await self._request('POST', f'/computer/{name}/toggleOffline')
+
+    async def update_node_offline_reason(self, name: str, message: str) -> None:
+        name = self._normalize_node_name(name)
+        await self._request('POST', f'/computer/{name}/changeOfflineCause',
+            params={'offlineMessage': message}
+        )
