@@ -1,6 +1,6 @@
 # aiojenkins
 
-![Tests](https://github.com/pbelskiy/aiojenkins/workflows/Python%20package/badge.svg)
+![Tests](https://github.com/pbelskiy/aiojenkins/workflows/Tests/badge.svg)
 ![Coveralls github](https://img.shields.io/coveralls/github/pbelskiy/aiojenkins?label=Coverage)
 ![PyPI - Downloads](https://img.shields.io/pypi/dm/aiojenkins?color=1&label=Downloads)
 
