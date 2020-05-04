@@ -5,10 +5,12 @@ import asyncio
 
 import pytest
 
-from aiojenkins import Jenkins, JenkinsNotFoundError
+from aiojenkins import Jenkins, JenkinsError, JenkinsNotFoundError
+
+HOST_ADDR = os.environ.get('host', 'http://localhost:8080')
 
 jenkins = Jenkins(
-    'http://localhost:8080',
+    HOST_ADDR,
     os.environ.get('login', 'admin'),
     os.environ.get('password', 'admin')
 )
@@ -47,6 +49,12 @@ TEST_CONFIG_XML = """<?xml version='1.0' encoding='UTF-8'?>
 """
 
 TEST_JOB_NAME = 'test'
+
+
+@pytest.mark.asyncio
+async def test_authentication_error():
+    with pytest.raises(JenkinsError):
+        await Jenkins(HOST_ADDR, 'random-login', 'random-password').get_status()
 
 
 @pytest.mark.asyncio

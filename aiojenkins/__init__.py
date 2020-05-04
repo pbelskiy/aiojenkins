@@ -28,6 +28,7 @@ class Jenkins:
         if self.crumb:
             return self.crumb
 
+        # FIXME: remove code duplication
         async with aiohttp.ClientSession() as session:
             response = await session.get(
                 urljoin(self.host, 'crumbIssuer/api/json'),
@@ -37,6 +38,12 @@ class Jenkins:
         if response.status == 404:
             self.crumb = False
             return None
+
+        if response.status in (401, 403, 500):
+            raise JenkinsError(
+                f'Request error [{response.status}], ' +
+                f'probably authentication problem:\n{await response.text()}'
+            )
 
         data = await response.json()
         self.crumb = {data['crumbRequestField']: data['crumb']}
