@@ -1,4 +1,5 @@
 import aiohttp
+import json
 
 from urllib.parse import urlencode, urljoin
 
@@ -174,3 +175,23 @@ class Jenkins:
         await self._request('POST', f'/computer/{name}/changeOfflineCause',
             params={'offlineMessage': message}
         )
+
+    async def create_node(self, name: str, config: dict) -> None:
+        if name in await self.get_nodes():
+            raise JenkinsError(f'Node `{name}` is already exists')
+
+        if 'type' not in config:
+            config['type'] = 'hudson.slaves.DumbSlave'
+
+        config['name'] = name
+
+        params = {
+            'name': name,
+            'type': config['type'],
+            'json': json.dumps(config)
+        }
+        await self._request('POST', '/computer/doCreateItem', params=params)
+
+    async def delete_node(self, name: str) -> None:
+        name = self._normalize_node_name(name)
+        await self._request('POST', f'/computer/{name}/doDelete')

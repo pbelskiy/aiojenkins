@@ -1,7 +1,8 @@
 #!/usr/bin/python3
 
-import os
 import asyncio
+import contextlib
+import os
 
 import pytest
 
@@ -173,3 +174,42 @@ async def test_update_node_offline_reason():
     await jenkins.update_node_offline_reason('master', 'maintenance2')
     info = await jenkins.get_node_info('master')
     assert info['offlineCauseReason'] == 'maintenance2'
+
+
+@pytest.mark.asyncio
+async def test_create_delete_node():
+    TEST_NODE_NAME = 'test_node'
+
+    with contextlib.suppress(JenkinsNotFoundError):
+        await jenkins.delete_node(TEST_NODE_NAME)
+
+    nodes_list = await jenkins.get_nodes()
+    assert TEST_NODE_NAME not in nodes_list
+
+    config = {
+        'name': TEST_NODE_NAME,
+        'nodeDescription': '',
+        'numExecutors': 10,
+        'remoteFS': '',
+        'labelString': '',
+        'launcher': {
+            'stapler-class': 'hudson.slaves.JNLPLauncher',
+        },
+        'retentionStrategy': {
+            'stapler-class': 'hudson.slaves.RetentionStrategy$Always',
+        },
+        'nodeProperties': {
+            'stapler-class-bag': 'true'
+        }
+    }
+
+    await jenkins.create_node(TEST_NODE_NAME, config)
+    nodes_list = await jenkins.get_nodes()
+    assert TEST_NODE_NAME in nodes_list
+
+    with pytest.raises(JenkinsError):
+        await jenkins.create_node(TEST_NODE_NAME, config)
+
+    await jenkins.delete_node(TEST_NODE_NAME)
+    nodes_list = await jenkins.get_nodes()
+    assert TEST_NODE_NAME not in nodes_list
