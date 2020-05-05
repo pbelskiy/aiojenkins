@@ -22,42 +22,9 @@ class Jenkins:
         if login and password:
             self.auth = aiohttp.BasicAuth(login, password)
 
-    async def _get_crumb(self) -> dict:
-        if self.crumb is False:
-            return None
-
-        if self.crumb:
-            return self.crumb
-
-        # FIXME: remove code duplication
-        async with aiohttp.ClientSession() as session:
-            response = await session.get(
-                urljoin(self.host, 'crumbIssuer/api/json'),
-                auth=self.auth
-            )
-
-        if response.status == 404:
-            self.crumb = False
-            return None
-
-        if response.status in (401, 403, 500):
-            raise JenkinsError(
-                f'Request error [{response.status}], ' +
-                f'probably authentication problem:\n{await response.text()}'
-            )
-
-        data = await response.json()
-        self.crumb = {data['crumbRequestField']: data['crumb']}
-        return self.crumb
-
-    async def _request(self, method: str, path: str, **kwargs):
+    async def _http_request(self, method: str, path: str, **kwargs):
         if self.auth and not kwargs.get('auth'):
             kwargs['auth'] = self.auth
-
-        kwargs.setdefault('headers', {})
-        crumb = await self._get_crumb()
-        if crumb:
-            kwargs['headers'].update(crumb)
 
         try:
             async with aiohttp.ClientSession() as session:
@@ -79,6 +46,31 @@ class Jenkins:
             )
 
         return response
+
+    async def _get_crumb(self) -> dict:
+        if self.crumb is False:
+            return None
+
+        if self.crumb:
+            return self.crumb
+
+        try:
+            response = await self._http_request('GET', '/crumbIssuer/api/json')
+        except JenkinsNotFoundError:
+            self.crumb = False
+            return None
+
+        data = await response.json()
+        self.crumb = {data['crumbRequestField']: data['crumb']}
+        return self.crumb
+
+    async def _request(self, method: str, path: str, **kwargs):
+        kwargs.setdefault('headers', {})
+        crumb = await self._get_crumb()
+        if crumb:
+            kwargs['headers'].update(crumb)
+
+        return await self._http_request(method, path, **kwargs)
 
     @staticmethod
     def _normalize_node_name(name: str) -> str:
