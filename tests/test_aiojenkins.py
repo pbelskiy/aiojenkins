@@ -79,7 +79,11 @@ async def test_get_job_config():
 @pytest.mark.asyncio
 async def test_build_job():
     await jenkins.enable_node('master')
+
     await jenkins.build_job(TEST_JOB_NAME, dict(delay=0))
+    info = await jenkins.get_job_info(TEST_JOB_NAME)
+    assert info['nextBuildNumber'] == 2
+
     await jenkins.build_job(TEST_JOB_NAME)
 
 
@@ -106,7 +110,8 @@ async def test_stop_build():
 
 @pytest.mark.asyncio
 async def test_get_job_info():
-    await jenkins.get_job_info(TEST_JOB_NAME)
+    info = await jenkins.get_job_info(TEST_JOB_NAME)
+    assert isinstance(info, dict)
 
 
 @pytest.mark.asyncio

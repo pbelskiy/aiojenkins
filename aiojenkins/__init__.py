@@ -1,7 +1,7 @@
 import aiohttp
 import json
 
-from urllib.parse import urlencode, urljoin
+from urllib.parse import urljoin
 
 
 class JenkinsError(Exception):
@@ -89,8 +89,10 @@ class Jenkins:
         )
 
     async def build_job(self, name: str, parameters: dict=None) -> None:
-        data = urlencode(parameters) if parameters else None
-        await self._request('POST', f'/job/{name}/buildWithParameters?{data}')
+        await self._request('POST',
+            f'/job/{name}/buildWithParameters',
+            params=parameters,
+        )
 
     async def delete_job(self, name: str) -> None:
         await self._request('POST', f'/job/{name}/doDelete')
