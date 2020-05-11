@@ -35,12 +35,13 @@ __Please look at tests directory for more examples.__
 ## Testing
 
 Currently tests aren't using any mocking.
-I am testing locally with dockerized Jenkins ver. 2.60.3
+I am testing locally with dockerized LTS Jenkins ver. 2.222.3
 
 Prerequisites: `docker, pytest pytest-cov pytest-asyncio`
 
 ```sh
-docker run -p 8080:8080 jenkins
+docker run -d --name jenkins --restart always -p 8080:8080 jenkins/jenkins:lts
+docker exec jenkins cat /var/jenkins_home/secrets/initialAdminPassword
 python3 -m pytest -v --cov=aiojenkins --cov-report=term --cov-report=html
 ```
 

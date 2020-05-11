@@ -10,10 +10,9 @@ jobs:
   build:
     runs-on: ubuntu-latest
     strategy:
-      max-parallel: 1
       matrix:
         python-version: [3.6, 3.7, 3.8]
-        jenkins-version: [lts]
+        jenkins-version: [2.60.3, lts]
 
     services:
       jenkins:
