@@ -50,4 +50,4 @@ jobs:
       run: |
         pip install pytest pytest-cov pytest-asyncio coveralls
         pytest -v --cov=aiojenkins --cov-report=term
-        COVERALLS_REPO_TOKEN=${{ secrets.coveralls }} coveralls
+        COVERALLS_REPO_TOKEN=${{ secrets.coveralls }} COVERALLS_PARALLEL=true coveralls
