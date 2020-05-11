@@ -13,10 +13,11 @@ jobs:
       max-parallel: 1
       matrix:
         python-version: [3.6, 3.7, 3.8]
+        jenkins-version: [lts]
 
     services:
       jenkins:
-        image: jenkins
+        image: jenkins/jenkins:${{ matrix.jenkins-version }}
         ports:
           - 8080:8080
         options: --name jenkins
@@ -42,7 +43,7 @@ jobs:
 
     - name: Get Jenkins initial password
       run: |
-        sleep 5
+        sleep 10
         echo ::set-env name=login::Admin
         echo ::set-env name=password::$(docker exec jenkins cat /var/jenkins_home/secrets/initialAdminPassword)
 
