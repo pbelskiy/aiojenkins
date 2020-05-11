@@ -19,6 +19,7 @@ class Jenkins:
         self.host = host
         self.auth = None
         self.crumb = None
+        self.cookies = None
 
         if login and password:
             self.auth = aiohttp.BasicAuth(login, password)
@@ -28,7 +29,7 @@ class Jenkins:
             kwargs['auth'] = self.auth
 
         try:
-            async with aiohttp.ClientSession() as session:
+            async with aiohttp.ClientSession(cookies=self.cookies) as session:
                 response = await session.request(
                     method,
                     urljoin(self.host, path),
@@ -46,6 +47,9 @@ class Jenkins:
                 f'Request error [{response.status}], ' +
                 f'probably authentication problem:\n{text}'
             )
+
+        if response.cookies:
+            self.cookies = response.cookies
 
         return response
 
