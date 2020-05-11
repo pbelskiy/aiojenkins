@@ -1,7 +1,8 @@
-import aiohttp
 import json
 
 from urllib.parse import urljoin
+
+import aiohttp
 
 
 class JenkinsError(Exception):
@@ -40,9 +41,10 @@ class Jenkins:
             raise JenkinsNotFoundError
 
         if response.status in (401, 403, 500):
+            text = await response.text()
             raise JenkinsError(
                 f'Request error [{response.status}], ' +
-                f'probably authentication problem:\n{await response.text()}'
+                f'probably authentication problem:\n{text}'
             )
 
         return response
