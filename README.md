@@ -8,7 +8,7 @@ Asynchronous python library of Jenkins API endpoints based on aiohttp 🥳
 
 Initial version of aiojenkins. Public API is still unstable (work is in progress)
 
-### Examples
+### Usage
 
 Start new build:
 ```python
@@ -21,3 +21,5 @@ async def example():
 
 asyncio.run(example())
 ```
+
+Please look at tests directory for more examples.
