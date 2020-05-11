@@ -8,7 +8,15 @@ Asynchronous python library of Jenkins API endpoints based on aiohttp 🥳
 
 Initial version of aiojenkins. Public API is still unstable (work is in progress)
 
-### Usage
+Minimal Python version is 3.6 due async await and f-strings.
+
+## Installation
+
+```sh
+pip install aiojenkins
+```
+
+## Usage
 
 Start new build:
 ```python
@@ -22,4 +30,20 @@ async def example():
 asyncio.run(example())
 ```
 
-Please look at tests directory for more examples.
+__Please look at tests directory for more examples.__
+
+## Testing
+
+Currently tests aren't using any mocking.
+I am testing locally with dockerized Jenkins ver. 2.60.3
+
+Prerequisites: `docker, pytest pytest-cov pytest-asyncio`
+
+```sh
+docker run -p 8080:8080 jenkins
+python3 -m pytest -v --cov=aiojenkins --cov-report=term --cov-report=html
+```
+
+## Contributing
+
+Feel free to PR :)
