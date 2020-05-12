@@ -32,11 +32,10 @@ jobs:
     - name: Install dependencies
       run: |
         python -m pip install --upgrade pip
-        pip install aiohttp
+        pip install aiohttp flake8 pytest pytest-cov pytest-asyncio coveralls
 
     - name: Lint with flake8
       run: |
-        pip install flake8
         flake8 . --ignore E124,E128,E252 --max-line-length=99
 
     - name: Get Jenkins initial password
@@ -47,6 +46,5 @@ jobs:
 
     - name: Test with pytest
       run: |
-        pip install pytest pytest-cov pytest-asyncio coveralls
         pytest -v --cov=aiojenkins --cov-report=term
         COVERALLS_REPO_TOKEN=${{ secrets.coveralls }} COVERALLS_PARALLEL=true coveralls
