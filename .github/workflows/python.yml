@@ -37,8 +37,7 @@ jobs:
     - name: Lint with flake8
       run: |
         pip install flake8
-        flake8 . --count --select=E9,F63,F7,F82 --show-source --statistics
-        flake8 . --count --exit-zero --max-complexity=10 --max-line-length=127 --statistics
+        flake8 . --ignore E124,E128,E252 --max-line-length=99
 
     - name: Get Jenkins initial password
       run: |

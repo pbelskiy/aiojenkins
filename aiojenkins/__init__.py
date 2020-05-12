@@ -44,7 +44,7 @@ class Jenkins:
         if response.status in (401, 403, 500):
             text = await response.text()
             raise JenkinsError(
-                f'Request error [{response.status}], ' +
+                f'Request error [{response.status}], '
                 f'probably authentication problem:\n{text}'
             )
 
