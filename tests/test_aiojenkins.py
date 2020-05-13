@@ -79,11 +79,17 @@ async def test_get_job_config():
 async def test_build_job():
     await jenkins.enable_node('master')
 
-    await jenkins.build_job(TEST_JOB_NAME, dict(delay=0))
+    await jenkins.build_job(TEST_JOB_NAME, dict(arg='test'))
     info = await jenkins.get_job_info(TEST_JOB_NAME)
     assert info['nextBuildNumber'] == 2
 
     await jenkins.build_job(TEST_JOB_NAME)
+
+    await jenkins.build_job(TEST_JOB_NAME, delay=1)
+
+    with pytest.raises(JenkinsError):
+        await jenkins.build_job(TEST_JOB_NAME, dict(delay=0))
+        await jenkins.build_job(TEST_JOB_NAME, dict(no_parameter='none'))
 
 
 @pytest.mark.asyncio
