@@ -6,7 +6,9 @@ import aiohttp
 
 
 class JenkinsError(Exception):
-    ...
+    def __init__(self, message=None, status=None):
+        self.message = message
+        self.status = status
 
 
 class JenkinsNotFoundError(JenkinsError):
@@ -28,6 +30,10 @@ class Jenkins:
         if self.auth and not kwargs.get('auth'):
             kwargs['auth'] = self.auth
 
+        if self.crumb:
+            kwargs.setdefault('headers', {})
+            kwargs['headers'].update(self.crumb)
+
         try:
             async with aiohttp.ClientSession(cookies=self.cookies) as session:
                 response = await session.request(
@@ -45,7 +51,8 @@ class Jenkins:
             text = await response.text()
             raise JenkinsError(
                 f'Request error [{response.status}], '
-                f'probably authentication problem:\n{text}'
+                f'probably authentication problem:\n{text}',
+                status=response.status,
             )
 
         if response.cookies:
@@ -54,27 +61,25 @@ class Jenkins:
         return response
 
     async def _get_crumb(self) -> dict:
-        if self.crumb is False:
-            return None
-
-        if self.crumb:
-            return self.crumb
-
         try:
             response = await self._http_request('GET', '/crumbIssuer/api/json')
         except JenkinsNotFoundError:
-            self.crumb = False
-            return None
+            return False
 
         data = await response.json()
         self.crumb = {data['crumbRequestField']: data['crumb']}
         return self.crumb
 
     async def _request(self, method: str, path: str, **kwargs):
-        kwargs.setdefault('headers', {})
-        crumb = await self._get_crumb()
-        if crumb:
-            kwargs['headers'].update(crumb)
+        if self.crumb:
+            try:
+                return await self._http_request(method, path, **kwargs)
+            except JenkinsError as e:
+                if e.status != 403:
+                    raise
+
+        if self.crumb is not False:
+            self.crumb = await self._get_crumb()
 
         return await self._http_request(method, path, **kwargs)
 
