@@ -1,18 +1,10 @@
 import json
-
-from urllib.parse import urljoin
+import urllib
 
 import aiohttp
 
-
-class JenkinsError(Exception):
-    def __init__(self, message=None, status=None):
-        self.message = message
-        self.status = status
-
-
-class JenkinsNotFoundError(JenkinsError):
-    ...
+from aiojenkins.exceptions import JenkinsError, JenkinsNotFoundError
+from aiojenkins.nodes import Node
 
 
 class Jenkins:
@@ -26,6 +18,8 @@ class Jenkins:
         if login and password:
             self.auth = aiohttp.BasicAuth(login, password)
 
+        self._nodes = Node(self)
+
     async def _http_request(self, method: str, path: str, **kwargs):
         if self.auth and not kwargs.get('auth'):
             kwargs['auth'] = self.auth
@@ -38,7 +32,7 @@ class Jenkins:
             async with aiohttp.ClientSession(cookies=self.cookies) as session:
                 response = await session.request(
                     method,
-                    urljoin(self.host, path),
+                    urllib.parse.urljoin(self.host, path),
                     **kwargs,
                 )
         except aiohttp.ClientError as e:
@@ -161,67 +155,6 @@ class Jenkins:
         response = await self._request('GET', '/api/json')
         return await response.json()
 
-    async def get_nodes(self) -> dict:
-        response = await self._request('GET', '/computer/api/json')
-        response = await response.json()
-        return {v['displayName']: v for v in response['computer']}
-
-    async def get_node_info(self, name: str) -> dict:
-        name = self._normalize_node_name(name)
-        response = await self._request('GET', f'/computer/{name}/api/json')
-        return await response.json()
-
-    async def is_node_exists(self, name: str) -> bool:
-        if name == '':
-            return False
-
-        try:
-            await self.get_node_info(name)
-        except JenkinsNotFoundError:
-            return False
-        return True
-
-    async def disable_node(self, name: str, message: str='') -> None:
-        info = await self.get_node_info(name)
-        if info['offline']:
-            return
-
-        name = self._normalize_node_name(name)
-        params = {'offlineMessage': message}
-        await self._request('POST', f'/computer/{name}/toggleOffline',
-            params=params
-        )
-
-    async def enable_node(self, name: str) -> None:
-        info = await self.get_node_info(name)
-        if not info['offline']:
-            return
-
-        name = self._normalize_node_name(name)
-        await self._request('POST', f'/computer/{name}/toggleOffline')
-
-    async def update_node_offline_reason(self, name: str, message: str) -> None:
-        name = self._normalize_node_name(name)
-        await self._request('POST', f'/computer/{name}/changeOfflineCause',
-            params={'offlineMessage': message}
-        )
-
-    async def create_node(self, name: str, config: dict) -> None:
-        if name in await self.get_nodes():
-            raise JenkinsError(f'Node `{name}` is already exists')
-
-        if 'type' not in config:
-            config['type'] = 'hudson.slaves.DumbSlave'
-
-        config['name'] = name
-
-        params = {
-            'name': name,
-            'type': config['type'],
-            'json': json.dumps(config)
-        }
-        await self._request('POST', '/computer/doCreateItem', params=params)
-
-    async def delete_node(self, name: str) -> None:
-        name = self._normalize_node_name(name)
-        await self._request('POST', f'/computer/{name}/doDelete')
+    @property
+    def nodes(self):
+        return self._nodes

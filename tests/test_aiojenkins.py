@@ -5,7 +5,8 @@ import os
 
 import pytest
 
-from aiojenkins import Jenkins, JenkinsError, JenkinsNotFoundError
+from aiojenkins import Jenkins
+from aiojenkins.exceptions import JenkinsError, JenkinsNotFoundError
 
 HOST_ADDR = os.environ.get('host', 'http://localhost:8080')
 
@@ -77,7 +78,7 @@ async def test_get_job_config():
 
 @pytest.mark.asyncio
 async def test_build_job():
-    await jenkins.enable_node('master')
+    await jenkins.nodes.enable('master')
 
     await jenkins.build_job(TEST_JOB_NAME, dict(arg='test'))
     info = await jenkins.get_job_info(TEST_JOB_NAME)
@@ -136,53 +137,53 @@ async def test_get_status():
 
 @pytest.mark.asyncio
 async def test_get_nodes():
-    await jenkins.get_nodes()
+    await jenkins.nodes.get()
 
 
 @pytest.mark.asyncio
 async def test_get_node_info():
-    info = await jenkins.get_node_info('(master)')
+    info = await jenkins.nodes.get_info('(master)')
     assert isinstance(info, dict)
-    info = await jenkins.get_node_info('master')
+    info = await jenkins.nodes.get_info('master')
     assert isinstance(info, dict)
 
 
 @pytest.mark.asyncio
 async def test_is_node_exists():
-    is_exists = await jenkins.is_node_exists('master')
+    is_exists = await jenkins.nodes.is_exists('master')
     assert is_exists is True
 
-    is_exists = await jenkins.is_node_exists('random_empty_node')
+    is_exists = await jenkins.nodes.is_exists('random_empty_node')
     assert is_exists is False
 
-    is_exists = await jenkins.is_node_exists('')
+    is_exists = await jenkins.nodes.is_exists('')
     assert is_exists is False
 
 
 @pytest.mark.asyncio
 async def test_disable_node():
     for _ in range(2):
-        await jenkins.disable_node('master')
-        info = await jenkins.get_node_info('master')
+        await jenkins.nodes.disable('master')
+        info = await jenkins.nodes.get_info('master')
         assert info['offline'] is True
 
 
 @pytest.mark.asyncio
 async def test_enable_node():
     for _ in range(2):
-        await jenkins.enable_node('master')
-        info = await jenkins.get_node_info('master')
+        await jenkins.nodes.enable('master')
+        info = await jenkins.nodes.get_info('master')
         assert info['offline'] is False
 
 
 @pytest.mark.asyncio
 async def test_update_node_offline_reason():
-    await jenkins.update_node_offline_reason('master', 'maintenance1')
-    info = await jenkins.get_node_info('master')
+    await jenkins.nodes.update_offline_reason('master', 'maintenance1')
+    info = await jenkins.nodes.get_info('master')
     assert info['offlineCauseReason'] == 'maintenance1'
 
-    await jenkins.update_node_offline_reason('master', 'maintenance2')
-    info = await jenkins.get_node_info('master')
+    await jenkins.nodes.update_offline_reason('master', 'maintenance2')
+    info = await jenkins.nodes.get_info('master')
     assert info['offlineCauseReason'] == 'maintenance2'
 
 
@@ -191,9 +192,9 @@ async def test_create_delete_node():
     TEST_NODE_NAME = 'test_node'
 
     with contextlib.suppress(JenkinsNotFoundError):
-        await jenkins.delete_node(TEST_NODE_NAME)
+        await jenkins.nodes.delete(TEST_NODE_NAME)
 
-    nodes_list = await jenkins.get_nodes()
+    nodes_list = await jenkins.nodes.get()
     assert TEST_NODE_NAME not in nodes_list
 
     config = {
@@ -213,13 +214,13 @@ async def test_create_delete_node():
         }
     }
 
-    await jenkins.create_node(TEST_NODE_NAME, config)
-    nodes_list = await jenkins.get_nodes()
+    await jenkins.nodes.create(TEST_NODE_NAME, config)
+    nodes_list = await jenkins.nodes.get()
     assert TEST_NODE_NAME in nodes_list
 
     with pytest.raises(JenkinsError):
-        await jenkins.create_node(TEST_NODE_NAME, config)
+        await jenkins.nodes.create(TEST_NODE_NAME, config)
 
-    await jenkins.delete_node(TEST_NODE_NAME)
-    nodes_list = await jenkins.get_nodes()
+    await jenkins.nodes.delete(TEST_NODE_NAME)
+    nodes_list = await jenkins.nodes.get()
     assert TEST_NODE_NAME not in nodes_list
