@@ -1,6 +1,10 @@
+import contextlib
 import pytest
 
-from aiojenkins.exceptions import JenkinsError
+from aiojenkins.exceptions import (
+    JenkinsError,
+    JenkinsNotFoundError,
+)
 from tests import jenkins
 
 
@@ -44,7 +48,9 @@ TEST_CONFIG_XML = """<?xml version='1.0' encoding='UTF-8'?>
 async def test_build_start():
     await jenkins.nodes.enable('master')
 
-    await jenkins.jobs.delete(TEST_JOB_NAME)
+    with contextlib.suppress(JenkinsNotFoundError):
+        await jenkins.jobs.delete(TEST_JOB_NAME)
+
     await jenkins.jobs.create(TEST_JOB_NAME, TEST_CONFIG_XML)
 
     await jenkins.builds.start(TEST_JOB_NAME, dict(arg='test'))

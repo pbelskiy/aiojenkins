@@ -5,7 +5,7 @@ import pytest
 from tests import jenkins, HOST_ADDR
 
 from aiojenkins import Jenkins
-from aiojenkins.exceptions import JenkinsError, JenkinsNotFoundError
+from aiojenkins.exceptions import JenkinsError
 
 
 @pytest.mark.asyncio

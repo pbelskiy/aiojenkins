@@ -1,9 +1,3 @@
-from aiojenkins.exceptions import (
-    JenkinsError,
-    JenkinsNotFoundError,
-)
-
-
 class Job:
 
     def __init__(self, jenkins):
