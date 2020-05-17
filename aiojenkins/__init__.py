@@ -2,6 +2,8 @@ import urllib
 
 import aiohttp
 
+from typing import NamedTuple
+
 from aiojenkins.exceptions import (
     JenkinsError,
     JenkinsNotFoundError,
@@ -10,6 +12,12 @@ from aiojenkins.exceptions import (
 from aiojenkins.builds import Builds
 from aiojenkins.jobs import Jobs
 from aiojenkins.nodes import Nodes
+
+
+class JenkinsVersion(NamedTuple):
+    major: int = 0
+    minor: int = 0
+    patch: int = 0
 
 
 class Jenkins:
@@ -87,6 +95,11 @@ class Jenkins:
     async def get_status(self) -> dict:
         response = await self._request('GET', '/api/json')
         return await response.json()
+
+    async def get_version(self) -> JenkinsVersion:
+        response = await self._request('GET', '/')
+        header = response.headers.get('X-Jenkins')
+        return JenkinsVersion(*map(int, header.split('.')))
 
     @property
     def nodes(self):
