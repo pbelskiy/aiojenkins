@@ -69,7 +69,7 @@ class Jenkins:
 
         return response
 
-    async def _get_crumb(self) -> dict:
+    async def _get_crumb(self):
         try:
             response = await self._http_request('GET', '/crumbIssuer/api/json')
         except JenkinsNotFoundError:

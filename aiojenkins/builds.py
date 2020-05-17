@@ -16,8 +16,7 @@ class Builds:
         data = None
         if parameters:
             formatted_parameters = [
-                {'name': k, 'value': str(v)}
-                for k, v in parameters.items()
+                {'name': k, 'value': str(v)} for k, v in parameters.items()
             ]
 
             if len(formatted_parameters) == 1:
