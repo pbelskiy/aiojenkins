@@ -3,7 +3,13 @@ import urllib
 
 import aiohttp
 
-from aiojenkins.exceptions import JenkinsError, JenkinsNotFoundError
+from aiojenkins.exceptions import (
+    JenkinsError,
+    JenkinsNotFoundError,
+)
+
+from aiojenkins.builds import Build
+from aiojenkins.jobs import Job
 from aiojenkins.nodes import Node
 
 
@@ -19,6 +25,8 @@ class Jenkins:
             self.auth = aiohttp.BasicAuth(login, password)
 
         self._nodes = Node(self)
+        self._jobs = Job(self)
+        self._builds = Build(self)
 
     async def _http_request(self, method: str, path: str, **kwargs):
         if self.auth and not kwargs.get('auth'):
@@ -77,73 +85,6 @@ class Jenkins:
 
         return await self._http_request(method, path, **kwargs)
 
-    async def create_job(self, name: str, config: str) -> None:
-        headers = {'Content-Type': 'text/xml'}
-        params = {'name': name}
-        await self._request('POST', '/createItem',
-            params=params,
-            data=config,
-            headers=headers
-        )
-
-    async def build_job(self, name: str, parameters: dict=None, delay: int=0) -> None:
-        """
-        Enqueue new build with delay (default is 0 seconds, means immediately)
-
-        Note about delay (quiet-period):
-        https://www.jenkins.io/blog/2010/08/11/quiet-period-feature/
-        """
-        data = None
-        if parameters:
-            formatted_parameters = [
-                {'name': k, 'value': str(v)}
-                for k, v in parameters.items()
-            ]
-
-            if len(formatted_parameters) == 1:
-                formatted_parameters = formatted_parameters[0]
-
-            data = {
-                'json': json.dumps({
-                    'parameter': formatted_parameters,
-                    'statusCode': '303',
-                    'redirectTo': '.',
-                })
-            }
-
-        await self._request('POST',
-            f'/job/{name}/build',
-            params={'delay': delay},
-            data=data,
-        )
-
-    async def delete_job(self, name: str) -> None:
-        await self._request('POST', f'/job/{name}/doDelete')
-
-    async def enable_job(self, name: str) -> None:
-        await self._request('POST', f'/job/{name}/enable')
-
-    async def disable_job(self, name: str) -> None:
-        await self._request('POST', f'/job/{name}/disable')
-
-    async def get_job_config(self, name: str) -> str:
-        response = await self._request('GET', f'/job/{name}/config.xml')
-        return await response.text()
-
-    async def stop_build(self, name: str, build_id: int) -> None:
-        await self._request('POST', f'/job/{name}/{build_id}/stop')
-
-    async def delete_build(self, name: str, build_id: int) -> None:
-        await self._request('POST', f'/job/{name}/{build_id}/doDelete')
-
-    async def get_job_info(self, name: str) -> dict:
-        response = await self._request('GET', f'/job/{name}/api/json')
-        return await response.json()
-
-    async def get_build_info(self, name: str, build_id: int) -> dict:
-        response = await self._request('GET', f'/job/{name}/{build_id}/api/json')
-        return await response.json()
-
     async def get_status(self) -> dict:
         response = await self._request('GET', '/api/json')
         return await response.json()
@@ -151,3 +92,11 @@ class Jenkins:
     @property
     def nodes(self):
         return self._nodes
+
+    @property
+    def jobs(self):
+        return self._jobs
+
+    @property
+    def builds(self):
+        return self._builds
