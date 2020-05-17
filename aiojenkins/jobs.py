@@ -1,4 +1,4 @@
-class Job:
+class Jobs:
 
     def __init__(self, jenkins):
         self.jenkins = jenkins
@@ -6,7 +6,9 @@ class Job:
     async def create(self, name: str, config: str) -> None:
         headers = {'Content-Type': 'text/xml'}
         params = {'name': name}
-        await self.jenkins._request('POST', '/createItem',
+
+        await self.jenkins._request(
+            'POST', '/createItem',
             params=params,
             data=config,
             headers=headers

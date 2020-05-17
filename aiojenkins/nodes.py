@@ -6,7 +6,7 @@ from aiojenkins.exceptions import (
 )
 
 
-class Node:
+class Nodes:
 
     def __init__(self, jenkins):
         self.jenkins = jenkins

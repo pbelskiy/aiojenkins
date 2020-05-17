@@ -7,9 +7,9 @@ from aiojenkins.exceptions import (
     JenkinsNotFoundError,
 )
 
-from aiojenkins.builds import Build
-from aiojenkins.jobs import Job
-from aiojenkins.nodes import Node
+from aiojenkins.builds import Builds
+from aiojenkins.jobs import Jobs
+from aiojenkins.nodes import Nodes
 
 
 class Jenkins:
@@ -23,9 +23,9 @@ class Jenkins:
         if login and password:
             self.auth = aiohttp.BasicAuth(login, password)
 
-        self._nodes = Node(self)
-        self._jobs = Job(self)
-        self._builds = Build(self)
+        self._nodes = Nodes(self)
+        self._jobs = Jobs(self)
+        self._builds = Builds(self)
 
     async def _http_request(self, method: str, path: str, **kwargs):
         if self.auth and not kwargs.get('auth'):

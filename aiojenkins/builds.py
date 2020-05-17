@@ -1,7 +1,7 @@
 import json
 
 
-class Build:
+class Builds:
 
     def __init__(self, jenkins):
         self.jenkins = jenkins
