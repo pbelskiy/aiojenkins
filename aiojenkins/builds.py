@@ -1,5 +1,7 @@
 import json
 
+from typing import Any
+
 
 class Builds:
 
@@ -15,7 +17,7 @@ class Builds:
         """
         data = None
         if parameters:
-            formatted_parameters = [
+            formatted_parameters: Any = [
                 {'name': k, 'value': str(v)} for k, v in parameters.items()
             ]
 
