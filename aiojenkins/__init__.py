@@ -77,13 +77,6 @@ class Jenkins:
 
         return await self._http_request(method, path, **kwargs)
 
-    @staticmethod
-    def _normalize_node_name(name: str) -> str:
-        # embedded node `master` actually have brackets in HTTP requests
-        if name == 'master':
-            return '(master)'
-        return name
-
     async def create_job(self, name: str, config: str) -> None:
         headers = {'Content-Type': 'text/xml'}
         params = {'name': name}
