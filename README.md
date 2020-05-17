@@ -25,7 +25,7 @@ import aiojenkins
 
 async def example():
     jenkins = aiojenkins.Jenkins('http://your_server/jenkins', 'login', 'password')
-    await jenkins.build_job('job_name', dict(parameter='test'))
+    await jenkins.builds.start('job_name', dict(parameter='test'))
 
 asyncio.run(example())
 ```

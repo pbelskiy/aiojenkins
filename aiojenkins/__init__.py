@@ -1,18 +1,15 @@
-import json
-
-from urllib.parse import urljoin
+import urllib
 
 import aiohttp
 
+from aiojenkins.exceptions import (
+    JenkinsError,
+    JenkinsNotFoundError,
+)
 
-class JenkinsError(Exception):
-    def __init__(self, message=None, status=None):
-        self.message = message
-        self.status = status
-
-
-class JenkinsNotFoundError(JenkinsError):
-    ...
+from aiojenkins.builds import Builds
+from aiojenkins.jobs import Jobs
+from aiojenkins.nodes import Nodes
 
 
 class Jenkins:
@@ -26,6 +23,10 @@ class Jenkins:
         if login and password:
             self.auth = aiohttp.BasicAuth(login, password)
 
+        self._nodes = Nodes(self)
+        self._jobs = Jobs(self)
+        self._builds = Builds(self)
+
     async def _http_request(self, method: str, path: str, **kwargs):
         if self.auth and not kwargs.get('auth'):
             kwargs['auth'] = self.auth
@@ -38,7 +39,7 @@ class Jenkins:
             async with aiohttp.ClientSession(cookies=self.cookies) as session:
                 response = await session.request(
                     method,
-                    urljoin(self.host, path),
+                    urllib.parse.urljoin(self.host, path),
                     **kwargs,
                 )
         except aiohttp.ClientError as e:
@@ -83,145 +84,18 @@ class Jenkins:
 
         return await self._http_request(method, path, **kwargs)
 
-    @staticmethod
-    def _normalize_node_name(name: str) -> str:
-        # embedded node `master` actually have brackets in HTTP requests
-        if name == 'master':
-            return '(master)'
-        return name
-
-    async def create_job(self, name: str, config: str) -> None:
-        headers = {'Content-Type': 'text/xml'}
-        params = {'name': name}
-        await self._request('POST', '/createItem',
-            params=params,
-            data=config,
-            headers=headers
-        )
-
-    async def build_job(self, name: str, parameters: dict=None, delay: int=0) -> None:
-        """
-        Enqueue new build with delay (default is 0 seconds, means immediately)
-
-        Note about delay (quiet-period):
-        https://www.jenkins.io/blog/2010/08/11/quiet-period-feature/
-        """
-        data = None
-        if parameters:
-            formatted_parameters = [
-                {'name': k, 'value': str(v)}
-                for k, v in parameters.items()
-            ]
-
-            if len(formatted_parameters) == 1:
-                formatted_parameters = formatted_parameters[0]
-
-            data = {
-                'json': json.dumps({
-                    'parameter': formatted_parameters,
-                    'statusCode': '303',
-                    'redirectTo': '.',
-                })
-            }
-
-        await self._request('POST',
-            f'/job/{name}/build',
-            params={'delay': delay},
-            data=data,
-        )
-
-    async def delete_job(self, name: str) -> None:
-        await self._request('POST', f'/job/{name}/doDelete')
-
-    async def enable_job(self, name: str) -> None:
-        await self._request('POST', f'/job/{name}/enable')
-
-    async def disable_job(self, name: str) -> None:
-        await self._request('POST', f'/job/{name}/disable')
-
-    async def get_job_config(self, name: str) -> str:
-        response = await self._request('GET', f'/job/{name}/config.xml')
-        return await response.text()
-
-    async def stop_build(self, name: str, build_id: int) -> None:
-        await self._request('POST', f'/job/{name}/{build_id}/stop')
-
-    async def delete_build(self, name: str, build_id: int) -> None:
-        await self._request('POST', f'/job/{name}/{build_id}/doDelete')
-
-    async def get_job_info(self, name: str) -> dict:
-        response = await self._request('GET', f'/job/{name}/api/json')
-        return await response.json()
-
-    async def get_build_info(self, name: str, build_id: int) -> dict:
-        response = await self._request('GET', f'/job/{name}/{build_id}/api/json')
-        return await response.json()
-
     async def get_status(self) -> dict:
         response = await self._request('GET', '/api/json')
         return await response.json()
 
-    async def get_nodes(self) -> dict:
-        response = await self._request('GET', '/computer/api/json')
-        response = await response.json()
-        return {v['displayName']: v for v in response['computer']}
+    @property
+    def nodes(self):
+        return self._nodes
 
-    async def get_node_info(self, name: str) -> dict:
-        name = self._normalize_node_name(name)
-        response = await self._request('GET', f'/computer/{name}/api/json')
-        return await response.json()
+    @property
+    def jobs(self):
+        return self._jobs
 
-    async def is_node_exists(self, name: str) -> bool:
-        if name == '':
-            return False
-
-        try:
-            await self.get_node_info(name)
-        except JenkinsNotFoundError:
-            return False
-        return True
-
-    async def disable_node(self, name: str, message: str='') -> None:
-        info = await self.get_node_info(name)
-        if info['offline']:
-            return
-
-        name = self._normalize_node_name(name)
-        params = {'offlineMessage': message}
-        await self._request('POST', f'/computer/{name}/toggleOffline',
-            params=params
-        )
-
-    async def enable_node(self, name: str) -> None:
-        info = await self.get_node_info(name)
-        if not info['offline']:
-            return
-
-        name = self._normalize_node_name(name)
-        await self._request('POST', f'/computer/{name}/toggleOffline')
-
-    async def update_node_offline_reason(self, name: str, message: str) -> None:
-        name = self._normalize_node_name(name)
-        await self._request('POST', f'/computer/{name}/changeOfflineCause',
-            params={'offlineMessage': message}
-        )
-
-    async def create_node(self, name: str, config: dict) -> None:
-        if name in await self.get_nodes():
-            raise JenkinsError(f'Node `{name}` is already exists')
-
-        if 'type' not in config:
-            config['type'] = 'hudson.slaves.DumbSlave'
-
-        config['name'] = name
-
-        params = {
-            'name': name,
-            'type': config['type'],
-            'json': json.dumps(config)
-        }
-        await self._request('POST', '/computer/doCreateItem', params=params)
-
-    async def delete_node(self, name: str) -> None:
-        name = self._normalize_node_name(name)
-        await self._request('POST', f'/computer/{name}/doDelete')
+    @property
+    def builds(self):
+        return self._builds
