@@ -10,8 +10,9 @@ from aiojenkins.exceptions import JenkinsError
 
 @pytest.mark.asyncio
 async def test_authentication_error():
+    jenkins = Jenkins(HOST_ADDR, 'random-login', 'random-password')
     with pytest.raises(JenkinsError):
-        await Jenkins(HOST_ADDR, 'random-login', 'random-password').get_status()
+        await jenkins.nodes.disable('master')
 
 
 @pytest.mark.asyncio

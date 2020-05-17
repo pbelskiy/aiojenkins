@@ -10,6 +10,10 @@ Initial version of aiojenkins. Public API is still unstable (work is in progress
 
 Minimal Python version is 3.6 due async await and f-strings.
 
+The package is tested on below matrix:
+- CPython: 3.6, 3.7, 3.8
+- Jenkins LTS: 1.554, 2.60.3, latest
+
 ## Installation
 
 ```sh

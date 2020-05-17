@@ -12,11 +12,11 @@ jobs:
     strategy:
       matrix:
         python-version: [3.6, 3.7, 3.8]
-        jenkins-version: [2.60.3, lts]
+        jenkins-version: ["jenkins:1.554", "jenkins/jenkins:2.60.3", "jenkins/jenkins:lts"]
 
     services:
       jenkins:
-        image: jenkins/jenkins:${{ matrix.jenkins-version }}
+        image: ${{ matrix.jenkins-version }}
         ports:
           - 8080:8080
         options: --name jenkins
