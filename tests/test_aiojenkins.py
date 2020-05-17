@@ -22,5 +22,12 @@ async def test_authentication_error():
 
 
 @pytest.mark.asyncio
+async def test_invalid_host():
+    with pytest.raises(JenkinsError):
+        jenkins = Jenkins('@#$')
+        await jenkins.get_version()
+
+
+@pytest.mark.asyncio
 async def test_get_status():
     await jenkins.get_status()
