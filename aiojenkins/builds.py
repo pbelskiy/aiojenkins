@@ -8,7 +8,19 @@ class Builds:
     def __init__(self, jenkins):
         self.jenkins = jenkins
 
-    async def start(self, name: str, parameters: dict=None, delay: int=0) -> None:
+    async def get_info(self, name: str, build_id: int) -> dict:
+        response = await self.jenkins._request(
+            'GET',
+            f'/job/{name}/{build_id}/api/json'
+        )
+
+        return await response.json()
+
+    async def start(self,
+                    name: str,
+                    parameters: dict = None,
+                    delay: int = 0
+                    ) -> None:
         """
         Enqueue new build with delay (default is 0 seconds, means immediately)
 
@@ -32,18 +44,21 @@ class Builds:
                 })
             }
 
-        await self.jenkins._request('POST',
+        await self.jenkins._request(
+            'POST',
             f'/job/{name}/build',
             params={'delay': delay},
             data=data,
         )
 
     async def stop(self, name: str, build_id: int) -> None:
-        await self.jenkins._request('POST', f'/job/{name}/{build_id}/stop')
+        await self.jenkins._request(
+            'POST',
+            f'/job/{name}/{build_id}/stop'
+        )
 
     async def delete(self, name: str, build_id: int) -> None:
-        await self.jenkins._request('POST', f'/job/{name}/{build_id}/doDelete')
-
-    async def get_info(self, name: str, build_id: int) -> dict:
-        response = await self.jenkins._request('GET', f'/job/{name}/{build_id}/api/json')
-        return await response.json()
+        await self.jenkins._request(
+            'POST',
+            f'/job/{name}/{build_id}/doDelete'
+        )

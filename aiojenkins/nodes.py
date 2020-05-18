@@ -19,13 +19,27 @@ class Nodes:
         return name
 
     async def get(self) -> dict:
-        response = await self.jenkins._request('GET', '/computer/api/json')
-        response = await response.json()
-        return {v['displayName']: v for v in response['computer']}
+        """
+        Get available nodes on server. Example dict result:
+        {
+            "master": dict(...),
+            "buildbot1": dict(...)
+        }
+        """
+        response = await self.jenkins._request(
+            'GET',
+            '/computer/api/json'
+        )
+
+        nodes = await response.json()
+        return {v['displayName']: v for v in nodes['computer']}
 
     async def get_info(self, name: str) -> dict:
         name = self._normalize_name(name)
-        response = await self.jenkins._request('GET', f'/computer/{name}/api/json')
+        response = await self.jenkins._request(
+            'GET',
+            f'/computer/{name}/api/json',
+        )
         return await response.json()
 
     async def is_exists(self, name: str) -> bool:
@@ -53,11 +67,18 @@ class Nodes:
             'json': json.dumps(config)
         }
 
-        await self.jenkins._request('POST', '/computer/doCreateItem', params=params)
+        await self.jenkins._request(
+            'POST',
+            '/computer/doCreateItem',
+            params=params,
+        )
 
     async def delete(self, name: str) -> None:
         name = self._normalize_name(name)
-        await self.jenkins._request('POST', f'/computer/{name}/doDelete')
+        await self.jenkins._request(
+            'POST',
+            f'/computer/{name}/doDelete'
+        )
 
     async def enable(self, name: str) -> None:
         info = await self.get_info(name)
@@ -65,21 +86,28 @@ class Nodes:
             return
 
         name = self._normalize_name(name)
-        await self.jenkins._request('POST', f'/computer/{name}/toggleOffline')
+        await self.jenkins._request(
+            'POST',
+            f'/computer/{name}/toggleOffline'
+        )
 
-    async def disable(self, name: str, message: str='') -> None:
+    async def disable(self, name: str, message: str = '') -> None:
         info = await self.get_info(name)
         if info['offline']:
             return
 
         name = self._normalize_name(name)
         params = {'offlineMessage': message}
-        await self.jenkins._request('POST', f'/computer/{name}/toggleOffline',
-            params=params
+        await self.jenkins._request(
+            'POST',
+            f'/computer/{name}/toggleOffline',
+            params=params,
         )
 
     async def update_offline_reason(self, name: str, message: str) -> None:
         name = self._normalize_name(name)
-        await self.jenkins._request('POST', f'/computer/{name}/changeOfflineCause',
-            params={'offlineMessage': message}
+        await self.jenkins._request(
+            'POST',
+            f'/computer/{name}/changeOfflineCause',
+            params={'offlineMessage': message},
         )

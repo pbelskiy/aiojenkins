@@ -36,7 +36,7 @@ jobs:
 
     - name: Lint with flake8
       run: |
-        flake8 . --ignore E124,E128,E252 --max-line-length=99
+        flake8 . --ignore E124,E128 --max-line-length=79
 
     - name: Check import sorting
       run: |
