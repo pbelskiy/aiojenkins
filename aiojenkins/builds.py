@@ -8,13 +8,43 @@ class Builds:
     def __init__(self, jenkins):
         self.jenkins = jenkins
 
+    async def get_list(self, name: str) -> list:
+        """
+        Get list of builds for specified job name. Returned example:
+
+        builds = [
+          {'number': 1, 'url': 'http://localhost/job/test/1/'},
+          {'number': 2, 'url': 'http://localhost/job/test/2/'}
+        ]
+        """
+        response = await self.jenkins._request(
+            'GET',
+            f'/job/{name}/api/json?tree=allBuilds[number,url]'
+        )
+
+        return (await response.json())['allBuilds']
+
     async def get_info(self, name: str, build_id: int) -> dict:
+        """
+        Get detailed information about specified build of job
+        """
         response = await self.jenkins._request(
             'GET',
             f'/job/{name}/{build_id}/api/json'
         )
 
         return await response.json()
+
+    async def get_output(self, name: str, build_id: int) -> str:
+        """
+        Get console output of specified build
+        """
+        response = await self.jenkins._request(
+            'GET',
+            f'/job/{name}/{build_id}/consoleText'
+        )
+
+        return await response.text()
 
     async def start(self,
                     name: str,

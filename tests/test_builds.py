@@ -45,6 +45,30 @@ TEST_CONFIG_XML = """<?xml version='1.0' encoding='UTF-8'?>
 
 
 @pytest.mark.asyncio
+async def test_build_list():
+    job_name = test_build_list.__name__
+
+    with contextlib.suppress(JenkinsNotFoundError):
+        await jenkins.jobs.delete(job_name)
+
+    await jenkins.jobs.create(job_name, TEST_CONFIG_XML)
+
+    builds = await jenkins.builds.get_list(job_name)
+    assert len(builds) == 0
+
+    await jenkins.nodes.enable('master')
+    await jenkins.builds.start(job_name, dict(arg=0))
+
+    builds = await jenkins.builds.get_list(job_name)
+    assert len(builds) > 0
+
+    output = await jenkins.builds.get_output(job_name, builds[-1]['number'])
+    assert len(output) > 0
+
+    await jenkins.jobs.delete(job_name)
+
+
+@pytest.mark.asyncio
 async def test_build_start():
     await jenkins.nodes.enable('master')
 
