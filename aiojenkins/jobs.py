@@ -3,6 +3,18 @@ class Jobs:
     def __init__(self, jenkins):
         self.jenkins = jenkins
 
+    async def get_all(self) -> dict:
+        """
+        Get list of builds for specified job name. Returned example:
+
+        jobs = [
+            {'name': 'test', 'url': 'http://localhost/job/test/'},
+            {'name': 'test_builds', 'url': 'http://localhost/job/test_builds/'}
+        ]
+        """
+        status = await self.jenkins.get_status()
+        return {v['name']: v for v in status['jobs']}
+
     async def get_info(self, name: str) -> dict:
         response = await self.jenkins._request(
             'GET',
@@ -35,6 +47,28 @@ class Jobs:
         await self.jenkins._request(
             'POST',
             f'/job/{name}/doDelete'
+        )
+
+    async def copy(self, name: str, new_name: str) -> None:
+        params = {
+            'mode': 'copy',
+            'from': name,
+            'name': new_name,
+        }
+
+        await self.jenkins._request(
+            'POST',
+            '/createItem',
+            params=params
+        )
+
+    async def rename(self, name: str, new_name: str) -> None:
+        params = {'newName': new_name}
+
+        await self.jenkins._request(
+            'POST',
+            f'/job/{name}/doRename',
+            params=params
         )
 
     async def enable(self, name: str) -> None:
