@@ -18,7 +18,7 @@ class Nodes:
             return '(master)'
         return name
 
-    async def get(self) -> dict:
+    async def get_list(self) -> dict:
         """
         Get available nodes on server. Example dict result:
         {
@@ -53,7 +53,7 @@ class Nodes:
         return True
 
     async def create(self, name: str, config: dict) -> None:
-        if name in await self.get():
+        if name in await self.get_list():
             raise JenkinsError(f'Node `{name}` is already exists')
 
         if 'type' not in config:
@@ -97,11 +97,10 @@ class Nodes:
             return
 
         name = self._normalize_name(name)
-        params = {'offlineMessage': message}
         await self.jenkins._request(
             'POST',
             f'/computer/{name}/toggleOffline',
-            params=params,
+            params={'offlineMessage': message}
         )
 
     async def update_offline_reason(self, name: str, message: str) -> None:
@@ -109,5 +108,5 @@ class Nodes:
         await self.jenkins._request(
             'POST',
             f'/computer/{name}/changeOfflineCause',
-            params={'offlineMessage': message},
+            params={'offlineMessage': message}
         )
