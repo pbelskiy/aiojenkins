@@ -5,43 +5,13 @@ from aiojenkins.exceptions import (
     JenkinsError,
     JenkinsNotFoundError,
 )
-from tests import jenkins
 
+from tests import (
+    jenkins,
+    JOB_CONFIG_XML,
+)
 
 TEST_JOB_NAME = 'test_builds'
-
-TEST_CONFIG_XML = """<?xml version='1.0' encoding='UTF-8'?>
-<project>
-  <actions/>
-  <description></description>
-  <keepDependencies>false</keepDependencies>
-  <properties>
-    <hudson.model.ParametersDefinitionProperty>
-      <parameterDefinitions>
-        <hudson.model.StringParameterDefinition>
-          <name>arg</name>
-          <description></description>
-          <defaultValue></defaultValue>
-        </hudson.model.StringParameterDefinition>
-      </parameterDefinitions>
-    </hudson.model.ParametersDefinitionProperty>
-  </properties>
-  <scm class="hudson.scm.NullSCM"/>
-  <canRoam>true</canRoam>
-  <disabled>false</disabled>
-  <blockBuildWhenDownstreamBuilding>false</blockBuildWhenDownstreamBuilding>
-  <blockBuildWhenUpstreamBuilding>false</blockBuildWhenUpstreamBuilding>
-  <triggers/>
-  <concurrentBuild>false</concurrentBuild>
-  <builders>
-    <hudson.tasks.Shell>
-      <command></command>
-    </hudson.tasks.Shell>
-  </builders>
-  <publishers/>
-  <buildWrappers/>
-</project>
-"""
 
 
 @pytest.mark.asyncio
@@ -51,7 +21,7 @@ async def test_build_list():
     with contextlib.suppress(JenkinsNotFoundError):
         await jenkins.jobs.delete(job_name)
 
-    await jenkins.jobs.create(job_name, TEST_CONFIG_XML)
+    await jenkins.jobs.create(job_name, JOB_CONFIG_XML)
 
     builds = await jenkins.builds.get_list(job_name)
     assert len(builds) == 0
@@ -75,7 +45,7 @@ async def test_build_start():
     with contextlib.suppress(JenkinsNotFoundError):
         await jenkins.jobs.delete(TEST_JOB_NAME)
 
-    await jenkins.jobs.create(TEST_JOB_NAME, TEST_CONFIG_XML)
+    await jenkins.jobs.create(TEST_JOB_NAME, JOB_CONFIG_XML)
 
     await jenkins.builds.start(TEST_JOB_NAME, dict(arg='test'))
     info = await jenkins.jobs.get_info(TEST_JOB_NAME)

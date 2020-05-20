@@ -1,5 +1,6 @@
-import urllib
+from typing import Tuple
 
+import urllib
 import aiohttp
 
 from typing import NamedTuple
@@ -100,6 +101,34 @@ class Jenkins:
         response = await self._request('GET', '/')
         header = response.headers.get('X-Jenkins')
         return JenkinsVersion(*map(int, header.split('.')))
+
+    @staticmethod
+    def _build_token_url(do: str) -> str:
+        return f'/me/descriptorByName/jenkins.security.ApiTokenProperty/{do}'
+
+    async def generate_token(self, name: str) -> Tuple[str, str]:
+        params = {'newTokenName': name}
+
+        response = await self._request(
+            'POST',
+            self._build_token_url('generateNewToken'),
+            params=params
+        )
+
+        response = await response.json()
+        if response['status'] != 'ok':
+            raise JenkinsError(f'Non OK status returned: `{response}`')
+
+        return response['data']['tokenValue'], response['data']['tokenUuid']
+
+    async def revoke_token(self, token: str) -> None:
+        params = {'tokenUuid': token}
+
+        await self._request(
+            'POST',
+            self._build_token_url('revoke'),
+            params=params
+        )
 
     @property
     def nodes(self):

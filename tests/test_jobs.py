@@ -6,41 +6,11 @@ from aiojenkins.exceptions import (
     JenkinsNotFoundError,
 )
 
-from tests import jenkins
+from tests import (
+    jenkins,
+    JOB_CONFIG_XML,
+)
 
-
-TEST_CONFIG_XML = """<?xml version='1.0' encoding='UTF-8'?>
-<project>
-  <actions/>
-  <description></description>
-  <keepDependencies>false</keepDependencies>
-  <properties>
-    <hudson.model.ParametersDefinitionProperty>
-      <parameterDefinitions>
-        <hudson.model.StringParameterDefinition>
-          <name>arg</name>
-          <description></description>
-          <defaultValue></defaultValue>
-        </hudson.model.StringParameterDefinition>
-      </parameterDefinitions>
-    </hudson.model.ParametersDefinitionProperty>
-  </properties>
-  <scm class="hudson.scm.NullSCM"/>
-  <canRoam>true</canRoam>
-  <disabled>false</disabled>
-  <blockBuildWhenDownstreamBuilding>false</blockBuildWhenDownstreamBuilding>
-  <blockBuildWhenUpstreamBuilding>false</blockBuildWhenUpstreamBuilding>
-  <triggers/>
-  <concurrentBuild>false</concurrentBuild>
-  <builders>
-    <hudson.tasks.Shell>
-      <command></command>
-    </hudson.tasks.Shell>
-  </builders>
-  <publishers/>
-  <buildWrappers/>
-</project>
-"""
 
 TEST_JOB_NAME = 'test'
 
@@ -55,7 +25,7 @@ async def test_delete_job():
 
 @pytest.mark.asyncio
 async def test_create_job():
-    await jenkins.jobs.create(TEST_JOB_NAME, TEST_CONFIG_XML)
+    await jenkins.jobs.create(TEST_JOB_NAME, JOB_CONFIG_XML)
 
 
 @pytest.mark.asyncio
@@ -94,7 +64,7 @@ async def test_copy_job():
         await jenkins.jobs.delete(job_name_old)
         await jenkins.jobs.delete(job_name_new)
 
-    await jenkins.jobs.create(job_name_old, TEST_CONFIG_XML)
+    await jenkins.jobs.create(job_name_old, JOB_CONFIG_XML)
     available_jobs = await jenkins.jobs.get_all()
     assert job_name_old in available_jobs
 
@@ -117,7 +87,7 @@ async def test_rename_job():
         await jenkins.jobs.delete(job_name_old)
         await jenkins.jobs.delete(job_name_new)
 
-    await jenkins.jobs.create(job_name_old, TEST_CONFIG_XML)
+    await jenkins.jobs.create(job_name_old, JOB_CONFIG_XML)
     available_jobs = await jenkins.jobs.get_all()
     assert job_name_old in available_jobs
 

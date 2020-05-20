@@ -74,10 +74,12 @@ class Builds:
                 })
             }
 
+        params = {'delay': delay}
+
         await self.jenkins._request(
             'POST',
             f'/job/{name}/build',
-            params={'delay': delay},
+            params=params,
             data=data,
         )
 
