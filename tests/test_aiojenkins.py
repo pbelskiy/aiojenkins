@@ -43,8 +43,8 @@ async def test_get_status():
 async def test_tokens():
     version = await jenkins.get_version()
 
-    if version.major < 2 or version.minor < 129:
-        return
+    if not (version.major >= 2 and version.minor >= 129):
+        pytest.skip('Version isn`t support API tokens')
 
     token_name = test_tokens.__name__
     job_name = test_tokens.__name__

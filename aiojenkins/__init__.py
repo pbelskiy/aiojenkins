@@ -107,6 +107,13 @@ class Jenkins:
         return f'/me/descriptorByName/jenkins.security.ApiTokenProperty/{do}'
 
     async def generate_token(self, name: str) -> Tuple[str, str]:
+        """
+        Generate new API token.
+
+        Returns two values:
+        * tokenValue - uses for authorization
+        * tokenUuid - uses for revoke
+        """
         params = {'newTokenName': name}
 
         response = await self._request(
@@ -121,8 +128,11 @@ class Jenkins:
 
         return response['data']['tokenValue'], response['data']['tokenUuid']
 
-    async def revoke_token(self, token: str) -> None:
-        params = {'tokenUuid': token}
+    async def revoke_token(self, token_uuid: str) -> None:
+        """
+        Revoke API token, please note that uuid is used, not value.
+        """
+        params = {'tokenUuid': token_uuid}
 
         await self._request(
             'POST',
