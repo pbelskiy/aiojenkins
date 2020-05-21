@@ -1,9 +1,8 @@
-from typing import Tuple
-
 import urllib
-import aiohttp
 
-from typing import NamedTuple
+from typing import Tuple, NamedTuple
+
+import aiohttp
 
 from aiojenkins.exceptions import (
     JenkinsError,
@@ -101,6 +100,30 @@ class Jenkins:
         response = await self._request('GET', '/')
         header = response.headers.get('X-Jenkins')
         return JenkinsVersion(*map(int, header.split('.')))
+
+    async def quiet_down(self) -> None:
+        """
+        Start server quiet down period, new builds will not be started
+        """
+        await self._request('POST', '/quietDown')
+
+    async def cancel_quiet_down(self) -> None:
+        """
+        Cancel server quiet down period
+        """
+        await self._request('POST', '/cancelQuietDown')
+
+    async def restart(self) -> None:
+        """
+        Restart server immediately
+        """
+        await self._request('POST', '/restart')
+
+    async def safe_restart(self) -> None:
+        """
+        Restart server when installation is complete and no jobs are running
+        """
+        await self._request('POST', '/safeRestart')
 
     @staticmethod
     def _build_token_url(do: str) -> str:

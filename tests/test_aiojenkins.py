@@ -40,6 +40,24 @@ async def test_get_status():
 
 
 @pytest.mark.asyncio
+async def test_quiet_down():
+    await jenkins.quiet_down()
+    server_status = await jenkins.get_status()
+    assert server_status['quietingDown'] is True
+
+    await jenkins.cancel_quiet_down()
+    server_status = await jenkins.get_status()
+    assert server_status['quietingDown'] is False
+
+
+@pytest.mark.skip('takes too much time')
+@pytest.mark.asyncio
+async def test_restart():
+    await jenkins.restart()
+    await jenkins.safe_restart()
+
+
+@pytest.mark.asyncio
 async def test_tokens():
     version = await jenkins.get_version()
 

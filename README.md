@@ -14,10 +14,14 @@ The package is tested on below matrix:
 - CPython: 3.6, 3.7, 3.8
 - Jenkins LTS: 1.554, 2.60.3, latest
 
-Implemented API (27 endpoints):
+Implemented API (31 endpoints):
 - jenkins:
   - get_status
   - get_version
+  - quiet_down
+  - cancel_quiet_down
+  - restart
+  - safe_restart
   - generate_token
   - revoke_token
 - nodes:
