@@ -7,11 +7,9 @@ from aiojenkins.exceptions import (
 )
 
 from tests import (
+    generate_job_config,
     jenkins,
-    JOB_CONFIG_XML,
 )
-
-TEST_JOB_NAME = 'test_builds'
 
 
 @pytest.mark.asyncio
@@ -21,12 +19,14 @@ async def test_build_list():
     with contextlib.suppress(JenkinsNotFoundError):
         await jenkins.jobs.delete(job_name)
 
-    await jenkins.jobs.create(job_name, JOB_CONFIG_XML)
+    await jenkins.jobs.create(job_name, generate_job_config(['arg']))
 
     builds = await jenkins.builds.get_list(job_name)
     assert len(builds) == 0
 
     await jenkins.nodes.enable('master')
+
+    # NB: on Jenkins ~1.554 job without arguments has some internal delay
     await jenkins.builds.start(job_name, dict(arg=0))
 
     builds = await jenkins.builds.get_list(job_name)
@@ -39,37 +39,33 @@ async def test_build_list():
 
 
 @pytest.mark.asyncio
-async def test_build_start():
+async def test_build_machinery():
+    job_name = test_build_machinery.__name__
+
     await jenkins.nodes.enable('master')
 
     with contextlib.suppress(JenkinsNotFoundError):
-        await jenkins.jobs.delete(TEST_JOB_NAME)
+        await jenkins.jobs.delete(job_name)
 
-    await jenkins.jobs.create(TEST_JOB_NAME, JOB_CONFIG_XML)
+    job_config = generate_job_config(['arg'])
 
-    await jenkins.builds.start(TEST_JOB_NAME, dict(arg='test'))
-    info = await jenkins.jobs.get_info(TEST_JOB_NAME)
+    await jenkins.jobs.create(job_name, job_config)
+
+    await jenkins.builds.start(job_name, dict(arg='test'))
+    info = await jenkins.jobs.get_info(job_name)
     assert info['nextBuildNumber'] == 2
 
-    await jenkins.builds.start(TEST_JOB_NAME)
-
-    await jenkins.builds.start(TEST_JOB_NAME, delay=1)
+    # parameters must be passed
+    with pytest.raises(JenkinsError):
+        await jenkins.builds.start(job_name)
+        await jenkins.builds.start(job_name, delay=1)
 
     with pytest.raises(JenkinsError):
-        await jenkins.builds.start(TEST_JOB_NAME, dict(delay=0))
-        await jenkins.builds.start(TEST_JOB_NAME, dict(no_parameter='none'))
+        await jenkins.builds.start(job_name, dict(delay=0))
+        await jenkins.builds.start(job_name, dict(no_parameter='none'))
 
+    await jenkins.builds.stop(job_name, 1)
 
-@pytest.mark.asyncio
-async def test_build_stop():
-    await jenkins.builds.stop(TEST_JOB_NAME, 1)
+    await jenkins.builds.get_info(job_name, 1)
 
-
-@pytest.mark.asyncio
-async def test_get_build_info():
-    await jenkins.builds.get_info(TEST_JOB_NAME, 1)
-
-
-@pytest.mark.asyncio
-async def test_delete_build():
-    await jenkins.builds.delete(TEST_JOB_NAME, 1)
+    await jenkins.builds.delete(job_name, 1)

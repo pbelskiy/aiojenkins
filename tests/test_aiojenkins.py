@@ -4,10 +4,10 @@ import contextlib
 import pytest
 
 from tests import (
+    generate_job_config,
+    get_host,
+    get_login,
     jenkins,
-    JENKINS_HOST,
-    JENKINS_LOGIN,
-    JOB_CONFIG_XML,
 )
 
 from aiojenkins import Jenkins
@@ -16,7 +16,7 @@ from aiojenkins.exceptions import JenkinsError, JenkinsNotFoundError
 
 @pytest.mark.asyncio
 async def test_authentication_error():
-    jenkins = Jenkins(JENKINS_HOST, 'random-login', 'random-password')
+    jenkins = Jenkins(get_host(), 'random-login', 'random-password')
 
     with pytest.raises(JenkinsError):
         version = await jenkins.get_version()
@@ -74,10 +74,10 @@ async def test_tokens():
     with contextlib.suppress(JenkinsNotFoundError):
         await jenkins.jobs.delete(job_name)
 
-    await jenkins.jobs.create(job_name, JOB_CONFIG_XML)
+    await jenkins.jobs.create(job_name, generate_job_config())
 
     # instance without credentials
-    jenkins_tokened = Jenkins(JENKINS_HOST, JENKINS_LOGIN, token_value)
+    jenkins_tokened = Jenkins(get_host(), get_login(), token_value)
     await jenkins_tokened.builds.start(job_name)
 
     await jenkins.revoke_token(token_uuid)

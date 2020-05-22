@@ -7,8 +7,8 @@ from aiojenkins.exceptions import (
 )
 
 from tests import (
+    generate_job_config,
     jenkins,
-    JOB_CONFIG_XML,
 )
 
 
@@ -25,7 +25,7 @@ async def test_delete_job():
 
 @pytest.mark.asyncio
 async def test_create_job():
-    await jenkins.jobs.create(TEST_JOB_NAME, JOB_CONFIG_XML)
+    await jenkins.jobs.create(TEST_JOB_NAME, generate_job_config())
 
 
 @pytest.mark.asyncio
@@ -64,7 +64,7 @@ async def test_copy_job():
         await jenkins.jobs.delete(job_name_old)
         await jenkins.jobs.delete(job_name_new)
 
-    await jenkins.jobs.create(job_name_old, JOB_CONFIG_XML)
+    await jenkins.jobs.create(job_name_old, generate_job_config())
     available_jobs = await jenkins.jobs.get_all()
     assert job_name_old in available_jobs
 
@@ -87,7 +87,7 @@ async def test_rename_job():
         await jenkins.jobs.delete(job_name_old)
         await jenkins.jobs.delete(job_name_new)
 
-    await jenkins.jobs.create(job_name_old, JOB_CONFIG_XML)
+    await jenkins.jobs.create(job_name_old, generate_job_config())
     available_jobs = await jenkins.jobs.get_all()
     assert job_name_old in available_jobs
 

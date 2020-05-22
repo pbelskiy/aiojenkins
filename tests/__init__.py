@@ -1,42 +1,63 @@
 import os
 
+from xml.etree.ElementTree import Element, SubElement, tostring
+from xml.dom import minidom
+
 from aiojenkins import Jenkins
 
-JENKINS_HOST = os.environ.get('host', 'http://localhost:8080')
-JENKINS_LOGIN = os.environ.get('login', 'admin')
-JENKINS_PASSWORD = os.environ.get('password', 'admin')
 
-JOB_CONFIG_XML = """<?xml version='1.0' encoding='UTF-8'?>
-<project>
-  <actions/>
-  <description></description>
-  <keepDependencies>false</keepDependencies>
-  <properties>
-    <hudson.model.ParametersDefinitionProperty>
-      <parameterDefinitions>
-        <hudson.model.StringParameterDefinition>
-          <name>arg</name>
-          <description></description>
-          <defaultValue></defaultValue>
-        </hudson.model.StringParameterDefinition>
-      </parameterDefinitions>
-    </hudson.model.ParametersDefinitionProperty>
-  </properties>
-  <scm class="hudson.scm.NullSCM"/>
-  <canRoam>true</canRoam>
-  <disabled>false</disabled>
-  <blockBuildWhenDownstreamBuilding>false</blockBuildWhenDownstreamBuilding>
-  <blockBuildWhenUpstreamBuilding>false</blockBuildWhenUpstreamBuilding>
-  <triggers/>
-  <concurrentBuild>false</concurrentBuild>
-  <builders>
-    <hudson.tasks.Shell>
-      <command></command>
-    </hudson.tasks.Shell>
-  </builders>
-  <publishers/>
-  <buildWrappers/>
-</project>
-"""
+def get_host():
+    return os.environ.get('host', 'http://localhost:8080')
 
-jenkins = Jenkins(JENKINS_HOST, JENKINS_LOGIN, JENKINS_PASSWORD)
+
+def get_login():
+    return os.environ.get('login', 'admin')
+
+
+def get_password():
+    return os.environ.get('password', 'admin')
+
+
+# TODO: move it as builds submodule function?
+def generate_job_config(parameters: list = None) -> str:
+    root = Element('project')
+
+    SubElement(root, 'actions')
+    SubElement(root, 'description')
+    SubElement(root, 'keepDependencies').text = 'false'
+
+    # add parameters here
+    props = SubElement(root, 'properties')
+
+    if parameters:
+        props = SubElement(props, 'hudson.model.ParametersDefinitionProperty')
+        props = SubElement(props, 'parameterDefinitions')
+
+        for name in parameters:
+            new_p = SubElement(props, 'hudson.model.StringParameterDefinition')
+
+            SubElement(new_p, 'name').text = name
+            SubElement(new_p, 'description').text = ''
+            SubElement(new_p, 'defaultValue').text = ''
+
+    SubElement(root, 'scm', attrib={'class': 'hudson.scm.NullSCM'})
+    SubElement(root, 'canRoam').text = 'true'
+    SubElement(root, 'disabled').text = 'false'
+    SubElement(root, 'blockBuildWhenDownstreamBuilding').text = 'false'
+    SubElement(root, 'blockBuildWhenUpstreamBuilding').text = 'false'
+    SubElement(root, 'triggers')
+    SubElement(root, 'concurrentBuild').text = 'false'
+
+    # add commands here
+    builders = SubElement(root, 'builders')
+    shell = SubElement(builders, 'hudson.tasks.Shell')
+    SubElement(shell, 'command')
+    SubElement(root, 'publishers')
+    SubElement(root, 'buildWrappers')
+
+    rough_string = tostring(root, 'utf-8')
+    reparsed = minidom.parseString(rough_string)
+    return reparsed.toprettyxml(indent='  ')
+
+
+jenkins = Jenkins(get_host(), get_login(), get_password())

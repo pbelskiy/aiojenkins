@@ -1,5 +1,6 @@
 import urllib
 
+from http import HTTPStatus
 from typing import Tuple, NamedTuple
 
 import aiohttp
@@ -53,14 +54,22 @@ class Jenkins:
         except aiohttp.ClientError as e:
             raise JenkinsError from e
 
-        if response.status == 404:
+        if response.status == HTTPStatus.NOT_FOUND:
             raise JenkinsNotFoundError
 
-        if response.status in (401, 403, 500):
+        if response.status >= HTTPStatus.BAD_REQUEST:
             text = await response.text()
+
+            if response.status in (
+                    HTTPStatus.UNAUTHORIZED,
+                    HTTPStatus.FORBIDDEN,
+                    HTTPStatus.INTERNAL_SERVER_ERROR):
+                details = f'probably authentication problem:\n{text}'
+            else:
+                details = f'\n{text}'
+
             raise JenkinsError(
-                f'Request error [{response.status}], '
-                f'probably authentication problem:\n{text}',
+                f'Request error [{response.status}], {details}',
                 status=response.status,
             )
 
