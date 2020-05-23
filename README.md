@@ -14,43 +14,6 @@ The package is tested on below matrix:
 - CPython: 3.6, 3.7, 3.8
 - Jenkins LTS: 1.554, 2.60.3, latest
 
-Implemented API (31 endpoints):
-- jenkins:
-  - get_status
-  - get_version
-  - quiet_down
-  - cancel_quiet_down
-  - restart
-  - safe_restart
-  - generate_token
-  - revoke_token
-- nodes:
-  - get_list
-  - get_info
-  - is_exists
-  - create
-  - delete
-  - enable
-  - disable
-  - update_offline_reason
-- jobs:
-  - get_all
-  - get_info
-  - get_config
-  - create
-  - delete
-  - copy
-  - rename
-  - enable
-  - disable
-- builds:
-  - get_list
-  - get_info
-  - get_output
-  - start
-  - stop
-  - delete
-
 ## Installation
 
 ```sh
@@ -89,3 +52,44 @@ python3 -m pytest -v --cov=aiojenkins --cov-report=term --cov-report=html
 ## Contributing
 
 Feel free to PR :)
+
+
+### Implemented API
+
+- jenkins:
+  - get_status
+  - get_version
+  - quiet_down
+  - cancel_quiet_down
+  - restart
+  - safe_restart
+  - is_ready
+  - wait_until_ready
+  - generate_token
+  - revoke_token
+- nodes:
+  - get_list
+  - get_info
+  - is_exists
+  - create
+  - delete
+  - enable
+  - disable
+  - update_offline_reason
+- jobs:
+  - get_all
+  - get_info
+  - get_config
+  - create
+  - delete
+  - copy
+  - rename
+  - enable
+  - disable
+- builds:
+  - get_list
+  - get_info
+  - get_output
+  - start
+  - stop
+  - delete

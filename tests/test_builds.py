@@ -1,4 +1,7 @@
+import asyncio
 import contextlib
+import time
+
 import pytest
 
 from aiojenkins.exceptions import (
@@ -14,7 +17,7 @@ from tests import (
 
 @pytest.mark.asyncio
 async def test_build_list():
-    job_name = test_build_list.__name__
+    job_name = f'{test_build_list.__name__}_{time.time()}'
 
     with contextlib.suppress(JenkinsNotFoundError):
         await jenkins.jobs.delete(job_name)
@@ -25,22 +28,25 @@ async def test_build_list():
     assert len(builds) == 0
 
     await jenkins.nodes.enable('master')
-
-    # NB: on Jenkins ~1.554 job without arguments has some internal delay
     await jenkins.builds.start(job_name, dict(arg=0))
 
+    info = await jenkins.jobs.get_info(job_name)
     builds = await jenkins.builds.get_list(job_name)
-    assert len(builds) > 0
+    assert (info['inQueue'] is True or len(builds) > 0)
 
-    output = await jenkins.builds.get_output(job_name, builds[-1]['number'])
-    assert len(output) > 0
+    if not info['inQueue']:
+        last_build_id = builds[-1]['number']
+        output = await jenkins.builds.get_output(job_name, last_build_id)
+        assert len(output) > 0
 
     await jenkins.jobs.delete(job_name)
+    with pytest.raises(JenkinsNotFoundError):
+        await jenkins.jobs.get_info(job_name)
 
 
 @pytest.mark.asyncio
 async def test_build_machinery():
-    job_name = test_build_machinery.__name__
+    job_name = f'{test_build_machinery.__name__}_{time.time()}'
 
     await jenkins.nodes.enable('master')
 
@@ -52,6 +58,8 @@ async def test_build_machinery():
     await jenkins.jobs.create(job_name, job_config)
 
     await jenkins.builds.start(job_name, dict(arg='test'))
+    await asyncio.sleep(1)
+
     info = await jenkins.jobs.get_info(job_name)
     assert info['nextBuildNumber'] == 2
 
@@ -65,7 +73,9 @@ async def test_build_machinery():
         await jenkins.builds.start(job_name, dict(no_parameter='none'))
 
     await jenkins.builds.stop(job_name, 1)
-
     await jenkins.builds.get_info(job_name, 1)
-
     await jenkins.builds.delete(job_name, 1)
+
+    await jenkins.jobs.delete(job_name)
+    with pytest.raises(JenkinsNotFoundError):
+        await jenkins.jobs.get_info(job_name)

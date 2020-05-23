@@ -1,5 +1,6 @@
 #!/usr/bin/python3
 
+import asyncio
 import contextlib
 import pytest
 
@@ -7,6 +8,7 @@ from tests import (
     generate_job_config,
     get_host,
     get_login,
+    is_locally,
     jenkins,
 )
 
@@ -50,11 +52,20 @@ async def test_quiet_down():
     assert server_status['quietingDown'] is False
 
 
-@pytest.mark.skip('takes too much time')
 @pytest.mark.asyncio
 async def test_restart():
-    await jenkins.restart()
+    if is_locally():
+        pytest.skip('takes too much time +40 seconds')
+
     await jenkins.safe_restart()
+    await asyncio.sleep(5)
+
+    await jenkins.wait_until_ready()
+    assert (await jenkins.is_ready()) is True
+
+    await jenkins.restart()
+    await jenkins.wait_until_ready()
+    assert (await jenkins.is_ready()) is True
 
 
 @pytest.mark.asyncio
@@ -66,6 +77,8 @@ async def test_tokens():
 
     token_name = test_tokens.__name__
     job_name = test_tokens.__name__
+
+    token_value, token_uuid = await jenkins.generate_token('')
 
     token_value, token_uuid = await jenkins.generate_token(token_name)
 

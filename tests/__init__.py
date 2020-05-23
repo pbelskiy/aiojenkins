@@ -1,4 +1,5 @@
 import os
+import platform
 
 from xml.etree.ElementTree import Element, SubElement, tostring
 from xml.dom import minidom
@@ -16,6 +17,13 @@ def get_login():
 
 def get_password():
     return os.environ.get('password', 'admin')
+
+
+def is_locally():
+    """
+    For skipping some long tests locally, but not on completely CI
+    """
+    return (platform.system() == 'Darwin')
 
 
 # TODO: move it as builds submodule function?

@@ -1,3 +1,4 @@
+import asyncio
 import urllib
 
 from http import HTTPStatus
@@ -49,6 +50,7 @@ class Jenkins:
                 response = await session.request(
                     method,
                     urllib.parse.urljoin(self.host, path),
+                    allow_redirects=False,
                     **kwargs,
                 )
         except aiohttp.ClientError as e:
@@ -109,6 +111,23 @@ class Jenkins:
         response = await self._request('GET', '/')
         header = response.headers.get('X-Jenkins')
         return JenkinsVersion(*map(int, header.split('.')))
+
+    async def is_ready(self) -> bool:
+        """
+        Determines is server loaded and ready for work
+        """
+        try:
+            status = await self.get_status()
+            return ('mode' in status)
+        except JenkinsError:
+            return False
+
+    async def wait_until_ready(self, sleep_interval_sec: float = 1.0) -> None:
+        """
+        Blocks until server is completely loaded
+        """
+        while (await self.is_ready()) is False:
+            await asyncio.sleep(sleep_interval_sec)
 
     async def quiet_down(self) -> None:
         """
