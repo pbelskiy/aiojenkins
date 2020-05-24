@@ -9,10 +9,9 @@ from aiojenkins.exceptions import (
     JenkinsNotFoundError,
 )
 
-from tests import (
-    generate_job_config,
-    jenkins,
-)
+from aiojenkins.utils import construct_job_config
+
+from tests import jenkins
 
 
 @pytest.mark.asyncio
@@ -22,7 +21,11 @@ async def test_build_list():
     with contextlib.suppress(JenkinsNotFoundError):
         await jenkins.jobs.delete(job_name)
 
-    await jenkins.jobs.create(job_name, generate_job_config(['arg']))
+    await jenkins.jobs.create(
+        job_name, construct_job_config(
+            parameters=[dict(name='arg')]
+        )
+    )
 
     builds = await jenkins.builds.get_list(job_name)
     assert len(builds) == 0
@@ -53,7 +56,10 @@ async def test_build_machinery():
     with contextlib.suppress(JenkinsNotFoundError):
         await jenkins.jobs.delete(job_name)
 
-    job_config = generate_job_config(['arg'])
+    job_config = construct_job_config(
+        parameters=[dict(name='arg')],
+        commands=['echo 1', 'echo 2']
+    )
 
     await jenkins.jobs.create(job_name, job_config)
 

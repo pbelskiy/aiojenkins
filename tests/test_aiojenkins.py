@@ -5,7 +5,6 @@ import contextlib
 import pytest
 
 from tests import (
-    generate_job_config,
     get_host,
     get_login,
     is_locally,
@@ -87,7 +86,7 @@ async def test_tokens():
     with contextlib.suppress(JenkinsNotFoundError):
         await jenkins.jobs.delete(job_name)
 
-    await jenkins.jobs.create(job_name, generate_job_config())
+    await jenkins.jobs.create(job_name, jenkins.jobs.construct())
 
     # instance without credentials
     jenkins_tokened = Jenkins(get_host(), get_login(), token_value)

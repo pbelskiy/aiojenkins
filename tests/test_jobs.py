@@ -6,10 +6,9 @@ from aiojenkins.exceptions import (
     JenkinsNotFoundError,
 )
 
-from tests import (
-    generate_job_config,
-    jenkins,
-)
+from aiojenkins.utils import construct_job_config
+
+from tests import jenkins
 
 
 TEST_JOB_NAME = 'test'
@@ -25,7 +24,7 @@ async def test_delete_job():
 
 @pytest.mark.asyncio
 async def test_create_job():
-    await jenkins.jobs.create(TEST_JOB_NAME, generate_job_config())
+    await jenkins.jobs.create(TEST_JOB_NAME, construct_job_config())
 
 
 @pytest.mark.asyncio
@@ -64,7 +63,7 @@ async def test_copy_job():
         await jenkins.jobs.delete(job_name_old)
         await jenkins.jobs.delete(job_name_new)
 
-    await jenkins.jobs.create(job_name_old, generate_job_config())
+    await jenkins.jobs.create(job_name_old, construct_job_config())
     available_jobs = await jenkins.jobs.get_all()
     assert job_name_old in available_jobs
 
@@ -87,7 +86,7 @@ async def test_rename_job():
         await jenkins.jobs.delete(job_name_old)
         await jenkins.jobs.delete(job_name_new)
 
-    await jenkins.jobs.create(job_name_old, generate_job_config())
+    await jenkins.jobs.create(job_name_old, jenkins.jobs.construct())
     available_jobs = await jenkins.jobs.get_all()
     assert job_name_old in available_jobs
 
@@ -98,3 +97,7 @@ async def test_rename_job():
     assert job_name_old not in available_jobs
 
     await jenkins.jobs.delete(job_name_new)
+
+
+def test_construct_job_config():
+    assert len(construct_job_config()) > 0

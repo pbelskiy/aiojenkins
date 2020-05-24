@@ -1,3 +1,6 @@
+from aiojenkins.utils import construct_job_config
+
+
 class Jobs:
 
     def __init__(self, jenkins):
@@ -22,6 +25,12 @@ class Jobs:
         )
 
         return await response.json()
+
+    def construct(self, *args, **kwargs) -> str:
+        """
+        Jenkins job XML constructor
+        """
+        return construct_job_config(*args, **kwargs)
 
     async def get_config(self, name: str) -> str:
         response = await self.jenkins._request(
