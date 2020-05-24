@@ -8,7 +8,7 @@ from tests import jenkins
 
 @pytest.mark.asyncio
 async def test_get_nodes():
-    await jenkins.nodes.get_list()
+    await jenkins.nodes.get_all()
 
 
 @pytest.mark.asyncio
@@ -65,7 +65,7 @@ async def test_create_delete_node():
     with contextlib.suppress(JenkinsNotFoundError):
         await jenkins.nodes.delete(TEST_NODE_NAME)
 
-    nodes_list = await jenkins.nodes.get_list()
+    nodes_list = await jenkins.nodes.get_all()
     assert TEST_NODE_NAME not in nodes_list
 
     config = {
@@ -86,12 +86,12 @@ async def test_create_delete_node():
     }
 
     await jenkins.nodes.create(TEST_NODE_NAME, config)
-    nodes_list = await jenkins.nodes.get_list()
+    nodes_list = await jenkins.nodes.get_all()
     assert TEST_NODE_NAME in nodes_list
 
     with pytest.raises(JenkinsError):
         await jenkins.nodes.create(TEST_NODE_NAME, config)
 
     await jenkins.nodes.delete(TEST_NODE_NAME)
-    nodes_list = await jenkins.nodes.get_list()
+    nodes_list = await jenkins.nodes.get_all()
     assert TEST_NODE_NAME not in nodes_list

@@ -8,7 +8,7 @@ class Builds:
     def __init__(self, jenkins):
         self.jenkins = jenkins
 
-    async def get_list(self, name: str) -> list:
+    async def get_all(self, name: str) -> list:
         """
         Get list of builds for specified job name. Returned example:
 

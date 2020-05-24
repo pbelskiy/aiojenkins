@@ -18,7 +18,7 @@ class Nodes:
             return '(master)'
         return name
 
-    async def get_list(self) -> dict:
+    async def get_all(self) -> dict:
         """
         Get available nodes on server. Example dict result:
         {
@@ -53,7 +53,7 @@ class Nodes:
         return True
 
     async def create(self, name: str, config: dict) -> None:
-        if name in await self.get_list():
+        if name in await self.get_all():
             raise JenkinsError(f'Node `{name}` is already exists')
 
         if 'type' not in config:

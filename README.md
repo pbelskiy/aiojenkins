@@ -33,8 +33,7 @@ async def example():
 
 asyncio.run(example())
 ```
-
-__Please look at tests directory for more examples.__
+[__Please look at tests directory for more examples.__](https://github.com/pbelskiy/aiojenkins/tree/master/tests)
 
 ## Testing
 
@@ -56,40 +55,45 @@ Feel free to PR :)
 
 ### Implemented API
 
-- jenkins:
-  - get_status
-  - get_version
-  - quiet_down
-  - cancel_quiet_down
-  - restart
-  - safe_restart
-  - is_ready
-  - wait_until_ready
-  - generate_token
-  - revoke_token
-- nodes:
-  - get_list
-  - get_info
-  - is_exists
-  - create
-  - delete
-  - enable
-  - disable
-  - update_offline_reason
-- jobs:
-  - get_all
-  - get_info
-  - get_config
-  - create
-  - delete
-  - copy
-  - rename
-  - enable
-  - disable
-- builds:
-  - get_list
-  - get_info
-  - get_output
-  - start
-  - stop
-  - delete
+- jenkins
+  - get_status() -> dict
+  - get_version() -> JenkinsVersion
+  - is_ready() -> bool
+  - wait_until_ready()
+  - quiet_down()
+  - cancel_quiet_down()
+  - restart()
+  - safe_restart()
+  - generate_token(name: str) -> Tuple[str, str]
+  - revoke_token(token_uuid: str)
+  - nodes
+    - get_all() -> dict
+    - get_info(name: str) -> dict
+    - is_exists(name: str) -> bool
+    - create(name: str, config: dict)
+    - delete(name: str)
+    - enable(name: str)
+    - disable(name: str, message: str = '')
+    - update_offline_reason(name: str, message: str)
+  - jobs
+    - get_all() -> dict
+    - get_info(name: str) -> dict
+    - construct(description: str = None,
+                parameters: List[dict] = None,
+                commands: List[str] = None) -> str:
+    - get_config(name: str) -> str
+    - create(name: str, config: str)
+    - delete(name: str)
+    - copy(name: str, new_name: str)
+    - rename(name: str, new_name: str)
+    - enable(name: str)
+    - disable(name: str)
+  - builds
+    - get_all(name: str) -> list
+    - get_info(name: str, build_id: int) -> dict
+    - get_output(name: str, build_id: int) -> str
+    - start(name: str,
+            parameters: dict = None,
+            delay: int = 0)
+    - stop(name: str, build_id: int)
+    - delete(name: str, build_id: int)

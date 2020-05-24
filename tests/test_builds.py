@@ -27,14 +27,14 @@ async def test_build_list():
         )
     )
 
-    builds = await jenkins.builds.get_list(job_name)
+    builds = await jenkins.builds.get_all(job_name)
     assert len(builds) == 0
 
     await jenkins.nodes.enable('master')
     await jenkins.builds.start(job_name, dict(arg=0))
 
     info = await jenkins.jobs.get_info(job_name)
-    builds = await jenkins.builds.get_list(job_name)
+    builds = await jenkins.builds.get_all(job_name)
     assert (info['inQueue'] is True or len(builds) > 0)
 
     if not info['inQueue']:
