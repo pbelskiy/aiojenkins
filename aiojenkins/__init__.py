@@ -24,11 +24,13 @@ class JenkinsVersion(NamedTuple):
 
 class Jenkins:
 
+    _session = None
+    _loop = None
+
     def __init__(self, host, login=None, password=None):
         self.host = host
         self.auth = None
         self.crumb = None
-        self.cookies = None
 
         if login and password:
             self.auth = aiohttp.BasicAuth(login, password)
@@ -36,6 +38,27 @@ class Jenkins:
         self._nodes = Nodes(self)
         self._jobs = Jobs(self)
         self._builds = Builds(self)
+
+    async def _get_client_session(self):
+        curr_loop = asyncio.get_running_loop()
+
+        if self._loop and self._session and self._loop != curr_loop:
+            await self._session.close()
+            self._session = None
+
+        if not self._session:
+            self._session = aiohttp.ClientSession()
+            self._loop = curr_loop
+
+        return self._session
+
+    @staticmethod
+    async def closer(session):
+        if session:
+            await session.close()
+
+    def __del__(self):
+        asyncio.get_event_loop().run_until_complete(self.closer(self._session))
 
     async def _http_request(self, method: str, path: str, **kwargs):
         if self.auth and not kwargs.get('auth'):
@@ -45,14 +68,14 @@ class Jenkins:
             kwargs.setdefault('headers', {})
             kwargs['headers'].update(self.crumb)
 
+        session = await self._get_client_session()
         try:
-            async with aiohttp.ClientSession(cookies=self.cookies) as session:
-                response = await session.request(
-                    method,
-                    urllib.parse.urljoin(self.host, path),
-                    allow_redirects=False,
-                    **kwargs,
-                )
+            response = await session.request(
+                method,
+                urllib.parse.urljoin(self.host, path),
+                allow_redirects=False,
+                **kwargs,
+            )
         except aiohttp.ClientError as e:
             raise JenkinsError from e
 
@@ -74,9 +97,6 @@ class Jenkins:
                 f'Request error [{response.status}], {details}',
                 status=response.status,
             )
-
-        if response.cookies:
-            self.cookies = response.cookies
 
         return response
 
