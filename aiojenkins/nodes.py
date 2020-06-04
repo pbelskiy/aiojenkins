@@ -52,6 +52,18 @@ class Nodes:
             return False
         return True
 
+    async def get_config(self, name: str) -> str:
+        """
+        Return node config in XML format
+        """
+        name = self._normalize_name(name)
+        response = await self.jenkins._request(
+            'GET',
+            f'/computer/{name}/config.xml'
+        )
+
+        return await response.text()
+
     async def create(self, name: str, config: dict) -> None:
         if name in await self.get_all():
             raise JenkinsError(f'Node `{name}` is already exists')

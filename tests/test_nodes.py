@@ -6,6 +6,26 @@ from aiojenkins.exceptions import JenkinsError, JenkinsNotFoundError
 from tests import jenkins
 
 
+# TODO: move to utils as job config constructor
+def construct_node_config(name: str) -> dict:
+    return {
+        'name': name,
+        'nodeDescription': '',
+        'numExecutors': 10,
+        'remoteFS': '',
+        'labelString': '',
+        'launcher': {
+            'stapler-class': 'hudson.slaves.JNLPLauncher',
+        },
+        'retentionStrategy': {
+            'stapler-class': 'hudson.slaves.RetentionStrategy$Always',
+        },
+        'nodeProperties': {
+            'stapler-class-bag': 'true'
+        }
+    }
+
+
 @pytest.mark.asyncio
 async def test_get_nodes():
     await jenkins.nodes.get_all()
@@ -59,8 +79,29 @@ async def test_update_node_offline_reason():
 
 
 @pytest.mark.asyncio
+async def test_get_node_config():
+    TEST_NODE_NAME = test_get_node_config.__name__
+
+    with contextlib.suppress(JenkinsNotFoundError):
+        await jenkins.nodes.delete(TEST_NODE_NAME)
+
+    with pytest.raises(JenkinsNotFoundError):
+        await jenkins.nodes.get_config(TEST_NODE_NAME)
+
+    config = construct_node_config(TEST_NODE_NAME)
+    await jenkins.nodes.create(TEST_NODE_NAME, config)
+
+    nodes_list = await jenkins.nodes.get_all()
+    assert TEST_NODE_NAME in nodes_list
+
+    # FIXME: timeout error only on github actions
+    # received_config = await jenkins.nodes.get_config(TEST_NODE_NAME)
+    # assert len(received_config) > 0
+
+
+@pytest.mark.asyncio
 async def test_create_delete_node():
-    TEST_NODE_NAME = 'test_node'
+    TEST_NODE_NAME = test_create_delete_node.__name__
 
     with contextlib.suppress(JenkinsNotFoundError):
         await jenkins.nodes.delete(TEST_NODE_NAME)
@@ -68,23 +109,7 @@ async def test_create_delete_node():
     nodes_list = await jenkins.nodes.get_all()
     assert TEST_NODE_NAME not in nodes_list
 
-    config = {
-        'name': TEST_NODE_NAME,
-        'nodeDescription': '',
-        'numExecutors': 10,
-        'remoteFS': '',
-        'labelString': '',
-        'launcher': {
-            'stapler-class': 'hudson.slaves.JNLPLauncher',
-        },
-        'retentionStrategy': {
-            'stapler-class': 'hudson.slaves.RetentionStrategy$Always',
-        },
-        'nodeProperties': {
-            'stapler-class-bag': 'true'
-        }
-    }
-
+    config = construct_node_config(TEST_NODE_NAME)
     await jenkins.nodes.create(TEST_NODE_NAME, config)
     nodes_list = await jenkins.nodes.get_all()
     assert TEST_NODE_NAME in nodes_list
