@@ -70,6 +70,8 @@ Feel free to PR :)
     - get_all() -> dict
     - get_info(name: str) -> dict
     - is_exists(name: str) -> bool
+    - get_failed_builds(self, name: str) -> List[dict]
+    - get_all_builds(self, name: str) -> List[dict]
     - get_config(name: str) -> str
     - create(name: str, config: dict)
     - delete(name: str)

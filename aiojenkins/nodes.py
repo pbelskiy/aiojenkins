@@ -1,9 +1,32 @@
 import json
+import re
+import xml.etree.ElementTree
+
+from typing import List
 
 from aiojenkins.exceptions import (
     JenkinsError,
     JenkinsNotFoundError,
 )
+
+
+def _parse_rss(rss):
+    builds = []
+    re_link = re.compile(r'/job/(?P<job_name>[^/]+)/(?P<build_number>\d+)')
+    ns = {'atom': 'http://www.w3.org/2005/Atom'}
+
+    root = xml.etree.ElementTree.fromstring(rss)
+    for entry in root.findall('atom:entry', ns):
+        url = entry.find('atom:link', ns).attrib['href']
+        group = re_link.search(url)
+
+        builds.append({
+            'url': url,
+            'job_name': group['job_name'],
+            'number': int(group['build_number']),
+        })
+
+    return list(reversed(builds))
 
 
 class Nodes:
@@ -51,6 +74,42 @@ class Nodes:
         except JenkinsNotFoundError:
             return False
         return True
+
+    async def get_failed_builds(self, name: str) -> List[dict]:
+        """
+        Return list of detalizied failed builds for node name, actually it
+        parsed from RSS feed. usefull for build restart. Ascending builds sort.
+
+        Example: [{
+          'job_name': 'test',
+          'number': 1,
+          'url': 'http://localhost:8080/job/test/1/'
+        }]
+        """
+        name = self._normalize_name(name)
+        response = await self.jenkins._request(
+            'GET',
+            f'/computer/{name}/rssFailed',
+        )
+        return _parse_rss(await response.text())
+
+    async def get_all_builds(self, name: str) -> List[dict]:
+        """
+        Return list of all detalizied builds for node name, actually it parsed
+        from RSS feed. Ascending builds sort.
+
+        Example: [{
+          'job_name': 'test',
+          'number': 1,
+          'url': 'http://localhost:8080/job/test/1/'
+        }]
+        """
+        name = self._normalize_name(name)
+        response = await self.jenkins._request(
+            'GET',
+            f'/computer/{name}/rssAll',
+        )
+        return _parse_rss(await response.text())
 
     async def get_config(self, name: str) -> str:
         """
