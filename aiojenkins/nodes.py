@@ -9,6 +9,8 @@ from aiojenkins.exceptions import (
     JenkinsNotFoundError,
 )
 
+from aiojenkins.utils import construct_node_config
+
 
 def _parse_rss(rss):
     builds = []
@@ -64,6 +66,12 @@ class Nodes:
             f'/computer/{name}/api/json',
         )
         return await response.json()
+
+    def construct(self, **kwargs):
+        """
+        Jenkins node constructor, returns dict to be passed to create method.
+        """
+        return construct_node_config(**kwargs)
 
     async def is_exists(self, name: str) -> bool:
         if name == '':

@@ -81,3 +81,33 @@ def construct_job_config(*, description: str = None,
     rough_string = tostring(root, 'utf-8')
     reparsed = minidom.parseString(rough_string)
     return reparsed.toprettyxml(indent='  ')
+
+
+def construct_node_config(*, name: str,
+                          remote_fs: str = '/tmp',
+                          executors: int = 2) -> dict:
+    """
+    Args:
+        - name: Node name
+        - remote_fs: Remote node root directory
+        - executors: Number of node executors
+
+    Returns:
+        - dict: return ready to use dict with nodes.create()
+    """
+    return {
+        'name': name,
+        'nodeDescription': '',
+        'numExecutors': executors,
+        'remoteFS': remote_fs,
+        'labelString': '',
+        'launcher': {
+            'stapler-class': 'hudson.slaves.JNLPLauncher',
+        },
+        'retentionStrategy': {
+            'stapler-class': 'hudson.slaves.RetentionStrategy$Always',
+        },
+        'nodeProperties': {
+            'stapler-class-bag': 'true'
+        }
+    }

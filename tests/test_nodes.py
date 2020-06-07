@@ -4,29 +4,17 @@ import time
 
 import pytest
 
-from aiojenkins.exceptions import JenkinsError, JenkinsNotFoundError
-from aiojenkins.utils import construct_job_config
+from aiojenkins.exceptions import (
+    JenkinsError,
+    JenkinsNotFoundError,
+)
+
+from aiojenkins.utils import (
+    construct_job_config,
+    construct_node_config,
+)
+
 from tests import jenkins
-
-
-# TODO: move to utils as job config constructor
-def construct_node_config(name: str) -> dict:
-    return {
-        'name': name,
-        'nodeDescription': '',
-        'numExecutors': 10,
-        'remoteFS': '',
-        'labelString': '',
-        'launcher': {
-            'stapler-class': 'hudson.slaves.JNLPLauncher',
-        },
-        'retentionStrategy': {
-            'stapler-class': 'hudson.slaves.RetentionStrategy$Always',
-        },
-        'nodeProperties': {
-            'stapler-class-bag': 'true'
-        }
-    }
 
 
 @pytest.mark.asyncio
@@ -91,7 +79,7 @@ async def test_get_node_config():
     with pytest.raises(JenkinsNotFoundError):
         await jenkins.nodes.get_config(TEST_NODE_NAME)
 
-    config = construct_node_config(TEST_NODE_NAME)
+    config = jenkins.nodes.construct(name=TEST_NODE_NAME)
     await jenkins.nodes.create(TEST_NODE_NAME, config)
 
     nodes_list = await jenkins.nodes.get_all()
@@ -112,7 +100,7 @@ async def test_create_delete_node():
     nodes_list = await jenkins.nodes.get_all()
     assert TEST_NODE_NAME not in nodes_list
 
-    config = construct_node_config(TEST_NODE_NAME)
+    config = construct_node_config(name=TEST_NODE_NAME)
     await jenkins.nodes.create(TEST_NODE_NAME, config)
     nodes_list = await jenkins.nodes.get_all()
     assert TEST_NODE_NAME in nodes_list

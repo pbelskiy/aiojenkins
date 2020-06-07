@@ -69,6 +69,9 @@ Feel free to PR :)
   - nodes
     - get_all() -> dict
     - get_info(name: str) -> dict
+    - construct(name: str,
+                remote_fs: str = '/tmp',
+                executors: int = 2) -> dict
     - is_exists(name: str) -> bool
     - get_failed_builds(self, name: str) -> List[dict]
     - get_all_builds(self, name: str) -> List[dict]

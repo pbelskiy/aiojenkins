@@ -26,11 +26,11 @@ class Jobs:
 
         return await response.json()
 
-    def construct(self, *args, **kwargs) -> str:
+    def construct(self, **kwargs) -> str:
         """
         Jenkins job XML constructor
         """
-        return construct_job_config(*args, **kwargs)
+        return construct_job_config(**kwargs)
 
     async def get_config(self, name: str) -> str:
         response = await self.jenkins._request(
