@@ -1,3 +1,4 @@
+from aiojenkins.exceptions import JenkinsNotFoundError
 from aiojenkins.utils import construct_job_config
 
 
@@ -26,12 +27,6 @@ class Jobs:
 
         return await response.json()
 
-    def construct(self, **kwargs) -> str:
-        """
-        Jenkins job XML constructor
-        """
-        return construct_job_config(**kwargs)
-
     async def get_config(self, name: str) -> str:
         response = await self.jenkins._request(
             'GET',
@@ -39,6 +34,20 @@ class Jobs:
         )
 
         return await response.text()
+
+    async def is_exists(self, name: str) -> bool:
+        try:
+            await self.get_info(name)
+        except JenkinsNotFoundError:
+            return False
+        else:
+            return True
+
+    def construct(self, **kwargs) -> str:
+        """
+        Jenkins job XML constructor
+        """
+        return construct_job_config(**kwargs)
 
     async def create(self, name: str, config: str) -> None:
         headers = {'Content-Type': 'text/xml'}

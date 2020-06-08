@@ -69,13 +69,13 @@ Feel free to PR :)
   - nodes
     - get_all() -> dict
     - get_info(name: str) -> dict
-    - construct(name: str,
-                remote_fs: str = '/tmp',
-                executors: int = 2) -> dict
-    - is_exists(name: str) -> bool
     - get_failed_builds(self, name: str) -> List[dict]
     - get_all_builds(self, name: str) -> List[dict]
     - get_config(name: str) -> str
+    - is_exists(name: str) -> bool
+    - construct(name: str,
+                remote_fs: str = '/tmp',
+                executors: int = 2) -> dict
     - create(name: str, config: dict)
     - delete(name: str)
     - enable(name: str)
@@ -84,10 +84,11 @@ Feel free to PR :)
   - jobs
     - get_all() -> dict
     - get_info(name: str) -> dict
+    - get_config(name: str) -> str
+    - is_exists(name: str) -> bool
     - construct(description: str = None,
                 parameters: List[dict] = None,
                 commands: List[str] = None) -> str:
-    - get_config(name: str) -> str
     - create(name: str, config: str)
     - delete(name: str)
     - copy(name: str, new_name: str)
@@ -98,6 +99,7 @@ Feel free to PR :)
     - get_all(name: str) -> list
     - get_info(name: str, build_id: int) -> dict
     - get_output(name: str, build_id: int) -> str
+    - is_exists(name: str, build_id: int) -> bool
     - start(name: str,
             parameters: dict = None,
             delay: int = 0)

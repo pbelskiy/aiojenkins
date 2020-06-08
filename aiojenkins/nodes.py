@@ -67,22 +67,6 @@ class Nodes:
         )
         return await response.json()
 
-    def construct(self, **kwargs):
-        """
-        Jenkins node constructor, returns dict to be passed to create method.
-        """
-        return construct_node_config(**kwargs)
-
-    async def is_exists(self, name: str) -> bool:
-        if name == '':
-            return False
-
-        try:
-            await self.get_info(name)
-        except JenkinsNotFoundError:
-            return False
-        return True
-
     async def get_failed_builds(self, name: str) -> List[dict]:
         """
         Return list of detalizied failed builds for node name, actually it
@@ -130,6 +114,22 @@ class Nodes:
         )
 
         return await response.text()
+
+    async def is_exists(self, name: str) -> bool:
+        if name == '':
+            return False
+
+        try:
+            await self.get_info(name)
+        except JenkinsNotFoundError:
+            return False
+        return True
+
+    def construct(self, **kwargs):
+        """
+        Jenkins node constructor, returns dict to be passed to create method.
+        """
+        return construct_node_config(**kwargs)
 
     async def create(self, name: str, config: dict) -> None:
         if name in await self.get_all():

@@ -1,6 +1,7 @@
 import json
-
 from typing import Any
+
+from aiojenkins.exceptions import JenkinsNotFoundError
 
 
 class Builds:
@@ -45,6 +46,14 @@ class Builds:
         )
 
         return await response.text()
+
+    async def is_exists(self, name: str, build_id: int) -> bool:
+        try:
+            await self.get_info(name, build_id)
+        except JenkinsNotFoundError:
+            return False
+        else:
+            return True
 
     async def start(self,
                     name: str,

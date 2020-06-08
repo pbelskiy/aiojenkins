@@ -85,3 +85,8 @@ async def test_build_machinery():
     await jenkins.jobs.delete(job_name)
     with pytest.raises(JenkinsNotFoundError):
         await jenkins.jobs.get_info(job_name)
+
+
+@pytest.mark.asyncio
+async def test_build_exists():
+    assert (await jenkins.builds.is_exists('test', -1)) is False

@@ -1,5 +1,6 @@
 import contextlib
 import pytest
+import time
 
 from aiojenkins.exceptions import (
     JenkinsError,
@@ -101,3 +102,17 @@ async def test_rename_job():
 
 def test_construct_job_config():
     assert len(construct_job_config()) > 0
+
+
+@pytest.mark.asyncio
+async def test_job_exists():
+    job_name = f'{test_job_exists.__name__}_{time.time()}'
+
+    with contextlib.suppress(JenkinsError):
+        await jenkins.jobs.delete(job_name)
+
+    assert (await jenkins.jobs.is_exists(job_name)) is False
+    await jenkins.jobs.create(job_name, jenkins.jobs.construct())
+    assert (await jenkins.jobs.is_exists(job_name)) is True
+
+    await jenkins.jobs.delete(job_name)
