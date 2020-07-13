@@ -1,5 +1,4 @@
 import asyncio
-import urllib
 
 from http import HTTPStatus
 from typing import Tuple, NamedTuple
@@ -25,7 +24,7 @@ class JenkinsVersion(NamedTuple):
 class Jenkins:
 
     def __init__(self, host, login=None, password=None):
-        self.host = host
+        self.host = host.rstrip('/')
         self.auth = None
         self.crumb = None
         self.cookies = None
@@ -49,7 +48,7 @@ class Jenkins:
             async with aiohttp.ClientSession(cookies=self.cookies) as session:
                 response = await session.request(
                     method,
-                    urllib.parse.urljoin(self.host, path),
+                    f'{self.host}/{path}',
                     allow_redirects=False,
                     **kwargs,
                 )
