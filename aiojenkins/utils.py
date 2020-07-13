@@ -1,7 +1,6 @@
-from xml.etree.ElementTree import Element, SubElement, tostring
-from xml.dom import minidom
-
 from typing import List
+from xml.dom import minidom
+from xml.etree.ElementTree import Element, SubElement, tostring
 
 
 def _construct_commands_block(parent, commands: List[str]) -> None:

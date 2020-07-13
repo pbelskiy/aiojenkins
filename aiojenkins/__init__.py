@@ -1,16 +1,12 @@
 import asyncio
 
 from http import HTTPStatus
-from typing import Tuple, NamedTuple
+from typing import NamedTuple, Tuple
 
 import aiohttp
 
-from aiojenkins.exceptions import (
-    JenkinsError,
-    JenkinsNotFoundError,
-)
-
 from aiojenkins.builds import Builds
+from aiojenkins.exceptions import JenkinsError, JenkinsNotFoundError
 from aiojenkins.jobs import Jobs
 from aiojenkins.nodes import Nodes
 

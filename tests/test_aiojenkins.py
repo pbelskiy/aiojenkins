@@ -2,17 +2,12 @@
 
 import asyncio
 import contextlib
-import pytest
 
-from tests import (
-    get_host,
-    get_login,
-    is_locally,
-    jenkins,
-)
+import pytest
 
 from aiojenkins import Jenkins
 from aiojenkins.exceptions import JenkinsError, JenkinsNotFoundError
+from tests import get_host, get_login, is_locally, jenkins
 
 
 @pytest.mark.asyncio

@@ -4,11 +4,7 @@ import xml.etree.ElementTree
 
 from typing import List
 
-from aiojenkins.exceptions import (
-    JenkinsError,
-    JenkinsNotFoundError,
-)
-
+from aiojenkins.exceptions import JenkinsError, JenkinsNotFoundError
 from aiojenkins.utils import construct_node_config
 
 

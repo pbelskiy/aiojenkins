@@ -40,7 +40,7 @@ jobs:
 
     - name: Check import sorting
       run: |
-        isort --check-only .
+        isort --diff --check-only .
 
     - name: Get Jenkins initial password
       run: |

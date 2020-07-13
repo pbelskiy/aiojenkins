@@ -1,16 +1,11 @@
 import contextlib
-import pytest
 import time
 
-from aiojenkins.exceptions import (
-    JenkinsError,
-    JenkinsNotFoundError,
-)
+import pytest
 
+from aiojenkins.exceptions import JenkinsError, JenkinsNotFoundError
 from aiojenkins.utils import construct_job_config
-
 from tests import jenkins
-
 
 TEST_JOB_NAME = 'test'
 
