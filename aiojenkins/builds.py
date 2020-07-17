@@ -56,11 +56,19 @@ class Builds:
         else:
             return True
 
+    async def get_queue_id_info(self, queue_id: int) -> dict:
+        response = await self.jenkins._request(
+            'GET',
+            f'/queue/item/{queue_id}/api/json'
+        )
+
+        return await response.json()
+
     async def start(self,
                     name: str,
                     parameters: dict = None,
                     delay: int = 0
-                    ) -> None:
+                    ) -> int:
         """
         Enqueue new build with delay (default is 0 seconds, means immediately)
 
@@ -86,12 +94,16 @@ class Builds:
 
         params = {'delay': delay}
 
-        await self.jenkins._request(
+        response = await self.jenkins._request(
             'POST',
             f'/job/{name}/build',
             params=params,
             data=data,
         )
+
+        queue_item_url = response.headers['location']
+        queue_id = queue_item_url.rstrip('/').split('/')[-1]
+        return int(queue_id)
 
     async def stop(self, name: str, build_id: int) -> None:
         await self.jenkins._request(

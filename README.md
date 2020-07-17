@@ -100,8 +100,9 @@ Feel free to PR :)
     - get_info(name: str, build_id: int) -> dict
     - get_output(name: str, build_id: int) -> str
     - is_exists(name: str, build_id: int) -> bool
+    - get_queue_id_info(self, queue_id: int) -> dict
     - start(name: str,
             parameters: dict = None,
-            delay: int = 0)
+            delay: int = 0) -> int
     - stop(name: str, build_id: int)
     - delete(name: str, build_id: int)

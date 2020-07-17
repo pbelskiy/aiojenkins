@@ -85,3 +85,19 @@ async def test_build_machinery():
 @pytest.mark.asyncio
 async def test_build_exists():
     assert (await jenkins.builds.is_exists('test', -1)) is False
+
+
+@pytest.mark.asyncio
+async def test_build_queue_id():
+    job_name = f'{test_build_queue_id.__name__}_{time.time()}'
+
+    await jenkins.jobs.create(job_name, construct_job_config())
+
+    try:
+        queue_id = await jenkins.builds.start(job_name)
+        assert queue_id >= 0
+
+        queue_id_info = await jenkins.builds.get_queue_id_info(queue_id)
+        assert isinstance(queue_id_info, dict) is True
+    finally:
+        await jenkins.jobs.delete(job_name)
