@@ -69,10 +69,6 @@ async def test_build_machinery():
         await jenkins.builds.start(job_name)
         await jenkins.builds.start(job_name, delay=1)
 
-    with pytest.raises(JenkinsError):
-        await jenkins.builds.start(job_name, dict(delay=0))
-        await jenkins.builds.start(job_name, dict(no_parameter='none'))
-
     await jenkins.builds.stop(job_name, 1)
     await jenkins.builds.get_info(job_name, 1)
     await jenkins.builds.delete(job_name, 1)
@@ -89,13 +85,18 @@ async def test_build_exists():
 
 @pytest.mark.asyncio
 async def test_build_queue_id():
+    version = await jenkins.get_version()
+    # was introduced  default admin with password
+    if version.major < 2:
+        pytest.skip('there is problem, probably queue id was not implemented')
+
     job_name = f'{test_build_queue_id.__name__}_{time.time()}'
 
     await jenkins.jobs.create(job_name, construct_job_config())
 
     try:
         queue_id = await jenkins.builds.start(job_name)
-        assert queue_id >= 0
+        assert queue_id > 0
 
         queue_id_info = await jenkins.builds.get_queue_id_info(queue_id)
         assert isinstance(queue_id_info, dict) is True

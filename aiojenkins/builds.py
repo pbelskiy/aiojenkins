@@ -1,6 +1,6 @@
 import json
 
-from typing import Any
+from typing import Any, Optional
 
 from aiojenkins.exceptions import JenkinsNotFoundError
 
@@ -68,7 +68,7 @@ class Builds:
                     name: str,
                     parameters: dict = None,
                     delay: int = 0
-                    ) -> int:
+                    ) -> Optional[int]:
         """
         Enqueue new build with delay (default is 0 seconds, means immediately)
 
@@ -76,7 +76,10 @@ class Builds:
         https://www.jenkins.io/blog/2010/08/11/quiet-period-feature/
         """
         data = None
+
         if parameters:
+            path = f'/job/{name}/buildWithParameters'
+
             formatted_parameters: Any = [
                 {'name': k, 'value': str(v)} for k, v in parameters.items()
             ]
@@ -91,19 +94,23 @@ class Builds:
                     'redirectTo': '.',
                 })
             }
-
-        params = {'delay': delay}
+        else:
+            path = f'/job/{name}/build'
 
         response = await self.jenkins._request(
             'POST',
-            f'/job/{name}/build',
-            params=params,
+            path,
+            params={'delay': delay},
             data=data,
         )
 
+        # FIXME: on Jenkins 1.554 there is problem, no queue id returned
         queue_item_url = response.headers['location']
-        queue_id = queue_item_url.rstrip('/').split('/')[-1]
-        return int(queue_id)
+        try:
+            queue_id = queue_item_url.rstrip('/').split('/')[-1]
+            return int(queue_id)
+        except ValueError:
+            return None
 
     async def stop(self, name: str, build_id: int) -> None:
         await self.jenkins._request(
