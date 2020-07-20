@@ -44,7 +44,7 @@ class Jenkins:
             async with aiohttp.ClientSession(cookies=self.cookies) as session:
                 response = await session.request(
                     method,
-                    f'{self.host}/{path}',
+                    f'{self.host}{path}',
                     allow_redirects=False,
                     **kwargs,
                 )
