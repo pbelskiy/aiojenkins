@@ -2,8 +2,8 @@ import json
 
 from typing import Any, Optional
 
-from aiojenkins.exceptions import JenkinsError, JenkinsNotFoundError
-from aiojenkins.utils import JOB_BUILD_URL_RE
+from aiojenkins.exceptions import JenkinsNotFoundError
+from aiojenkins.utils import parse_build_url
 
 
 class Builds:
@@ -38,15 +38,12 @@ class Builds:
 
         return await response.json()
 
-    async def get_url_info(self, url: str) -> dict:
+    async def get_url_info(self, build_url: str) -> dict:
         """
         Extract job name and build number from url and return info
         """
-        r = JOB_BUILD_URL_RE.search(url)
-        if not r:
-            raise JenkinsError(f'Invalid URL: {url}')
-
-        return await self.get_info(r['job_name'], int(r['build_number']))
+        job_name, build_id = parse_build_url(build_url)
+        return await self.get_info(job_name, build_id)
 
     async def get_output(self, name: str, build_id: int) -> str:
         """

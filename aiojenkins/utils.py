@@ -1,8 +1,10 @@
 import re
 
-from typing import List
+from typing import List, Tuple
 from xml.dom import minidom
 from xml.etree.ElementTree import Element, SubElement, tostring
+
+from aiojenkins.exceptions import JenkinsError
 
 JOB_BUILD_URL_RE = re.compile(
     r'/job/(?P<job_name>[^/]+)/(?P<build_number>\d+)'
@@ -116,3 +118,14 @@ def construct_node_config(*, name: str,
             'stapler-class-bag': 'true'
         }
     }
+
+
+def parse_build_url(build_url) -> Tuple[str, int]:
+    """
+    Extract job name and build number from build url
+    """
+    group = JOB_BUILD_URL_RE.search(build_url)
+    if not group:
+        raise JenkinsError(f'Invalid URL: {build_url}')
+
+    return group['job_name'], int(group['build_number'])

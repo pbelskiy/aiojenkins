@@ -107,3 +107,11 @@ Feel free to PR :)
             delay: int = 0) -> int
     - stop(name: str, build_id: int)
     - delete(name: str, build_id: int)
+- jenkins.utils
+  - construct_job_config(*, description: str = None,
+                         parameters: List[dict] = None,
+                         commands: List[str] = None) -> str
+  - construct_node_config(*, name: str,
+                          remote_fs: str = '/tmp',
+                          executors: int = 2) -> dict
+  - parse_build_url(build_url) -> Tuple[str, int]

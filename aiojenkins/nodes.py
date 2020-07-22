@@ -4,7 +4,7 @@ import xml.etree.ElementTree
 from typing import List
 
 from aiojenkins.exceptions import JenkinsError, JenkinsNotFoundError
-from aiojenkins.utils import JOB_BUILD_URL_RE, construct_node_config
+from aiojenkins.utils import construct_node_config, parse_build_url
 
 
 def _parse_rss(rss):
@@ -13,13 +13,13 @@ def _parse_rss(rss):
 
     root = xml.etree.ElementTree.fromstring(rss)
     for entry in root.findall('atom:entry', ns):
-        url = entry.find('atom:link', ns).attrib['href']
-        group = JOB_BUILD_URL_RE.search(url)
+        build_url = entry.find('atom:link', ns).attrib['href']
+        job_name, build_id = parse_build_url(build_url)
 
         builds.append({
-            'url': url,
-            'job_name': group['job_name'],
-            'number': int(group['build_number']),
+            'url': build_url,
+            'job_name': job_name,
+            'number': build_id,
         })
 
     return list(reversed(builds))
