@@ -102,3 +102,26 @@ async def test_build_queue_id():
         assert isinstance(queue_id_info, dict) is True
     finally:
         await jenkins.jobs.delete(job_name)
+
+
+@pytest.mark.asyncio
+async def test_build_get_url_info():
+    # TC: invalid URL must raise the exception
+    with pytest.raises(JenkinsError):
+        await jenkins.builds.get_url_info('invalid')
+
+    # TC: correct build url must return info (dict)
+    job_name = f'{test_build_get_url_info.__name__}_{time.time()}'
+
+    await jenkins.jobs.create(job_name, construct_job_config())
+    try:
+        await jenkins.builds.start(job_name)
+        await asyncio.sleep(3)
+
+        job_info = await jenkins.jobs.get_info(job_name)
+        build_url = job_info['builds'][-1]['url']
+
+        build_info = await jenkins.builds.get_url_info(build_url)
+        assert isinstance(build_info, dict) is True
+    finally:
+        await jenkins.jobs.delete(job_name)

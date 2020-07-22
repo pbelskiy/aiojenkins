@@ -1,6 +1,12 @@
+import re
+
 from typing import List
 from xml.dom import minidom
 from xml.etree.ElementTree import Element, SubElement, tostring
+
+JOB_BUILD_URL_RE = re.compile(
+    r'/job/(?P<job_name>[^/]+)/(?P<build_number>\d+)'
+)
 
 
 def _construct_commands_block(parent, commands: List[str]) -> None:

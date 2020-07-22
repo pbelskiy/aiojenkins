@@ -1,22 +1,20 @@
 import json
-import re
 import xml.etree.ElementTree
 
 from typing import List
 
 from aiojenkins.exceptions import JenkinsError, JenkinsNotFoundError
-from aiojenkins.utils import construct_node_config
+from aiojenkins.utils import JOB_BUILD_URL_RE, construct_node_config
 
 
 def _parse_rss(rss):
     builds = []
-    re_link = re.compile(r'/job/(?P<job_name>[^/]+)/(?P<build_number>\d+)')
     ns = {'atom': 'http://www.w3.org/2005/Atom'}
 
     root = xml.etree.ElementTree.fromstring(rss)
     for entry in root.findall('atom:entry', ns):
         url = entry.find('atom:link', ns).attrib['href']
-        group = re_link.search(url)
+        group = JOB_BUILD_URL_RE.search(url)
 
         builds.append({
             'url': url,

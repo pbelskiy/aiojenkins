@@ -98,6 +98,7 @@ Feel free to PR :)
   - builds
     - get_all(name: str) -> list
     - get_info(name: str, build_id: int) -> dict
+    - get_url_info(url: str) -> dict
     - get_output(name: str, build_id: int) -> str
     - is_exists(name: str, build_id: int) -> bool
     - get_queue_id_info(self, queue_id: int) -> dict
