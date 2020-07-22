@@ -5,7 +5,7 @@ import pytest
 
 from aiojenkins.exceptions import JenkinsError, JenkinsNotFoundError
 from aiojenkins.utils import construct_job_config
-from tests import jenkins
+from tests import CreateJob, jenkins
 
 TEST_JOB_NAME = 'test'
 
@@ -101,13 +101,9 @@ def test_construct_job_config():
 
 @pytest.mark.asyncio
 async def test_job_exists():
-    job_name = f'{test_job_exists.__name__}_{time.time()}'
+    # TC: unavailable job must not exist
+    assert (await jenkins.jobs.is_exists(str(time.time()))) is False
 
-    with contextlib.suppress(JenkinsError):
-        await jenkins.jobs.delete(job_name)
-
-    assert (await jenkins.jobs.is_exists(job_name)) is False
-    await jenkins.jobs.create(job_name, jenkins.jobs.construct())
-    assert (await jenkins.jobs.is_exists(job_name)) is True
-
-    await jenkins.jobs.delete(job_name)
+    # TC: just created job must exist
+    async with CreateJob() as job_name:
+        assert (await jenkins.jobs.is_exists(job_name)) is True

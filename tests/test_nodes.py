@@ -1,12 +1,11 @@
 import asyncio
 import contextlib
-import time
 
 import pytest
 
 from aiojenkins.exceptions import JenkinsError, JenkinsNotFoundError
-from aiojenkins.utils import construct_job_config, construct_node_config
-from tests import jenkins
+from aiojenkins.utils import construct_node_config
+from tests import CreateJob, jenkins
 
 
 @pytest.mark.asyncio
@@ -107,51 +106,31 @@ async def test_create_delete_node():
 
 @pytest.mark.asyncio
 async def test_get_all_builds():
-    job_name = f'{test_get_all_builds.__name__}_{time.time()}'
     node_name = 'master'
-
     await jenkins.nodes.enable(node_name)
 
-    with contextlib.suppress(JenkinsNotFoundError):
-        await jenkins.jobs.delete(job_name)
+    async with CreateJob() as job_name:
+        await jenkins.builds.start(job_name)
+        await asyncio.sleep(1)  # FIXME:
 
-    job_config = construct_job_config()
+        builds = await jenkins.nodes.get_all_builds(node_name)
+        assert len(builds) > 0
 
-    await jenkins.jobs.create(job_name, job_config)
-
-    await jenkins.builds.start(job_name)
-    await asyncio.sleep(1)  # FIXME:
-
-    builds = await jenkins.nodes.get_all_builds(node_name)
-    assert len(builds) > 0
-
-    assert builds[-1]['job_name'] == job_name
-
-    await jenkins.jobs.delete(job_name)
+        assert builds[-1]['job_name'] == job_name
 
 
 @pytest.mark.asyncio
 async def test_get_failed_builds():
-    job_name = f'{test_get_failed_builds.__name__}_{time.time()}'
     node_name = 'master'
-
     await jenkins.nodes.enable(node_name)
 
-    with contextlib.suppress(JenkinsNotFoundError):
-        await jenkins.jobs.delete(job_name)
+    async with CreateJob(commands=['false']) as job_name:
+        pre_failed_builds = await jenkins.nodes.get_failed_builds(node_name)
 
-    job_config = construct_job_config(commands=['false'])
+        await jenkins.builds.start(job_name)
+        await asyncio.sleep(1)  # FIXME:
 
-    await jenkins.jobs.create(job_name, job_config)
+        post_failed_builds = await jenkins.nodes.get_failed_builds(node_name)
+        assert (len(post_failed_builds) - len(pre_failed_builds)) > 0
 
-    pre_failed_builds = await jenkins.nodes.get_failed_builds(node_name)
-
-    await jenkins.builds.start(job_name)
-    await asyncio.sleep(1)  # FIXME:
-
-    post_failed_builds = await jenkins.nodes.get_failed_builds(node_name)
-    assert (len(post_failed_builds) - len(pre_failed_builds)) > 0
-
-    assert post_failed_builds[-1]['job_name'] == job_name
-
-    await jenkins.jobs.delete(job_name)
+        assert post_failed_builds[-1]['job_name'] == job_name

@@ -1,13 +1,13 @@
 #!/usr/bin/python3
 
 import asyncio
-import contextlib
+import time
 
 import pytest
 
 from aiojenkins import Jenkins
-from aiojenkins.exceptions import JenkinsError, JenkinsNotFoundError
-from tests import get_host, get_login, is_locally, jenkins
+from aiojenkins.exceptions import JenkinsError
+from tests import CreateJob, get_host, get_login, is_locally, jenkins
 
 
 @pytest.mark.asyncio
@@ -69,27 +69,19 @@ async def test_tokens():
     if not (version.major >= 2 and version.minor >= 129):
         pytest.skip('Version isn`t support API tokens')
 
-    token_name = test_tokens.__name__
-    job_name = test_tokens.__name__
+    async with CreateJob() as job_name:
+        token_value, token_uuid = await jenkins.generate_token('')
 
-    token_value, token_uuid = await jenkins.generate_token('')
+        token_name = str(time.time())
+        token_value, token_uuid = await jenkins.generate_token(token_name)
 
-    token_value, token_uuid = await jenkins.generate_token(token_name)
+        await jenkins.nodes.enable('master')
 
-    await jenkins.nodes.enable('master')
-
-    with contextlib.suppress(JenkinsNotFoundError):
-        await jenkins.jobs.delete(job_name)
-
-    await jenkins.jobs.create(job_name, jenkins.jobs.construct())
-
-    # instance without credentials
-    jenkins_tokened = Jenkins(get_host(), get_login(), token_value)
-    await jenkins_tokened.builds.start(job_name)
-
-    await jenkins.revoke_token(token_uuid)
-
-    with pytest.raises(JenkinsError):
+        # instance without credentials
+        jenkins_tokened = Jenkins(get_host(), get_login(), token_value)
         await jenkins_tokened.builds.start(job_name)
 
-    await jenkins.jobs.delete(job_name)
+        await jenkins.revoke_token(token_uuid)
+
+        with pytest.raises(JenkinsError):
+            await jenkins_tokened.builds.start(job_name)
