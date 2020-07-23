@@ -55,7 +55,15 @@ async def test_build_machinery():
 
 @pytest.mark.asyncio
 async def test_build_exists():
-    assert (await jenkins.builds.is_exists('test', -1)) is False
+    async with CreateJob() as job_name:
+        # TC: just created job hasn't any builds yet
+        assert (await jenkins.builds.is_exists(job_name, 1)) is False
+
+        # TC: start build and check its existence
+        await jenkins.builds.start(job_name)
+        await asyncio.sleep(1)
+
+        assert (await jenkins.builds.is_exists(job_name, 1)) is True
 
 
 @pytest.mark.asyncio
