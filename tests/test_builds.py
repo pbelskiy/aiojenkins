@@ -28,7 +28,7 @@ async def test_build_list():
 
 
 @pytest.mark.asyncio
-async def test_build_machinery():
+async def test_build_stop_delete():
     job_config = dict(
         parameters=[dict(name='arg')],
         commands=['echo 1', 'echo 2']
@@ -46,6 +46,8 @@ async def test_build_machinery():
         # parameters must be passed
         with pytest.raises(JenkinsError):
             await jenkins.builds.start(job_name)
+
+        with pytest.raises(JenkinsError):
             await jenkins.builds.start(job_name, delay=1)
 
         await jenkins.builds.stop(job_name, 1)
@@ -90,7 +92,7 @@ async def test_build_get_url_info():
     # TC: correct build url must return info (dict)
     async with CreateJob() as job_name:
         await jenkins.builds.start(job_name)
-        await asyncio.sleep(3)
+        await asyncio.sleep(1)
 
         job_info = await jenkins.jobs.get_info(job_name)
         build_url = job_info['builds'][-1]['url']

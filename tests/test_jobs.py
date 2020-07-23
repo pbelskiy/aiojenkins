@@ -1,9 +1,8 @@
-import contextlib
 import time
 
 import pytest
 
-from aiojenkins.exceptions import JenkinsError, JenkinsNotFoundError
+from aiojenkins.exceptions import JenkinsNotFoundError
 from aiojenkins.utils import construct_job_config
 from tests import CreateJob, jenkins
 
@@ -52,47 +51,25 @@ async def test_get_job_info():
 
 @pytest.mark.asyncio
 async def test_copy_job():
-    job_name_old = test_copy_job.__name__
-    job_name_new = job_name_old + '_new'
-
-    with contextlib.suppress(JenkinsError):
-        await jenkins.jobs.delete(job_name_old)
-        await jenkins.jobs.delete(job_name_new)
-
-    await jenkins.jobs.create(job_name_old, construct_job_config())
-    available_jobs = await jenkins.jobs.get_all()
-    assert job_name_old in available_jobs
-
-    await jenkins.jobs.copy(job_name_old, job_name_new)
-    available_jobs = await jenkins.jobs.get_all()
-
-    assert job_name_new in available_jobs
-    assert job_name_old in available_jobs
-
-    await jenkins.jobs.delete(job_name_old)
-    await jenkins.jobs.delete(job_name_new)
+    async with CreateJob() as job_name:
+        job_name_new = f'{job_name}_new'
+        await jenkins.jobs.copy(job_name, job_name_new)
+        available_jobs = await jenkins.jobs.get_all()
+        assert job_name_new in available_jobs
 
 
 @pytest.mark.asyncio
 async def test_rename_job():
-    job_name_old = test_rename_job.__name__
-    job_name_new = job_name_old + '_new'
+    async with CreateJob() as job_name:
+        job_name_new = f'{job_name}_new'
+        await jenkins.jobs.rename(job_name, job_name_new)
+        available_jobs = await jenkins.jobs.get_all()
 
-    with contextlib.suppress(JenkinsError):
-        await jenkins.jobs.delete(job_name_old)
-        await jenkins.jobs.delete(job_name_new)
+        assert job_name_new in available_jobs
+        assert job_name not in available_jobs
 
-    await jenkins.jobs.create(job_name_old, jenkins.jobs.construct())
-    available_jobs = await jenkins.jobs.get_all()
-    assert job_name_old in available_jobs
-
-    await jenkins.jobs.rename(job_name_old, job_name_new)
-    available_jobs = await jenkins.jobs.get_all()
-
-    assert job_name_new in available_jobs
-    assert job_name_old not in available_jobs
-
-    await jenkins.jobs.delete(job_name_new)
+        # for context manager success delete temporary job
+        await jenkins.jobs.rename(job_name_new, job_name)
 
 
 def test_construct_job_config():

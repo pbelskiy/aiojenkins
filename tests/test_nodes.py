@@ -111,7 +111,7 @@ async def test_get_all_builds():
 
     async with CreateJob() as job_name:
         await jenkins.builds.start(job_name)
-        await asyncio.sleep(1)  # FIXME:
+        await asyncio.sleep(1)
 
         builds = await jenkins.nodes.get_all_builds(node_name)
         assert len(builds) > 0
@@ -128,7 +128,7 @@ async def test_get_failed_builds():
         pre_failed_builds = await jenkins.nodes.get_failed_builds(node_name)
 
         await jenkins.builds.start(job_name)
-        await asyncio.sleep(1)  # FIXME:
+        await asyncio.sleep(1)
 
         post_failed_builds = await jenkins.nodes.get_failed_builds(node_name)
         assert (len(post_failed_builds) - len(pre_failed_builds)) > 0
