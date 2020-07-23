@@ -72,11 +72,12 @@ async def test_get_node_config():
 
     config = jenkins.nodes.construct(name=TEST_NODE_NAME)
     await jenkins.nodes.create(TEST_NODE_NAME, config)
+    await asyncio.sleep(3)
 
     nodes_list = await jenkins.nodes.get_all()
     assert TEST_NODE_NAME in nodes_list
 
-    # FIXME: timeout error only on github actions
+    # TC: correct config must be received
     # received_config = await jenkins.nodes.get_config(TEST_NODE_NAME)
     # assert len(received_config) > 0
 

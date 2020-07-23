@@ -86,9 +86,9 @@ Feel free to PR :)
     - get_info(name: str) -> dict
     - get_config(name: str) -> str
     - is_exists(name: str) -> bool
-    - construct(description: str = None,
-                parameters: List[dict] = None,
-                commands: List[str] = None) -> str:
+    - construct_config(description: str = None,
+                       parameters: List[dict] = None,
+                      commands: List[str] = None) -> str:
     - create(name: str, config: str)
     - delete(name: str)
     - copy(name: str, new_name: str)

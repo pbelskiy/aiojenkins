@@ -73,7 +73,7 @@ async def test_rename_job():
 
 
 def test_construct_job_config():
-    assert len(construct_job_config()) > 0
+    assert len(jenkins.jobs.construct_config()) > 0
 
 
 @pytest.mark.asyncio

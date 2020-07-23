@@ -43,7 +43,7 @@ class Jobs:
         else:
             return True
 
-    def construct(self, **kwargs) -> str:
+    def construct_config(self, **kwargs) -> str:
         """
         Jenkins job XML constructor
         """
