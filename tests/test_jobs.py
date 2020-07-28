@@ -1,35 +1,41 @@
+import contextlib
 import time
 
 import pytest
 
 from aiojenkins.exceptions import JenkinsNotFoundError
-from aiojenkins.utils import construct_job_config
 from tests import CreateJob, jenkins
-
-TEST_JOB_NAME = 'test'
 
 
 @pytest.mark.asyncio
 async def test_delete_job():
-    try:
-        await jenkins.jobs.delete(TEST_JOB_NAME)
-    except JenkinsNotFoundError:
-        ...
+    with contextlib.suppress(JenkinsNotFoundError):
+        async with CreateJob() as job_name:
+            await jenkins.jobs.delete(job_name)
+            available_jobs = await jenkins.jobs.get_all()
+            assert job_name not in available_jobs
 
 
 @pytest.mark.asyncio
 async def test_create_job():
-    await jenkins.jobs.create(TEST_JOB_NAME, construct_job_config())
+    async with CreateJob() as job_name:
+        available_jobs = await jenkins.jobs.get_all()
+        assert job_name in available_jobs
 
 
 @pytest.mark.asyncio
 async def test_get_job_config():
-    await jenkins.jobs.get_config(TEST_JOB_NAME)
+    async with CreateJob() as job_name:
+        config = await jenkins.jobs.get_config(job_name)
+        assert len(config) > 0
 
 
 @pytest.mark.asyncio
 async def test_disable_job():
-    await jenkins.jobs.disable(TEST_JOB_NAME)
+    async with CreateJob() as job_name:
+        await jenkins.jobs.disable(job_name)
+        job_info = await jenkins.jobs.get_info(job_name)
+        assert job_info['color'] == 'disabled'
 
 
 @pytest.mark.asyncio
@@ -40,13 +46,18 @@ async def test_disable_unavailable_job():
 
 @pytest.mark.asyncio
 async def test_enable_job():
-    await jenkins.jobs.enable(TEST_JOB_NAME)
+    async with CreateJob() as job_name:
+        await jenkins.jobs.disable(job_name)
+        await jenkins.jobs.enable(job_name)
+        job_info = await jenkins.jobs.get_info(job_name)
+        assert job_info['color'] != 'disabled'
 
 
 @pytest.mark.asyncio
 async def test_get_job_info():
-    info = await jenkins.jobs.get_info(TEST_JOB_NAME)
-    assert isinstance(info, dict)
+    async with CreateJob() as job_name:
+        info = await jenkins.jobs.get_info(job_name)
+        assert isinstance(info, dict)
 
 
 @pytest.mark.asyncio
@@ -54,8 +65,11 @@ async def test_copy_job():
     async with CreateJob() as job_name:
         job_name_new = f'{job_name}_new'
         await jenkins.jobs.copy(job_name, job_name_new)
-        available_jobs = await jenkins.jobs.get_all()
-        assert job_name_new in available_jobs
+        try:
+            available_jobs = await jenkins.jobs.get_all()
+            assert job_name_new in available_jobs
+        finally:
+            await jenkins.jobs.delete(job_name_new)
 
 
 @pytest.mark.asyncio
