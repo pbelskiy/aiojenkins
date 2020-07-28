@@ -100,7 +100,8 @@ class Builds:
                     'parameter': formatted_parameters,
                     'statusCode': '303',
                     'redirectTo': '.',
-                })
+                }),
+                **parameters,
             }
         else:
             path = f'/job/{name}/build'

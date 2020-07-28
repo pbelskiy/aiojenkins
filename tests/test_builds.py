@@ -7,6 +7,26 @@ from tests import CreateJob, jenkins
 
 
 @pytest.mark.asyncio
+async def test_build_start():
+    arg_name = 'arg'
+    arg_value = 'arg'
+
+    config = dict(
+        parameters=[dict(name=arg_name)]
+    )
+
+    async with CreateJob(**config) as job_name:
+        await jenkins.builds.start(job_name, {arg_name: arg_value})
+        await asyncio.sleep(1)
+
+        job_info = await jenkins.jobs.get_info(job_name)
+        last_build_number = job_info['lastBuild']['number']
+
+        build_info = await jenkins.builds.get_info(job_name, last_build_number)
+        assert build_info['actions'][0]['parameters'][0]['value'] == arg_value
+
+
+@pytest.mark.asyncio
 async def test_build_list():
     async with CreateJob(parameters=[dict(name='arg')]) as job_name:
         # TC: just created job must not has any builds
