@@ -66,6 +66,7 @@ Feel free to PR :)
   - safe_restart()
   - generate_token(name: str) -> Tuple[str, str]
   - revoke_token(token_uuid: str)
+  - run_groovy_script(self, script: str) -> str
   - nodes
     - get_all() -> dict
     - get_info(name: str) -> dict

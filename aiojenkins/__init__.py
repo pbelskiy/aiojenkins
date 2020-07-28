@@ -186,6 +186,18 @@ class Jenkins:
             params=params
         )
 
+    async def run_groovy_script(self, script: str) -> str:
+        """
+        Execute Groovy script on the server.
+        """
+        response = await self._request(
+            'POST',
+            '/scriptText',
+            data={'script': script}
+        )
+
+        return await response.text()
+
     @property
     def nodes(self):
         return self._nodes

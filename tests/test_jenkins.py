@@ -83,3 +83,15 @@ async def test_tokens():
 
         with pytest.raises(JenkinsError):
             await jenkins_tokened.builds.start(job_name)
+
+
+@pytest.mark.asyncio
+async def test_run_groovy_script():
+    # TC: compare with expected result
+    text = 'test'
+    response = await jenkins.run_groovy_script(f'print("{text}")')
+    assert response == text
+
+    # TC: invalid script
+    response = await jenkins.run_groovy_script('xxx')
+    assert 'No such property' in response
