@@ -57,7 +57,7 @@ class Nodes:
         name = self._normalize_name(name)
         response = await self.jenkins._request(
             'GET',
-            f'/computer/{name}/api/json',
+            '/computer/{}/api/json'.format(name),
         )
         return await response.json()
 
@@ -75,7 +75,7 @@ class Nodes:
         name = self._normalize_name(name)
         response = await self.jenkins._request(
             'GET',
-            f'/computer/{name}/rssFailed',
+            '/computer/{}/rssFailed'.format(name),
         )
         return _parse_rss(await response.text())
 
@@ -93,7 +93,7 @@ class Nodes:
         name = self._normalize_name(name)
         response = await self.jenkins._request(
             'GET',
-            f'/computer/{name}/rssAll',
+            '/computer/{}/rssAll'.format(name),
         )
         return _parse_rss(await response.text())
 
@@ -104,7 +104,7 @@ class Nodes:
         name = self._normalize_name(name)
         response = await self.jenkins._request(
             'GET',
-            f'/computer/{name}/config.xml'
+            '/computer/{}/config.xml'.format(name)
         )
 
         return await response.text()
@@ -127,7 +127,7 @@ class Nodes:
 
     async def create(self, name: str, config: dict) -> None:
         if name in await self.get_all():
-            raise JenkinsError(f'Node `{name}` is already exists')
+            raise JenkinsError('Node `{}` is already exists'.format(name))
 
         if 'type' not in config:
             config['type'] = 'hudson.slaves.DumbSlave'
@@ -150,7 +150,7 @@ class Nodes:
         name = self._normalize_name(name)
         await self.jenkins._request(
             'POST',
-            f'/computer/{name}/doDelete'
+            '/computer/{}/doDelete'.format(name)
         )
 
     async def enable(self, name: str) -> None:
@@ -161,7 +161,7 @@ class Nodes:
         name = self._normalize_name(name)
         await self.jenkins._request(
             'POST',
-            f'/computer/{name}/toggleOffline'
+            '/computer/{}/toggleOffline'.format(name)
         )
 
     async def disable(self, name: str, message: str = '') -> None:
@@ -172,7 +172,7 @@ class Nodes:
         name = self._normalize_name(name)
         await self.jenkins._request(
             'POST',
-            f'/computer/{name}/toggleOffline',
+            '/computer/{}/toggleOffline'.format(name),
             params={'offlineMessage': message}
         )
 
@@ -180,6 +180,6 @@ class Nodes:
         name = self._normalize_name(name)
         await self.jenkins._request(
             'POST',
-            f'/computer/{name}/changeOfflineCause',
+            '/computer/{}/changeOfflineCause'.format(name),
             params={'offlineMessage': message}
         )

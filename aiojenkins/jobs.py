@@ -22,7 +22,7 @@ class Jobs:
     async def get_info(self, name: str) -> dict:
         response = await self.jenkins._request(
             'GET',
-            f'/job/{name}/api/json'
+            '/job/{}/api/json'.format(name)
         )
 
         return await response.json()
@@ -30,7 +30,7 @@ class Jobs:
     async def get_config(self, name: str) -> str:
         response = await self.jenkins._request(
             'GET',
-            f'/job/{name}/config.xml'
+            '/job/{}/config.xml'.format(name)
         )
 
         return await response.text()
@@ -64,7 +64,7 @@ class Jobs:
     async def delete(self, name: str) -> None:
         await self.jenkins._request(
             'POST',
-            f'/job/{name}/doDelete'
+            '/job/{}/doDelete'.format(name)
         )
 
     async def copy(self, name: str, new_name: str) -> None:
@@ -85,18 +85,18 @@ class Jobs:
 
         await self.jenkins._request(
             'POST',
-            f'/job/{name}/doRename',
+            '/job/{}/doRename'.format(name),
             params=params
         )
 
     async def enable(self, name: str) -> None:
         await self.jenkins._request(
             'POST',
-            f'/job/{name}/enable'
+            '/job/{}/enable'.format(name)
         )
 
     async def disable(self, name: str) -> None:
         await self.jenkins._request(
             'POST',
-            f'/job/{name}/disable'
+            '/job/{}/disable'.format(name)
         )

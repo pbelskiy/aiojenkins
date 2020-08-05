@@ -10,11 +10,9 @@ from aiojenkins.exceptions import JenkinsError, JenkinsNotFoundError
 from aiojenkins.jobs import Jobs
 from aiojenkins.nodes import Nodes
 
-
-class JenkinsVersion(NamedTuple):
-    major: int = 0
-    minor: int = 0
-    patch: int = 0
+JenkinsVersion = NamedTuple(
+    'JenkinsVersion', [('major', int), ('minor', int), ('patch', int)]
+)
 
 
 class Jenkins:
@@ -44,7 +42,7 @@ class Jenkins:
             async with aiohttp.ClientSession(cookies=self.cookies) as session:
                 response = await session.request(
                     method,
-                    f'{self.host}{path}',
+                    self.host + path,
                     allow_redirects=False,
                     **kwargs,
                 )
@@ -61,12 +59,12 @@ class Jenkins:
                     HTTPStatus.UNAUTHORIZED,
                     HTTPStatus.FORBIDDEN,
                     HTTPStatus.INTERNAL_SERVER_ERROR):
-                details = f'probably authentication problem:\n{text}'
+                details = 'probably authentication problem:\n' + text
             else:
-                details = f'\n{text}'
+                details = '\n' + text
 
             raise JenkinsError(
-                f'Request error [{response.status}], {details}',
+                'Request error [{}], {}'.format(response.status, details),
                 status=response.status,
             )
 
@@ -150,7 +148,7 @@ class Jenkins:
 
     @staticmethod
     def _build_token_url(do: str) -> str:
-        return f'/me/descriptorByName/jenkins.security.ApiTokenProperty/{do}'
+        return '/me/descriptorByName/jenkins.security.ApiTokenProperty/' + do
 
     async def generate_token(self, name: str) -> Tuple[str, str]:
         """
@@ -170,7 +168,7 @@ class Jenkins:
 
         response = await response.json()
         if response['status'] != 'ok':
-            raise JenkinsError(f'Non OK status returned: `{response}`')
+            raise JenkinsError('Non OK status returned: ' + str(response))
 
         return response['data']['tokenValue'], response['data']['tokenUuid']
 

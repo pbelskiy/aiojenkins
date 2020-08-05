@@ -63,7 +63,7 @@ async def test_get_job_info():
 @pytest.mark.asyncio
 async def test_copy_job():
     async with CreateJob() as job_name:
-        job_name_new = f'{job_name}_new'
+        job_name_new = job_name + '_new'
         await jenkins.jobs.copy(job_name, job_name_new)
         try:
             available_jobs = await jenkins.jobs.get_all()
@@ -75,7 +75,7 @@ async def test_copy_job():
 @pytest.mark.asyncio
 async def test_rename_job():
     async with CreateJob() as job_name:
-        job_name_new = f'{job_name}_new'
+        job_name_new = job_name + '_new'
         await jenkins.jobs.rename(job_name, job_name_new)
         available_jobs = await jenkins.jobs.get_all()
 

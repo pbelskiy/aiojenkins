@@ -22,7 +22,7 @@ class Builds:
         """
         response = await self.jenkins._request(
             'GET',
-            f'/job/{name}/api/json?tree=allBuilds[number,url]'
+            '/job/{}/api/json?tree=allBuilds[number,url]'.format(name)
         )
 
         return (await response.json())['allBuilds']
@@ -33,7 +33,7 @@ class Builds:
         """
         response = await self.jenkins._request(
             'GET',
-            f'/job/{name}/{build_id}/api/json'
+            '/job/{}/{}/api/json'.format(name, build_id)
         )
 
         return await response.json()
@@ -51,7 +51,7 @@ class Builds:
         """
         response = await self.jenkins._request(
             'GET',
-            f'/job/{name}/{build_id}/consoleText'
+            '/job/{}/{}/consoleText'.format(name, build_id)
         )
 
         return await response.text()
@@ -67,7 +67,7 @@ class Builds:
     async def get_queue_id_info(self, queue_id: int) -> dict:
         response = await self.jenkins._request(
             'GET',
-            f'/queue/item/{queue_id}/api/json'
+            '/queue/item/{}/api/json'.format(queue_id)
         )
 
         return await response.json()
@@ -86,11 +86,11 @@ class Builds:
         data = None
 
         if parameters:
-            path = f'/job/{name}/buildWithParameters'
+            path = '/job/{}/buildWithParameters'.format(name)
 
-            formatted_parameters: Any = [
+            formatted_parameters = [
                 {'name': k, 'value': str(v)} for k, v in parameters.items()
-            ]
+            ]  # type: Any
 
             if len(formatted_parameters) == 1:
                 formatted_parameters = formatted_parameters[0]
@@ -104,7 +104,7 @@ class Builds:
                 **parameters,
             }
         else:
-            path = f'/job/{name}/build'
+            path = '/job/{}/build'.format(name)
 
         response = await self.jenkins._request(
             'POST',
@@ -124,11 +124,11 @@ class Builds:
     async def stop(self, name: str, build_id: int) -> None:
         await self.jenkins._request(
             'POST',
-            f'/job/{name}/{build_id}/stop'
+            '/job/{}/{}/stop'.format(name, build_id)
         )
 
     async def delete(self, name: str, build_id: int) -> None:
         await self.jenkins._request(
             'POST',
-            f'/job/{name}/{build_id}/doDelete'
+            '/job/{}/{}/doDelete'.format(name, build_id)
         )

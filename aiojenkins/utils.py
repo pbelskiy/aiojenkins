@@ -124,8 +124,8 @@ def parse_build_url(build_url) -> Tuple[str, int]:
     """
     Extract job name and build number from build url
     """
-    group = JOB_BUILD_URL_RE.search(build_url)
-    if not group:
-        raise JenkinsError(f'Invalid URL: {build_url}')
+    match = JOB_BUILD_URL_RE.search(build_url)
+    if match:
+        return str(match.group('job_name')), int(match.group('build_number'))
 
-    return group['job_name'], int(group['build_number'])
+    raise JenkinsError('Invalid URL: {}'.format(build_url))
