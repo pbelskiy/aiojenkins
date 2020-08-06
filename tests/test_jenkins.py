@@ -9,19 +9,6 @@ from tests import CreateJob, get_host, get_login, is_locally, jenkins
 
 
 @pytest.mark.asyncio
-async def test_authentication_error():
-    jenkins = Jenkins(get_host(), 'random-login', 'random-password')
-
-    with pytest.raises(JenkinsError):
-        version = await jenkins.get_version()
-        # was introduced  default admin with password
-        if version.major >= 2:
-            await jenkins.nodes.disable('master')
-        else:
-            raise JenkinsError
-
-
-@pytest.mark.asyncio
 async def test_invalid_host():
     with pytest.raises(JenkinsError):
         jenkins = Jenkins('@#$')
