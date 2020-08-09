@@ -1,11 +1,11 @@
-from setuptools import find_packages, setup
+from setuptools import setup
 
 with open('README.md') as readme_file:
     README = readme_file.read()
 
 setup_args = dict(
     name='aiojenkins',
-    version='0.5.0',
+    version='0.5.2',
     description='Asynchronous library of Jenkins API based on aiohttp',
     long_description_content_type='text/markdown',
     long_description=README,
@@ -18,7 +18,10 @@ setup_args = dict(
         'Programming Language :: Python :: 3.8',
     ],
     license='MIT',
-    packages=find_packages(),
+    packages=['aiojenkins'],
+    package_data={
+        '': ['*.pyi'],
+    },
     author='Petr Belskiy',
     author_email='petr.belskiy@gmail.com',
     keywords=['aiojenkins', 'async jenkins api'],
