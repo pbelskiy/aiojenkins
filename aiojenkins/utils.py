@@ -120,7 +120,7 @@ def construct_node_config(*, name: str,
     }
 
 
-def parse_build_url(build_url) -> Tuple[str, int]:
+def parse_build_url(build_url: str) -> Tuple[str, int]:
     """
     Extract job name and build number from build url
     """

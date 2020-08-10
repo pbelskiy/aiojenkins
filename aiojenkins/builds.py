@@ -1,6 +1,6 @@
 import json
 
-from typing import Any, Optional
+from typing import Any, Optional, Tuple
 
 from aiojenkins.exceptions import JenkinsNotFoundError
 from aiojenkins.utils import parse_build_url
@@ -10,6 +10,13 @@ class Builds:
 
     def __init__(self, jenkins):
         self.jenkins = jenkins
+
+    @staticmethod
+    def parse_url(build_url: str) -> Tuple[str, int]:
+        """
+        Extract job name and build number from build url
+        """
+        return parse_build_url(build_url)
 
     async def get_all(self, name: str) -> list:
         """
@@ -42,7 +49,7 @@ class Builds:
         """
         Extract job name and build number from url and return info
         """
-        job_name, build_id = parse_build_url(build_url)
+        job_name, build_id = self.parse_url(build_url)
         return await self.get_info(job_name, build_id)
 
     async def get_output(self, name: str, build_id: int) -> str:
