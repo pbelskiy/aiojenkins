@@ -13,14 +13,16 @@ def _parse_rss(rss: str) -> list:
 
     root = xml.etree.ElementTree.fromstring(rss)
     for entry in root.findall('atom:entry', ns):
-        build_url = entry.find('atom:link', ns).attrib['href']
-        job_name, build_id = parse_build_url(build_url)
+        link = entry.find('atom:link', ns)
+        if link is not None:
+            build_url = link.attrib['href']
+            job_name, build_id = parse_build_url(build_url)
 
-        builds.append({
-            'url': build_url,
-            'job_name': job_name,
-            'number': build_id,
-        })
+            builds.append({
+                'url': build_url,
+                'job_name': job_name,
+                'number': build_id,
+            })
 
     return list(reversed(builds))
 

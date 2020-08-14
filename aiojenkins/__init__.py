@@ -22,9 +22,9 @@ class Jenkins:
                  login: Optional[str] = None,
                  password: Optional[str] = None):
         self.host = host.rstrip('/')
-        self.auth = None
-        self.crumb = None
-        self.cookies = None
+        self.auth = None  # type: Any
+        self.crumb = None  # type: Any
+        self.cookies = None  # type: Any
 
         if login and password:
             self.auth = BasicAuth(login, password)
@@ -79,14 +79,14 @@ class Jenkins:
 
         return response
 
-    async def _get_crumb(self) -> Union[bool, str]:
+    async def _get_crumb(self) -> Union[bool, dict]:
         try:
             response = await self._http_request('GET', '/crumbIssuer/api/json')
         except JenkinsNotFoundError:
             return False
 
-        data = await response.json()
-        self.crumb = {data['crumbRequestField']: data['crumb']}
+        content = await response.json()
+        self.crumb = {content['crumbRequestField']: content['crumb']}
         return self.crumb
 
     async def _request(self,
@@ -178,11 +178,11 @@ class Jenkins:
             params=params
         )
 
-        response = await response.json()
-        if response['status'] != 'ok':
-            raise JenkinsError('Non OK status returned: ' + str(response))
+        content = await response.json()
+        if content['status'] != 'ok':
+            raise JenkinsError('Non OK status returned: ' + str(content))
 
-        return response['data']['tokenValue'], response['data']['tokenUuid']
+        return content['data']['tokenValue'], content['data']['tokenUuid']
 
     async def revoke_token(self, token_uuid: str) -> None:
         """
