@@ -1,9 +1,9 @@
 import asyncio
 
 from http import HTTPStatus
-from typing import NamedTuple, Tuple
+from typing import Any, NamedTuple, Optional, Tuple, Union
 
-import aiohttp
+from aiohttp import BasicAuth, ClientError, ClientResponse, ClientSession
 
 from aiojenkins.builds import Builds
 from aiojenkins.exceptions import JenkinsError, JenkinsNotFoundError
@@ -17,20 +17,26 @@ JenkinsVersion = NamedTuple(
 
 class Jenkins:
 
-    def __init__(self, host, login=None, password=None):
+    def __init__(self,
+                 host: str,
+                 login: Optional[str] = None,
+                 password: Optional[str] = None):
         self.host = host.rstrip('/')
         self.auth = None
         self.crumb = None
         self.cookies = None
 
         if login and password:
-            self.auth = aiohttp.BasicAuth(login, password)
+            self.auth = BasicAuth(login, password)
 
         self._nodes = Nodes(self)
         self._jobs = Jobs(self)
         self._builds = Builds(self)
 
-    async def _http_request(self, method: str, path: str, **kwargs):
+    async def _http_request(self,
+                            method: str,
+                            path: str,
+                            **kwargs: Any) -> ClientResponse:
         if self.auth and not kwargs.get('auth'):
             kwargs['auth'] = self.auth
 
@@ -39,14 +45,14 @@ class Jenkins:
             kwargs['headers'].update(self.crumb)
 
         try:
-            async with aiohttp.ClientSession(cookies=self.cookies) as session:
+            async with ClientSession(cookies=self.cookies) as session:
                 response = await session.request(
                     method,
                     self.host + path,
                     allow_redirects=False,
                     **kwargs,
                 )
-        except aiohttp.ClientError as e:
+        except ClientError as e:
             raise JenkinsError from e
 
         if response.status == HTTPStatus.NOT_FOUND:
@@ -73,7 +79,7 @@ class Jenkins:
 
         return response
 
-    async def _get_crumb(self):
+    async def _get_crumb(self) -> Union[bool, str]:
         try:
             response = await self._http_request('GET', '/crumbIssuer/api/json')
         except JenkinsNotFoundError:
@@ -83,12 +89,18 @@ class Jenkins:
         self.crumb = {data['crumbRequestField']: data['crumb']}
         return self.crumb
 
-    async def _request(self, method: str, path: str, **kwargs):
+    async def _request(self,
+                       method: str,
+                       path: str,
+                       **kwargs: Any) -> ClientResponse:
+        """
+        Core class method for endpoints, which wraps auto crumb detection
+        """
         if self.crumb:
             try:
                 return await self._http_request(method, path, **kwargs)
             except JenkinsError as e:
-                if e.status != 403:
+                if e.status != HTTPStatus.FORBIDDEN:
                     raise
 
         if self.crumb is not False:

@@ -1,13 +1,13 @@
 import json
 import xml.etree.ElementTree
 
-from typing import List
+from typing import Any, List
 
 from aiojenkins.exceptions import JenkinsError, JenkinsNotFoundError
 from aiojenkins.utils import construct_node_config, parse_build_url
 
 
-def _parse_rss(rss):
+def _parse_rss(rss: str) -> list:
     builds = []
     ns = {'atom': 'http://www.w3.org/2005/Atom'}
 
@@ -119,7 +119,7 @@ class Nodes:
             return False
         return True
 
-    def construct(self, **kwargs):
+    def construct(self, **kwargs: Any):
         """
         Jenkins node constructor, returns dict to be passed to create method.
         """

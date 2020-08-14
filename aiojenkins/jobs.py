@@ -1,3 +1,5 @@
+from typing import Any
+
 from aiojenkins.exceptions import JenkinsNotFoundError
 from aiojenkins.utils import construct_job_config
 
@@ -43,7 +45,7 @@ class Jobs:
         else:
             return True
 
-    def construct_config(self, **kwargs) -> str:
+    def construct_config(self, **kwargs: Any) -> str:
         """
         Jenkins job XML constructor
         """
