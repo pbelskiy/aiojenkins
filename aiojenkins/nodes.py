@@ -1,26 +1,28 @@
 import json
 import xml.etree.ElementTree
 
-from typing import List
+from typing import Any, List
 
 from aiojenkins.exceptions import JenkinsError, JenkinsNotFoundError
 from aiojenkins.utils import construct_node_config, parse_build_url
 
 
-def _parse_rss(rss):
+def _parse_rss(rss: str) -> list:
     builds = []
     ns = {'atom': 'http://www.w3.org/2005/Atom'}
 
     root = xml.etree.ElementTree.fromstring(rss)
     for entry in root.findall('atom:entry', ns):
-        build_url = entry.find('atom:link', ns).attrib['href']
-        job_name, build_id = parse_build_url(build_url)
+        link = entry.find('atom:link', ns)
+        if link is not None:
+            build_url = link.attrib['href']
+            job_name, build_id = parse_build_url(build_url)
 
-        builds.append({
-            'url': build_url,
-            'job_name': job_name,
-            'number': build_id,
-        })
+            builds.append({
+                'url': build_url,
+                'job_name': job_name,
+                'number': build_id,
+            })
 
     return list(reversed(builds))
 
@@ -119,7 +121,7 @@ class Nodes:
             return False
         return True
 
-    def construct(self, **kwargs):
+    def construct(self, **kwargs: Any):
         """
         Jenkins node constructor, returns dict to be passed to create method.
         """
