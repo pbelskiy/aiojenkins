@@ -2,7 +2,7 @@ import asyncio
 
 from functools import partial
 from http import HTTPStatus
-from typing import Any, Callable, NamedTuple, Optional, Tuple, Union
+from typing import Any, NamedTuple, Optional, Tuple, Union
 
 from aiohttp import BasicAuth, ClientError, ClientResponse, ClientSession
 
@@ -20,10 +20,10 @@ class RetryClientSession:
     _ATTEMPTS_NUM = 50
     _INTERVAL_SEC = 0.2
 
-    def __init__(self, options, *args: Any, **kwargs: Any):
-        self.attempts = options.get('attempts', self._ATTEMPTS_NUM)
-        self.interval = options.get('interval', self._INTERVAL_SEC)
-        self.statuses = options.get('statuses', [])
+    def __init__(self, retry_options: dict, *args: Any, **kwargs: Any):
+        self.attempts = retry_options.get('attempts', self._ATTEMPTS_NUM)
+        self.interval = retry_options.get('interval', self._INTERVAL_SEC)
+        self.statuses = retry_options.get('statuses', [])
 
         self.client = ClientSession(*args, **kwargs)
 
@@ -60,13 +60,13 @@ class Jenkins:
 
         It`s possible to use retry argument to prevent failures if server
         restarting or temporary network problems, anyway 500 ~ 599 HTTP statues
-        is checked and triggers new retry attempt. To enable retryier with
+        is checked and triggers new retry attempt. To enable retry with
         default options just pass retry=dict(enabled=True)
 
         Example: retry = dict(
-            attempts=50,   # total attempts count default is 50
-            interval=0.2,  # interval in seconds between attempts
-            statuses=403,  # additional HTTP statuses for retry
+            attempts=50,    # total attempts count default is 50
+            interval=0.2,   # interval in seconds between attempts
+            statuses=[403], # additional HTTP statuses for retry
         )
         """
         self.host = host.rstrip('/')
@@ -93,10 +93,9 @@ class Jenkins:
             kwargs.setdefault('headers', {})
             kwargs['headers'].update(self.crumb)
 
+        Client = ClientSession  # type: Any
         if self.retry:
-            Client = partial(RetryClientSession, options=self.retry)
-        else:
-            Client = ClientSession
+            Client = partial(RetryClientSession, retry_options=self.retry)
 
         try:
             async with Client(cookies=self.cookies) as session:
