@@ -5,7 +5,7 @@ import pytest
 
 from aiojenkins import Jenkins
 from aiojenkins.exceptions import JenkinsError
-from tests import CreateJob, get_host, get_login, is_locally, jenkins
+from tests import CreateJob, get_host, get_login, get_password, is_locally, jenkins
 
 
 @pytest.mark.asyncio
@@ -82,3 +82,19 @@ async def test_run_groovy_script():
     # TC: invalid script
     response = await jenkins.run_groovy_script('xxx')
     assert 'No such property' in response
+
+
+@pytest.mark.asyncio
+async def test_retry_client():
+    retry = dict(
+        enabled=True,
+    )
+
+    retry_jenkins = Jenkins(
+        get_host(),
+        get_login(),
+        get_password(),
+        retry=retry
+    )
+
+    await retry_jenkins.get_status()
