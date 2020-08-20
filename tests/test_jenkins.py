@@ -1,11 +1,21 @@
 import asyncio
 import time
 
+from collections import namedtuple
+from http import HTTPStatus
+
 import pytest
 
 from aiojenkins import Jenkins
 from aiojenkins.exceptions import JenkinsError
-from tests import CreateJob, get_host, get_login, is_locally, jenkins
+from tests import (
+    CreateJob,
+    get_host,
+    get_login,
+    get_password,
+    is_locally,
+    jenkins,
+)
 
 
 @pytest.mark.asyncio
@@ -82,3 +92,46 @@ async def test_run_groovy_script():
     # TC: invalid script
     response = await jenkins.run_groovy_script('xxx')
     assert 'No such property' in response
+
+
+@pytest.mark.asyncio
+async def test_retry_client(monkeypatch):
+    attempts = 0
+
+    async def text():
+        return 'error'
+
+    async def request(*args, **kwargs):
+        nonlocal attempts
+
+        attempts += 1
+        response = namedtuple(
+            'response', ['status', 'cookies', 'text', 'json']
+        )
+
+        if attempts < 3:
+            response.status = HTTPStatus.INTERNAL_SERVER_ERROR
+        else:
+            response.status = HTTPStatus.OK
+
+        response.text = text
+        response.json = text
+
+        return response
+
+    retry = dict(
+        enabled=True,
+        attempts=5,
+        interval=0.01,
+    )
+
+    retry_jenkins = Jenkins(
+        get_host(),
+        get_login(),
+        get_password(),
+        retry=retry
+    )
+
+    await retry_jenkins.get_status()
+    monkeypatch.setattr('aiohttp.client.ClientSession.request', request)
+    await retry_jenkins.get_status()

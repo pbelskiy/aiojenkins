@@ -1,5 +1,6 @@
 import asyncio
 
+from functools import partial
 from http import HTTPStatus
 from typing import Any, NamedTuple, Optional, Tuple, Union
 
@@ -15,16 +16,64 @@ JenkinsVersion = NamedTuple(
 )
 
 
+class RetryClientSession:
+    _ATTEMPTS_NUM = 50
+    _INTERVAL_SEC = 0.2
+
+    def __init__(self, retry_options: dict, *args: Any, **kwargs: Any):
+        self.attempts = retry_options.get('attempts', self._ATTEMPTS_NUM)
+        self.interval = retry_options.get('interval', self._INTERVAL_SEC)
+        self.statuses = retry_options.get('statuses', [])
+
+        self.client = ClientSession(*args, **kwargs)
+
+    def _check_status(self, status: int) -> bool:
+        return (HTTPStatus.INTERNAL_SERVER_ERROR <= status <= 599) or \
+            status in self.statuses
+
+    async def request(self, *args: Any, **kwargs: Any) -> ClientResponse:
+        for _ in range(self.attempts):
+            response = await self.client.request(*args, **kwargs)
+            if not self._check_status(response.status):
+                break
+
+            await asyncio.sleep(self.interval)
+
+        return response
+
+    async def __aenter__(self):
+        return self
+
+    async def __aexit__(self, exc_type: Any, exc_val: Any, exc_tb: Any):
+        await self.client.close()
+
+
 class Jenkins:
 
     def __init__(self,
                  host: str,
                  login: Optional[str] = None,
-                 password: Optional[str] = None):
+                 password: Optional[str] = None,
+                 *, retry: Optional[dict] = None):
+        """
+        Core library class.
+
+        It`s possible to use retry argument to prevent failures if server
+        restarting or temporary network problems, anyway 500 ~ 599 HTTP statues
+        is checked and triggers new retry attempt. To enable retry with
+        default options just pass retry=dict(enabled=True)
+
+        Example: retry = dict(
+            attempts=50,    # total attempts count default is 50
+            interval=0.2,   # interval in seconds between attempts
+            statuses=[403], # additional HTTP statuses for retry
+        )
+        """
         self.host = host.rstrip('/')
         self.auth = None  # type: Any
         self.crumb = None  # type: Any
         self.cookies = None  # type: Any
+        self.retry = retry
 
         if login and password:
             self.auth = BasicAuth(login, password)
@@ -44,8 +93,12 @@ class Jenkins:
             kwargs.setdefault('headers', {})
             kwargs['headers'].update(self.crumb)
 
+        Client = ClientSession  # type: Any
+        if self.retry:
+            Client = partial(RetryClientSession, retry_options=self.retry)
+
         try:
-            async with ClientSession(cookies=self.cookies) as session:
+            async with Client(cookies=self.cookies) as session:
                 response = await session.request(
                     method,
                     self.host + path,
