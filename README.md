@@ -3,7 +3,7 @@
 ![Tests](https://github.com/pbelskiy/aiojenkins/workflows/Tests/badge.svg)
 ![Coveralls github](https://img.shields.io/coveralls/github/pbelskiy/aiojenkins?label=Coverage)
 ![PyPI - Python Version](https://img.shields.io/pypi/pyversions/aiojenkins?label=Python)
-[![Downloads](https://pepy.tech/badge/aiojenkins)](https://pepy.tech/project/aiojenkins)
+![PyPI - Downloads](https://img.shields.io/pypi/dm/aiojenkins?color=1&label=Downloads)
 
 Asynchronous python library of Jenkins API endpoints based on aiohttp 🥳
 
