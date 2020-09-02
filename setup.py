@@ -5,7 +5,7 @@ with open('README.md') as readme_file:
 
 setup_args = dict(
     name='aiojenkins',
-    version='0.5.2',
+    version='0.5.3',
     description='Asynchronous library of Jenkins API based on aiohttp',
     long_description_content_type='text/markdown',
     long_description=README,
@@ -20,7 +20,7 @@ setup_args = dict(
     license='MIT',
     packages=['aiojenkins'],
     package_data={
-        '': ['*.pyi'],
+        '': ['py.typed', '*.pyi'],
     },
     author='Petr Belskiy',
     author_email='petr.belskiy@gmail.com',

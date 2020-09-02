@@ -81,7 +81,7 @@ class Builds:
 
     async def start(self,
                     name: str,
-                    parameters: dict = None,
+                    parameters: Optional[dict] = None,
                     delay: int = 0
                     ) -> Optional[int]:
         """
