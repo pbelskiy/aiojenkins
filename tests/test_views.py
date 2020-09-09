@@ -12,5 +12,9 @@ async def test_get_views():
 
 @pytest.mark.asyncio
 async def test_is_exists():
-    assert (await jenkins.views.is_exists('All') or  # <= 1.554
-            await jenkins.views.is_exists('all')) is True
+    version = await jenkins.get_version()
+
+    if version.major < 2:
+        assert await jenkins.views.is_exists('All') is True
+    else:
+        assert await jenkins.views.is_exists('all') is True
