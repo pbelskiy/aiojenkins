@@ -10,6 +10,7 @@ from aiojenkins.builds import Builds
 from aiojenkins.exceptions import JenkinsError, JenkinsNotFoundError
 from aiojenkins.jobs import Jobs
 from aiojenkins.nodes import Nodes
+from aiojenkins.views import Views
 
 JenkinsVersion = NamedTuple(
     'JenkinsVersion', [('major', int), ('minor', int), ('patch', int)]
@@ -81,6 +82,7 @@ class Jenkins:
         self._nodes = Nodes(self)
         self._jobs = Jobs(self)
         self._builds = Builds(self)
+        self._views = Views(self)
 
     async def _http_request(self,
                             method: str,
@@ -272,3 +274,7 @@ class Jenkins:
     @property
     def builds(self):
         return self._builds
+
+    @property
+    def views(self):
+        return self._views
