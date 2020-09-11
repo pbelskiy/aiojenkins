@@ -18,3 +18,13 @@ async def test_is_exists():
         assert await jenkins.views.is_exists('All') is True
     else:
         assert await jenkins.views.is_exists('all') is True
+
+
+@pytest.mark.asyncio
+async def test_get_config():
+    version = await jenkins.get_version()
+
+    if version.major < 2:
+        assert len(await jenkins.views.get_config('All')) > 0
+    else:
+        assert len(await jenkins.views.get_config('all')) > 0
