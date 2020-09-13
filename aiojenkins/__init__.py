@@ -42,14 +42,14 @@ class RetryClientSession:
 
         return response
 
-    async def __aenter__(self):
-        return self
-
-    async def __aexit__(self, exc_type: Any, exc_val: Any, exc_tb: Any):
+    async def close(self):
         await self.client.close()
 
 
 class Jenkins:
+
+    _loop = None
+    _session = None
 
     def __init__(self,
                  host: str,
@@ -84,6 +84,33 @@ class Jenkins:
         self._builds = Builds(self)
         self._views = Views(self)
 
+    def __del__(self):
+        if self._session:
+            asyncio.get_event_loop().run_until_complete(
+                self._session.close()
+            )
+
+    async def _get_session(self):
+        curr_loop = asyncio.get_event_loop()
+
+        # FIXME: for tests, package should not do such checks and things
+        if self._loop and self._session and self._loop != curr_loop:
+            await self._session.close()
+            self._session = None
+
+        if not self._session:
+            if self.retry:
+                Client = partial(RetryClientSession, retry_options=self.retry)
+            else:
+                Client = ClientSession
+
+            # FIXME: cookies reused also for tests speedup, crumb isn`t
+            # requested each time
+            self._session = Client(cookies=self.cookies)
+            self._loop = curr_loop
+
+        return self._session
+
     async def _http_request(self,
                             method: str,
                             path: str,
@@ -95,18 +122,14 @@ class Jenkins:
             kwargs.setdefault('headers', {})
             kwargs['headers'].update(self.crumb)
 
-        Client = ClientSession  # type: Any
-        if self.retry:
-            Client = partial(RetryClientSession, retry_options=self.retry)
-
+        session = await self._get_session()
         try:
-            async with Client(cookies=self.cookies) as session:
-                response = await session.request(
-                    method,
-                    self.host + path,
-                    allow_redirects=False,
-                    **kwargs,
-                )
+            response = await session.request(
+                method,
+                self.host + path,
+                allow_redirects=False,
+                **kwargs,
+            )
         except ClientError as e:
             raise JenkinsError from e
 
