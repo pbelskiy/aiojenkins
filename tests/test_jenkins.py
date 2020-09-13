@@ -135,3 +135,20 @@ async def test_retry_client(monkeypatch):
     await retry_jenkins.get_status()
     monkeypatch.setattr('aiohttp.client.ClientSession.request', request)
     await retry_jenkins.get_status()
+
+
+def test_session_close():
+
+    def do():
+        Jenkins(
+            get_host(),
+            get_login(),
+            get_password(),
+            retry=dict(enabled=True)
+        )
+
+    do()
+
+    # just check for no exceptions
+    import gc
+    gc.collect()
