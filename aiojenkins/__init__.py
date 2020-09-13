@@ -85,14 +85,10 @@ class Jenkins:
         self._views = Views(self)
 
     def __del__(self):
-        asyncio.get_event_loop().run_until_complete(
-            self._close_session(self._session)
-        )
-
-    @staticmethod
-    async def _close_session(session):
-        if session:
-            await session.close()
+        if self._session:
+            asyncio.get_event_loop().run_until_complete(
+                self._session.close()
+            )
 
     async def _get_session(self):
         curr_loop = asyncio.get_event_loop()
