@@ -78,8 +78,8 @@ async def test_get_node_config():
     assert TEST_NODE_NAME in nodes_list
 
     # TC: correct config must be received
-    # received_config = await jenkins.nodes.get_config(TEST_NODE_NAME)
-    # assert len(received_config) > 0
+    received_config = await jenkins.nodes.get_config(TEST_NODE_NAME)
+    assert len(received_config) > 0
 
 
 @pytest.mark.asyncio
