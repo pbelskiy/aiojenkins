@@ -14,24 +14,23 @@ from tests import (
     get_login,
     get_password,
     is_locally,
-    jenkins,
 )
 
 
 @pytest.mark.asyncio
-async def test_invalid_host():
+async def test_invalid_host(jenkins):
     with pytest.raises(JenkinsError):
         jenkins = Jenkins('@#$')
         await jenkins.get_version()
 
 
 @pytest.mark.asyncio
-async def test_get_status():
+async def test_get_status(jenkins):
     await jenkins.get_status()
 
 
 @pytest.mark.asyncio
-async def test_quiet_down():
+async def test_quiet_down(jenkins):
     await jenkins.quiet_down()
     server_status = await jenkins.get_status()
     assert server_status['quietingDown'] is True
@@ -42,7 +41,7 @@ async def test_quiet_down():
 
 
 @pytest.mark.asyncio
-async def test_restart():
+async def test_restart(jenkins):
     if is_locally():
         pytest.skip('takes too much time +40 seconds')
 
@@ -58,13 +57,13 @@ async def test_restart():
 
 
 @pytest.mark.asyncio
-async def test_tokens():
+async def test_tokens(jenkins):
     version = await jenkins.get_version()
 
     if not (version.major >= 2 and version.minor >= 129):
         pytest.skip('Version isn`t support API tokens')
 
-    async with CreateJob() as job_name:
+    async with CreateJob(jenkins) as job_name:
         token_value, token_uuid = await jenkins.generate_token('')
 
         token_name = str(time.time())
@@ -83,7 +82,7 @@ async def test_tokens():
 
 
 @pytest.mark.asyncio
-async def test_run_groovy_script():
+async def test_run_groovy_script(jenkins):
     # TC: compare with expected result
     text = 'test'
     response = await jenkins.run_groovy_script('print("{}")'.format(text))
