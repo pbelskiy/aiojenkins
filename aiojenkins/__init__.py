@@ -1,6 +1,5 @@
 import asyncio
 
-from functools import partial
 from http import HTTPStatus
 from typing import Any, NamedTuple, Optional, Tuple, Union
 
@@ -89,13 +88,13 @@ class Jenkins:
             )
 
     async def _get_session(self):
-        if not self._session:
-            if self.retry:
-                Client = partial(RetryClientSession, retry_options=self.retry)
-            else:
-                Client = ClientSession
+        if self._session:
+            return self._session
 
-            self._session = Client()
+        if self.retry:
+            self._session = RetryClientSession(retry_options=self.retry)
+        else:
+            self._session = ClientSession()
 
         return self._session
 
