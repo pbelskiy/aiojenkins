@@ -5,16 +5,16 @@ import pytest
 
 from aiojenkins.exceptions import JenkinsError, JenkinsNotFoundError
 from aiojenkins.utils import construct_node_config
-from tests import CreateJob, jenkins
+from tests import CreateJob
 
 
 @pytest.mark.asyncio
-async def test_get_nodes():
+async def test_get_nodes(jenkins):
     await jenkins.nodes.get_all()
 
 
 @pytest.mark.asyncio
-async def test_get_node_info():
+async def test_get_node_info(jenkins):
     info = await jenkins.nodes.get_info('(master)')
     assert isinstance(info, dict)
     info = await jenkins.nodes.get_info('master')
@@ -22,7 +22,7 @@ async def test_get_node_info():
 
 
 @pytest.mark.asyncio
-async def test_is_node_exists():
+async def test_is_node_exists(jenkins):
     is_exists = await jenkins.nodes.is_exists('master')
     assert is_exists is True
 
@@ -34,7 +34,7 @@ async def test_is_node_exists():
 
 
 @pytest.mark.asyncio
-async def test_disable_node():
+async def test_disable_node(jenkins):
     for _ in range(2):
         await jenkins.nodes.disable('master')
         info = await jenkins.nodes.get_info('master')
@@ -42,7 +42,7 @@ async def test_disable_node():
 
 
 @pytest.mark.asyncio
-async def test_enable_node():
+async def test_enable_node(jenkins):
     for _ in range(2):
         await jenkins.nodes.enable('master')
         info = await jenkins.nodes.get_info('master')
@@ -50,7 +50,7 @@ async def test_enable_node():
 
 
 @pytest.mark.asyncio
-async def test_update_node_offline_reason():
+async def test_update_node_offline_reason(jenkins):
     await jenkins.nodes.update_offline_reason('master', 'maintenance1')
     info = await jenkins.nodes.get_info('master')
     assert info['offlineCauseReason'] == 'maintenance1'
@@ -61,7 +61,7 @@ async def test_update_node_offline_reason():
 
 
 @pytest.mark.asyncio
-async def test_get_node_config():
+async def test_get_node_config(jenkins):
     TEST_NODE_NAME = test_get_node_config.__name__
 
     with contextlib.suppress(JenkinsNotFoundError):
@@ -83,7 +83,7 @@ async def test_get_node_config():
 
 
 @pytest.mark.asyncio
-async def test_create_delete_node():
+async def test_create_delete_node(jenkins):
     TEST_NODE_NAME = test_create_delete_node.__name__
 
     with contextlib.suppress(JenkinsNotFoundError):
@@ -106,11 +106,11 @@ async def test_create_delete_node():
 
 
 @pytest.mark.asyncio
-async def test_get_all_builds():
+async def test_get_all_builds(jenkins):
     node_name = 'master'
     await jenkins.nodes.enable(node_name)
 
-    async with CreateJob() as job_name:
+    async with CreateJob(jenkins) as job_name:
         await jenkins.builds.start(job_name)
         await asyncio.sleep(1)
 
@@ -121,11 +121,11 @@ async def test_get_all_builds():
 
 
 @pytest.mark.asyncio
-async def test_get_failed_builds():
+async def test_get_failed_builds(jenkins):
     node_name = 'master'
     await jenkins.nodes.enable(node_name)
 
-    async with CreateJob(commands=['false']) as job_name:
+    async with CreateJob(jenkins, commands=['false']) as job_name:
         pre_failed_builds = await jenkins.nodes.get_failed_builds(node_name)
 
         await jenkins.builds.start(job_name)

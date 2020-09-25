@@ -1,6 +1,5 @@
 import asyncio
 
-from functools import partial
 from http import HTTPStatus
 from typing import Any, NamedTuple, Optional, Tuple, Union
 
@@ -48,7 +47,6 @@ class RetryClientSession:
 
 class Jenkins:
 
-    _loop = None
     _session = None
 
     def __init__(self,
@@ -73,7 +71,6 @@ class Jenkins:
         self.host = host.rstrip('/')
         self.auth = None  # type: Any
         self.crumb = None  # type: Any
-        self.cookies = None  # type: Any
         self.retry = retry
 
         if login and password:
@@ -91,23 +88,13 @@ class Jenkins:
             )
 
     async def _get_session(self):
-        curr_loop = asyncio.get_event_loop()
+        if self._session:
+            return self._session
 
-        # FIXME: for tests, package should not do such checks and things
-        if self._loop and self._session and self._loop != curr_loop:
-            await self._session.close()
-            self._session = None
-
-        if not self._session:
-            if self.retry:
-                Client = partial(RetryClientSession, retry_options=self.retry)
-            else:
-                Client = ClientSession
-
-            # FIXME: cookies reused also for tests speedup, crumb isn`t
-            # requested each time
-            self._session = Client(cookies=self.cookies)
-            self._loop = curr_loop
+        if self.retry:
+            self._session = RetryClientSession(retry_options=self.retry)
+        else:
+            self._session = ClientSession()
 
         return self._session
 
@@ -151,9 +138,6 @@ class Jenkins:
                 'Request error [{}], {}'.format(response.status, details),
                 status=response.status,
             )
-
-        if response.cookies:
-            self.cookies = response.cookies
 
         return response
 

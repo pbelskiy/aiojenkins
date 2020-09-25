@@ -3,25 +3,25 @@ import os
 import platform
 import time
 
-from aiojenkins import Jenkins
 from aiojenkins.utils import construct_job_config
 
 
 class CreateJob:
     # cannot use contextlib.asynccontextmanager now due Python 3.6 support
-    def __init__(self, *args, **kwargs):
+    def __init__(self, jenkins, *args, **kwargs):
         function_name = inspect.stack()[1].function
         self.name = '{}_{}'.format(function_name, time.time())
+        self.jenkins = jenkins
         self.args = args
         self.kwargs = kwargs
 
     async def __aenter__(self):
         job_config = construct_job_config(*self.args, **self.kwargs)
-        await jenkins.jobs.create(self.name, job_config)
+        await self.jenkins.jobs.create(self.name, job_config)
         return self.name
 
     async def __aexit__(self, exc_type, exc, tb):
-        await jenkins.jobs.delete(self.name)
+        await self.jenkins.jobs.delete(self.name)
 
 
 def get_host():
@@ -41,6 +41,3 @@ def is_locally():
     For skipping some long tests locally, but not on completely CI
     """
     return (platform.system() == 'Darwin')
-
-
-jenkins = Jenkins(get_host(), get_login(), get_password())

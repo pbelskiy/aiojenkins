@@ -1,17 +1,15 @@
 import pytest
 
-from tests import jenkins
-
 
 @pytest.mark.asyncio
-async def test_get_views():
+async def test_get_views(jenkins):
     views = await jenkins.views.get_all()
     assert len(views) == 1
     assert 'all' in map(lambda s: s.lower(), views)
 
 
 @pytest.mark.asyncio
-async def test_is_exists():
+async def test_is_exists(jenkins):
     version = await jenkins.get_version()
 
     if version.major < 2:
@@ -21,7 +19,7 @@ async def test_is_exists():
 
 
 @pytest.mark.asyncio
-async def test_get_config():
+async def test_get_config(jenkins):
     version = await jenkins.get_version()
 
     if version.major < 2:

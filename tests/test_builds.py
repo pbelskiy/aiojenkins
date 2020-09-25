@@ -3,11 +3,11 @@ import asyncio
 import pytest
 
 from aiojenkins.exceptions import JenkinsError
-from tests import CreateJob, jenkins
+from tests import CreateJob
 
 
 @pytest.mark.asyncio
-async def test_build_start():
+async def test_build_start(jenkins):
     arg_name = 'arg'
     arg_value = 'arg'
 
@@ -15,7 +15,7 @@ async def test_build_start():
         parameters=[dict(name=arg_name)]
     )
 
-    async with CreateJob(**config) as job_name:
+    async with CreateJob(jenkins, **config) as job_name:
         await jenkins.builds.start(job_name, {arg_name: arg_value})
         await asyncio.sleep(1)
 
@@ -27,8 +27,8 @@ async def test_build_start():
 
 
 @pytest.mark.asyncio
-async def test_build_list():
-    async with CreateJob(parameters=[dict(name='arg')]) as job_name:
+async def test_build_list(jenkins):
+    async with CreateJob(jenkins, parameters=[dict(name='arg')]) as job_name:
         # TC: just created job must not has any builds
         builds = await jenkins.builds.get_all(job_name)
         assert len(builds) == 0
@@ -48,13 +48,13 @@ async def test_build_list():
 
 
 @pytest.mark.asyncio
-async def test_build_stop_delete():
+async def test_build_stop_delete(jenkins):
     job_config = dict(
         parameters=[dict(name='arg')],
         commands=['echo 1', 'echo 2']
     )
 
-    async with CreateJob(**job_config) as job_name:
+    async with CreateJob(jenkins, **job_config) as job_name:
         await jenkins.nodes.enable('master')
 
         await jenkins.builds.start(job_name, dict(arg='test'))
@@ -76,8 +76,8 @@ async def test_build_stop_delete():
 
 
 @pytest.mark.asyncio
-async def test_build_exists():
-    async with CreateJob() as job_name:
+async def test_build_exists(jenkins):
+    async with CreateJob(jenkins) as job_name:
         # TC: just created job hasn't any builds yet
         assert (await jenkins.builds.is_exists(job_name, 1)) is False
 
@@ -89,13 +89,13 @@ async def test_build_exists():
 
 
 @pytest.mark.asyncio
-async def test_build_queue_id():
+async def test_build_queue_id(jenkins):
     version = await jenkins.get_version()
     # was introduced  default admin with password
     if version.major < 2:
         pytest.skip('there is problem, probably queue id was not implemented')
 
-    async with CreateJob() as job_name:
+    async with CreateJob(jenkins) as job_name:
         queue_id = await jenkins.builds.start(job_name)
         assert queue_id > 0
 
@@ -104,13 +104,13 @@ async def test_build_queue_id():
 
 
 @pytest.mark.asyncio
-async def test_build_get_url_info():
+async def test_build_get_url_info(jenkins):
     # TC: invalid URL must raise the exception
     with pytest.raises(JenkinsError):
         await jenkins.builds.get_url_info('invalid')
 
     # TC: correct build url must return info (dict)
-    async with CreateJob() as job_name:
+    async with CreateJob(jenkins) as job_name:
         await jenkins.builds.start(job_name)
         await asyncio.sleep(1)
 
