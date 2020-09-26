@@ -22,11 +22,17 @@ Start new build:
 import asyncio
 import aiojenkins
 
+jenkins = aiojenkins.Jenkins('http://your_server/jenkins', 'login', 'password')
+
 async def example():
-    jenkins = aiojenkins.Jenkins('http://your_server/jenkins', 'login', 'password')
     await jenkins.builds.start('job_name', dict(parameter='test'))
 
-asyncio.run(example())
+loop = asyncio.get_event_loop()
+try:
+    loop.run_until_complete(example())
+finally:
+    loop.run_until_complete(jenkins.close())
+    loop.close()
 ```
 [__Please look at tests directory for more examples.__](https://github.com/pbelskiy/aiojenkins/tree/master/tests)
 

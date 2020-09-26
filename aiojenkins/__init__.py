@@ -81,12 +81,6 @@ class Jenkins:
         self._builds = Builds(self)
         self._views = Views(self)
 
-    def __del__(self):
-        if self._session:
-            asyncio.get_event_loop().run_until_complete(
-                self._session.close()
-            )
-
     async def _get_session(self):
         if self._session:
             return self._session
@@ -169,6 +163,10 @@ class Jenkins:
             self.crumb = await self._get_crumb()
 
         return await self._http_request(method, path, **kwargs)
+
+    async def close(self):
+        if self._session:
+            await self._session.close()
 
     async def get_status(self) -> dict:
         response = await self._request('GET', '/api/json')
