@@ -1,6 +1,5 @@
 import inspect
 import os
-import platform
 import time
 
 from aiojenkins.utils import construct_job_config
@@ -36,8 +35,8 @@ def get_password():
     return os.environ.get('password', 'admin')
 
 
-def is_locally():
+def is_ci_server():
     """
     For skipping some long tests locally, but not on completely CI
     """
-    return (platform.system() == 'Darwin')
+    return 'CI' in os.environ

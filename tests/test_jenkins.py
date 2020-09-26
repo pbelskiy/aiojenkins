@@ -8,7 +8,7 @@ import pytest
 
 from aiojenkins import Jenkins
 from aiojenkins.exceptions import JenkinsError
-from tests import CreateJob, get_host, get_login, get_password, is_locally
+from tests import CreateJob, get_host, get_login, get_password, is_ci_server
 
 
 @pytest.mark.asyncio
@@ -36,7 +36,7 @@ async def test_quiet_down(jenkins):
 
 @pytest.mark.asyncio
 async def test_restart(jenkins):
-    if is_locally():
+    if not is_ci_server():
         pytest.skip('takes too much time +40 seconds')
 
     await jenkins.safe_restart()
