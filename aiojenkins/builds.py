@@ -2,8 +2,8 @@ import json
 
 from typing import Any, Optional, Tuple
 
-from aiojenkins.exceptions import JenkinsNotFoundError
-from aiojenkins.utils import parse_build_url
+from .exceptions import JenkinsNotFoundError
+from .utils import parse_build_url
 
 
 class Builds:

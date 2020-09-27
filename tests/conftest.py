@@ -2,7 +2,7 @@ import asyncio
 
 import pytest
 
-from aiojenkins import Jenkins
+from aiojenkins.jenkins import Jenkins
 from tests import get_host, get_login, get_password
 
 

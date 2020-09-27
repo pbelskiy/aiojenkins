@@ -6,7 +6,7 @@ from http import HTTPStatus
 
 import pytest
 
-from aiojenkins import Jenkins
+from aiojenkins.jenkins import Jenkins
 from aiojenkins.exceptions import JenkinsError
 from tests import CreateJob, get_host, get_login, get_password, is_ci_server
 

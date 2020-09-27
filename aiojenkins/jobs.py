@@ -1,7 +1,7 @@
 from typing import Any
 
-from aiojenkins.exceptions import JenkinsNotFoundError
-from aiojenkins.utils import construct_job_config
+from .exceptions import JenkinsNotFoundError
+from .utils import construct_job_config
 
 
 class Jobs:
