@@ -76,10 +76,10 @@ class Jenkins:
         if login and password:
             self.auth = BasicAuth(login, password)
 
-        self._nodes = Nodes(self)
-        self._jobs = Jobs(self)
-        self._builds = Builds(self)
-        self._views = Views(self)
+        self.nodes = Nodes(self)
+        self.jobs = Jobs(self)
+        self.builds = Builds(self)
+        self.views = Views(self)
 
     async def _get_session(self):
         if self._session:
@@ -267,19 +267,3 @@ class Jenkins:
         )
 
         return await response.text()
-
-    @property
-    def nodes(self):
-        return self._nodes
-
-    @property
-    def jobs(self):
-        return self._jobs
-
-    @property
-    def builds(self):
-        return self._builds
-
-    @property
-    def views(self):
-        return self._views
