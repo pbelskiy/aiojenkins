@@ -3,8 +3,8 @@ import xml.etree.ElementTree
 
 from typing import Any, List
 
-from aiojenkins.exceptions import JenkinsError, JenkinsNotFoundError
-from aiojenkins.utils import construct_node_config, parse_build_url
+from .exceptions import JenkinsError, JenkinsNotFoundError
+from .utils import construct_node_config, parse_build_url
 
 
 def _parse_rss(rss: str) -> list:

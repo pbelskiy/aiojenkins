@@ -4,7 +4,7 @@ from typing import List, Tuple
 from xml.dom import minidom
 from xml.etree.ElementTree import Element, SubElement, tostring
 
-from aiojenkins.exceptions import JenkinsError
+from .exceptions import JenkinsError
 
 JOB_BUILD_URL_RE = re.compile(
     r'/job/(?P<job_name>[^/]+)/(?P<build_number>\d+)'
