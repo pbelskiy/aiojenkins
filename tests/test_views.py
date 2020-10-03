@@ -1,6 +1,6 @@
 import pytest
 
-VIEW_CONFIG_XML = """<?xml version="1.1" encoding="UTF-8"?>
+VIEW_CONFIG_XML = """<?xml version="1.0" encoding="UTF-8"?>
 <hudson.model.ListView>
   <name>{name}</name>
   <filterExecutors>false</filterExecutors>
