@@ -1,3 +1,6 @@
+from .exceptions import JenkinsError
+
+
 class Views:
 
     def __init__(self, jenkins):
@@ -21,3 +24,21 @@ class Views:
         )
 
         return await response.text()
+
+    async def create(self, name: str, config: str) -> None:
+        if name in await self.get_all():
+            raise JenkinsError('View `{}` is already exists'.format(name))
+
+        headers = {'Content-Type': 'text/xml'}
+        params = {'name': name}
+
+        await self.jenkins._request(
+            'POST',
+            '/createView',
+            data=config,
+            params=params,
+            headers=headers,
+        )
+
+    async def delete(self, name: str) -> None:
+        await self.jenkins._request('POST', '/view/{}/doDelete'.format(name))
