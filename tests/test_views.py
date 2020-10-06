@@ -1,5 +1,7 @@
 import pytest
 
+from aiojenkins.exceptions import JenkinsError
+
 VIEW_CONFIG_XML = """<?xml version="1.0" encoding="UTF-8"?>
 <hudson.model.ListView>
   <name>{name}</name>
@@ -52,8 +54,11 @@ async def test_get_config(jenkins):
 
 
 @pytest.mark.asyncio
-async def test_view_create(jenkins):
+async def test_view_create_delete(jenkins):
     await jenkins.views.create('test', VIEW_CONFIG_XML.format(name='test'))
+
+    with pytest.raises(JenkinsError):
+        await jenkins.views.create('test', VIEW_CONFIG_XML.format(name='test'))
 
     views = await jenkins.views.get_all()
     assert 'test' in views
