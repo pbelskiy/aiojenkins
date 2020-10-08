@@ -148,6 +148,14 @@ class Nodes:
             params=params,
         )
 
+    async def reconfigure(self, name: str, config: str) -> None:
+        name = self._normalize_name(name)
+        await self.jenkins._request(
+            'POST',
+            '/computer/{}/config.xml'.format(name),
+            headers={'Content-Type': 'text/xml'},
+        )
+
     async def delete(self, name: str) -> None:
         name = self._normalize_name(name)
         await self.jenkins._request(

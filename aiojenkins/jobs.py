@@ -63,6 +63,14 @@ class Jobs:
             headers=headers
         )
 
+    async def reconfigure(self, name: str, config: str) -> None:
+        await self.jenkins._request(
+            'POST',
+            '/job/{}/config.xml'.format(name),
+            data=config,
+            headers={'Content-Type': 'text/xml'},
+        )
+
     async def delete(self, name: str) -> None:
         await self.jenkins._request(
             'POST',
