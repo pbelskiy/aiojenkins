@@ -1,4 +1,5 @@
 import contextlib
+
 import pytest
 
 from aiojenkins.exceptions import JenkinsError
