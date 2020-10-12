@@ -111,6 +111,14 @@ async def test_node_reconfigure(jenkins):
 
 
 @pytest.mark.asyncio
+async def test_node_reconfigure_master(jenkins):
+    config = jenkins.nodes.construct(name='reconfigure_master')
+
+    with pytest.raises(JenkinsError):
+        await jenkins.nodes.reconfigure('master', config)
+
+
+@pytest.mark.asyncio
 async def test_create_delete_node(jenkins):
     TEST_NODE_NAME = test_create_delete_node.__name__
 
