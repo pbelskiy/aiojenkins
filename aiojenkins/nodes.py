@@ -150,9 +150,14 @@ class Nodes:
 
     async def reconfigure(self, name: str, config: str) -> None:
         name = self._normalize_name(name)
+
+        if name == '(master)':
+            raise JenkinsError('Cannot reconfigure master node')
+
         await self.jenkins._request(
             'POST',
             '/computer/{}/config.xml'.format(name),
+            data=config,
             headers={'Content-Type': 'text/xml'},
         )
 
