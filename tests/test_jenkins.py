@@ -118,16 +118,19 @@ async def test_retry_client(monkeypatch):
         interval=0.01,
     )
 
-    retry_jenkins = Jenkins(
-        get_host(),
-        get_login(),
-        get_password(),
-        retry=retry
-    )
+    try:
+        retry_jenkins = Jenkins(
+            get_host(),
+            get_login(),
+            get_password(),
+            retry=retry
+        )
 
-    await retry_jenkins.get_status()
-    monkeypatch.setattr('aiohttp.client.ClientSession.request', request)
-    await retry_jenkins.get_status()
+        await retry_jenkins.get_status()
+        monkeypatch.setattr('aiohttp.client.ClientSession.request', request)
+        await retry_jenkins.get_status()
+    finally:
+        await retry_jenkins.close()
 
 
 def test_session_close():
