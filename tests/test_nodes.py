@@ -105,7 +105,7 @@ async def test_node_reconfigure(jenkins):
 
     await jenkins.nodes.reconfigure(TEST_NODE_NAME, new_config)
     config = await jenkins.nodes.get_config(TEST_NODE_NAME)
-    assert config == new_config
+    assert '<numExecutors>4</numExecutors>' in config
 
     await jenkins.nodes.delete(TEST_NODE_NAME)
 

@@ -42,7 +42,7 @@ async def test_get_job_reconfigure(jenkins):
 
         await jenkins.jobs.reconfigure(job_name, config_new)
         config = await jenkins.jobs.get_config(job_name)
-        assert config == config_new
+        assert '<concurrentBuild>true</concurrentBuild>' in config
 
 
 @pytest.mark.asyncio
