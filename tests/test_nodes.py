@@ -80,6 +80,42 @@ async def test_get_node_config(jenkins):
     # TC: correct config must be received
     received_config = await jenkins.nodes.get_config(TEST_NODE_NAME)
     assert len(received_config) > 0
+    await jenkins.nodes.delete(TEST_NODE_NAME)
+
+
+@pytest.mark.asyncio
+async def test_node_reconfigure(jenkins):
+    TEST_NODE_NAME = test_node_reconfigure.__name__
+
+    with contextlib.suppress(JenkinsNotFoundError):
+        await jenkins.nodes.delete(TEST_NODE_NAME)
+
+    config = jenkins.nodes.construct(name=TEST_NODE_NAME)
+    await jenkins.nodes.create(TEST_NODE_NAME, config)
+    await asyncio.sleep(3)
+
+    nodes_list = await jenkins.nodes.get_all()
+    assert TEST_NODE_NAME in nodes_list
+
+    old_config = await jenkins.nodes.get_config(TEST_NODE_NAME)
+    new_config = old_config.replace(
+        '<numExecutors>2</numExecutors>',
+        '<numExecutors>4</numExecutors>'
+    )
+
+    await jenkins.nodes.reconfigure(TEST_NODE_NAME, new_config)
+    config = await jenkins.nodes.get_config(TEST_NODE_NAME)
+    assert '<numExecutors>4</numExecutors>' in config
+
+    await jenkins.nodes.delete(TEST_NODE_NAME)
+
+
+@pytest.mark.asyncio
+async def test_node_reconfigure_master(jenkins):
+    config = jenkins.nodes.construct(name='reconfigure_master')
+
+    with pytest.raises(JenkinsError):
+        await jenkins.nodes.reconfigure('master', config)
 
 
 @pytest.mark.asyncio

@@ -1,3 +1,5 @@
+import contextlib
+
 import pytest
 
 from aiojenkins.exceptions import JenkinsError
@@ -29,7 +31,7 @@ VIEW_CONFIG_XML = """<?xml version="1.0" encoding="UTF-8"?>
 @pytest.mark.asyncio
 async def test_get_views(jenkins):
     views = await jenkins.views.get_all()
-    assert len(views) == 1
+    assert len(views) > 0
     assert 'all' in map(lambda s: s.lower(), views)
 
 
@@ -66,3 +68,25 @@ async def test_view_create_delete(jenkins):
     await jenkins.views.delete('test')
     views = await jenkins.views.get_all()
     assert 'test' not in views
+
+
+@pytest.mark.asyncio
+async def test_view_reconfigure(jenkins):
+    with contextlib.suppress(JenkinsError):
+        await jenkins.views.delete('test2')
+
+    await jenkins.views.create('test2', VIEW_CONFIG_XML.format(name='test2'))
+
+    views = await jenkins.views.get_all()
+    assert 'test2' in views
+
+    config = VIEW_CONFIG_XML.format(name='test2')
+    config = config.replace(
+        '<filterExecutors>false</filterExecutors>',
+        '<filterExecutors>true</filterExecutors>'
+    )
+
+    await jenkins.views.reconfigure('test2', config)
+
+    config = await jenkins.views.get_config('test2')
+    assert '<filterExecutors>true</filterExecutors>' in config

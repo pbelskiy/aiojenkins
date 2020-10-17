@@ -31,6 +31,21 @@ async def test_get_job_config(jenkins):
 
 
 @pytest.mark.asyncio
+async def test_get_job_reconfigure(jenkins):
+    async with CreateJob(jenkins) as job_name:
+        config_old = await jenkins.jobs.get_config(job_name)
+
+        config_new = config_old.replace(
+            '<concurrentBuild>false</concurrentBuild>',
+            '<concurrentBuild>true</concurrentBuild>'
+        )
+
+        await jenkins.jobs.reconfigure(job_name, config_new)
+        config = await jenkins.jobs.get_config(job_name)
+        assert '<concurrentBuild>true</concurrentBuild>' in config
+
+
+@pytest.mark.asyncio
 async def test_disable_job(jenkins):
     async with CreateJob(jenkins) as job_name:
         await jenkins.jobs.disable(job_name)
