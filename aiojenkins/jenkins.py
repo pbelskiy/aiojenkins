@@ -175,6 +175,9 @@ class Jenkins:
     async def get_version(self) -> JenkinsVersion:
         response = await self._request('GET', '/')
         header = response.headers.get('X-Jenkins')
+        if not header:
+            raise JenkinsError('Header `X-Jenkins` isn`t found in response')
+
         return JenkinsVersion(*map(int, header.split('.')))
 
     async def is_ready(self) -> bool:
