@@ -21,7 +21,7 @@ setup_args = dict(
     name='aiojenkins',
     version=version,
     description='Asynchronous library of Jenkins API based on aiohttp',
-    long_description_content_type='text/markdown',
+    long_description_content_type='text/x-rst',
     long_description=README,
     classifiers=[
         'Programming Language :: Python',
