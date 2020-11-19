@@ -35,6 +35,8 @@ jobs:
         pip install tox coveralls
 
     - name: Get Jenkins initial password
+      env:
+        ACTIONS_ALLOW_UNSECURE_COMMANDS: 'true'
       run: |
         sleep 10
         echo ::set-env name=login::Admin
