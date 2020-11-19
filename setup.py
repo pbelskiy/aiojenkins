@@ -1,11 +1,25 @@
+import os
+import re
+
 from setuptools import setup
+
+init_file_path = os.path.join(
+    os.path.dirname(__file__),
+    'aiojenkins/__init__.py'
+)
+
+with open(init_file_path) as f:
+    try:
+        version = re.findall(r"__version__ = '(.*)'", f.read())[0]
+    except IndexError:
+        raise RuntimeError('Unable to get package version')
 
 with open('README.rst') as readme_file:
     README = readme_file.read()
 
 setup_args = dict(
     name='aiojenkins',
-    version='0.6.1',
+    version=version,
     description='Asynchronous library of Jenkins API based on aiohttp',
     long_description_content_type='text/markdown',
     long_description=README,

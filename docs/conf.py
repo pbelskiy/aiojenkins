@@ -11,9 +11,23 @@
 # documentation root, use os.path.abspath to make it absolute, like shown here.
 
 import os
+import re
 import sys
 
 sys.path.insert(0, os.path.abspath('..'))
+
+# parse version
+
+init_file_path = os.path.join(
+    os.path.dirname(__file__),
+    '../aiojenkins/__init__.py'
+)
+
+with open(init_file_path) as f:
+    try:
+        version = re.findall(r"__version__ = '(.*)'", f.read())[0]
+    except IndexError:
+        raise RuntimeError('Unable to get package version')
 
 
 # -- Project information -----------------------------------------------------
@@ -23,7 +37,7 @@ copyright = '2020, Petr Belskiy'
 author = 'Petr Belskiy'
 
 # The full version, including alpha/beta/rc tags
-release = '0.6.1'
+release = version
 
 master_doc = 'index'
 
