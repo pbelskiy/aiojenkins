@@ -1,6 +1,6 @@
 from setuptools import setup
 
-with open('README.md') as readme_file:
+with open('README.rst') as readme_file:
     README = readme_file.read()
 
 setup_args = dict(
