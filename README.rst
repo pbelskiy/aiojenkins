@@ -1,4 +1,4 @@
-Async Python client for `Jenkins <https://jenkins.io>`_
+Async python client for `Jenkins <https://jenkins.io>`_
 =======================================================
 
 Asynchronous python library of Jenkins API endpoints based on aiohttp.
