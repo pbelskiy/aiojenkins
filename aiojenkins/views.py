@@ -7,10 +7,16 @@ class Views:
         self.jenkins = jenkins
 
     async def get_all(self) -> dict:
+        """
+        Returns dict of all views and their properties.
+        """
         status = await self.jenkins.get_status()
         return {v['name']: v for v in status['views']}
 
     async def is_exists(self, name: str) -> bool:
+        """
+        Check if view exists
+        """
         views = await self.get_all()
         return name in views
 
@@ -26,6 +32,9 @@ class Views:
         return await response.text()
 
     async def create(self, name: str, config: str) -> None:
+        """
+        Create view
+        """
         if name in await self.get_all():
             raise JenkinsError('View `{}` is already exists'.format(name))
 
@@ -41,6 +50,9 @@ class Views:
         )
 
     async def reconfigure(self, name: str, config: str) -> None:
+        """
+        Reconfigure view
+        """
         await self.jenkins._request(
             'POST',
             '/view/{}/config.xml'.format(name),
@@ -49,4 +61,7 @@ class Views:
         )
 
     async def delete(self, name: str) -> None:
+        """
+        Delete view
+        """
         await self.jenkins._request('POST', '/view/{}/doDelete'.format(name))
