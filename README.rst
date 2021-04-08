@@ -64,13 +64,14 @@ Testing
 Currently tests aren't using any mocking.
 I am testing locally with dockerized LTS Jenkins ver. 2.222.3
 
-Prerequisites: `docker, pytest pytest-cov pytest-asyncio`
+Prerequisites: `docker, tox`
 
 ::
 
     docker run -d --name jenkins --restart always -p 8080:8080 jenkins/jenkins:lts
     docker exec jenkins cat /var/jenkins_home/secrets/initialAdminPassword
-    python3 -m pytest -v --cov=aiojenkins --cov-report=term --cov-report=html
+    chromium http://localhost:8080  # create admin:admin
+    tox
 
 
 Contributing
