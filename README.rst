@@ -26,7 +26,7 @@ Installation
 
 ::
 
-    pip install aiojenkins
+    pip3 install -U aiojenkins
 
 
 Documentation
