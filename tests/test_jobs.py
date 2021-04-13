@@ -4,7 +4,30 @@ import time
 import pytest
 
 from aiojenkins.exceptions import JenkinsNotFoundError
+from aiojenkins.utils import construct_job_config
+
 from tests import CreateJob
+
+FOLDER_CONFIG_XML = r"""<?xml version='1.1' encoding='UTF-8'?>
+<com.cloudbees.hudson.plugins.folder.Folder plugin="cloudbees-folder@6.15">
+  <description></description>
+  <properties/>
+  <folderViews class="com.cloudbees.hudson.plugins.folder.views.DefaultFolderViewHolder">
+    <views>
+      <hudson.model.AllView>
+        <owner class="com.cloudbees.hudson.plugins.folder.Folder" reference="../../../.."/>
+        <name>All</name>
+        <filterExecutors>false</filterExecutors>
+        <filterQueue>false</filterQueue>
+        <properties class="hudson.model.View$PropertyList"/>
+      </hudson.model.AllView>
+    </views>
+    <tabBar class="hudson.views.DefaultViewsTabBar"/>
+  </folderViews>
+  <healthMetrics/>
+  <icon class="com.cloudbees.hudson.plugins.folder.icons.StockFolderIcon"/>
+</com.cloudbees.hudson.plugins.folder.Folder>
+"""
 
 
 @pytest.mark.asyncio
@@ -113,3 +136,17 @@ async def test_job_exists(jenkins):
     # TC: just created job must exist
     async with CreateJob(jenkins) as job_name:
         assert (await jenkins.jobs.is_exists(job_name)) is True
+
+
+@pytest.mark.asyncio
+async def test_folder(jenkins):
+    try:
+        await jenkins.jobs.create('test_folder', FOLDER_CONFIG_XML)
+        await jenkins.jobs.create('test_folder/test_job', construct_job_config())
+
+        jobs = await jenkins.jobs.get_all()
+        assert 'test_folder/test_job' in jobs
+
+        await jenkins.jobs.delete('test_folder/test_job')
+    finally:
+        await jenkins.jobs.delete('test_folder')

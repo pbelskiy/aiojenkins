@@ -105,9 +105,14 @@ class Jenkins:
 
         session = await self._get_session()
         try:
+            if path.startswith('http'):
+                url = path
+            else:
+                url = self.host + path
+
             response = await session.request(
                 method,
-                self.host + path,
+                url,
                 allow_redirects=False,
                 **kwargs,
             )

@@ -1,4 +1,4 @@
-from typing import Any
+from typing import Any, Dict, Tuple
 
 from .exceptions import JenkinsNotFoundError
 from .utils import construct_job_config
@@ -9,17 +9,52 @@ class Jobs:
     def __init__(self, jenkins):
         self.jenkins = jenkins
 
-    async def get_all(self) -> dict:
-        """
-        Get list of builds for specified job name. Returned example:
+    @staticmethod
+    def _get_folder_and_job_names(name: str) -> Tuple[str, str]:
+        folder_name = ''
 
-        jobs = [
-            {'name': 'test', 'url': 'http://localhost/job/test/'},
-            {'name': 'test_builds', 'url': 'http://localhost/job/test_builds/'}
-        ]
+        for folder in name.split('/')[:-1]:
+            folder_name += '/job/{}'.format(folder)
+
+        job_name = name.split('/')[-1]
+
+        return folder_name, job_name
+
+    async def _get_all_jobs(self, url: str, parent: str) -> Dict[str, dict]:
+        all_jobs = {}
+
+        response = await self.jenkins._request('GET', url + '/api/json')
+        jobs = (await response.json())['jobs']
+
+        for job in jobs:
+            all_jobs[parent + job['name']] = job
+
+            if 'Folder' in job['_class']:
+                all_jobs.update(await self._get_all_jobs(
+                    job['url'],
+                    parent + job['name'] + '/'
+                ))
+
+        return all_jobs
+
+    async def get_all(self) -> Dict[str, dict]:
         """
-        status = await self.jenkins.get_status()
-        return {v['name']: v for v in status['jobs']}
+        Get dict of all existed jobs in system, including jobs in folder.
+
+        Returns: Dict[str, dict] - name and job properties.
+
+        Example: {
+            'test': {
+                'name': 'test',
+                'url': 'http://localhost/job/test/'
+            },
+            'folder/foo': {
+                'name': 'folder/job',
+                'url': 'http://localhost/job/folder/job/foo/'
+            }
+        }
+        """
+        return await self._get_all_jobs('', '')
 
     async def get_info(self, name: str) -> dict:
         response = await self.jenkins._request(
@@ -47,17 +82,31 @@ class Jobs:
 
     def construct_config(self, **kwargs: Any) -> str:
         """
-        Jenkins job XML constructor
+        Jenkins job XML constructor, cannot be used for folder creating yet.
         """
         return construct_job_config(**kwargs)
 
     async def create(self, name: str, config: str) -> None:
+        """
+        Create new jenkins job (project).
+
+        Args:
+            name (str): job name.
+            config (str): XML config of new job. It`s convenient way to use
+              `get_config()` to get existing job config and change it on your
+              taste, or to use `construct_config()` method.
+
+        Returns:
+            None
+        """
+        folder_name, job_name = self._get_folder_and_job_names(name)
+
         headers = {'Content-Type': 'text/xml'}
-        params = {'name': name}
+        params = {'name': job_name}
 
         await self.jenkins._request(
             'POST',
-            '/createItem',
+            '{}/createItem'.format(folder_name),
             params=params,
             data=config,
             headers=headers
@@ -72,9 +121,20 @@ class Jobs:
         )
 
     async def delete(self, name: str) -> None:
+        """
+        Delete existed jenkins job (project).
+
+        Args:
+            name (str): job name. For job in folder just use `/`.
+
+        Returns:
+            None
+        """
+        p = '/job/'.join(name.split('/'))
+
         await self.jenkins._request(
             'POST',
-            '/job/{}/doDelete'.format(name)
+            '/job/{}/doDelete'.format(p)
         )
 
     async def copy(self, name: str, new_name: str) -> None:
