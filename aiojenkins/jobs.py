@@ -29,7 +29,7 @@ class Jobs:
         for job in jobs:
             all_jobs[parent + job['name']] = job
 
-            if 'Folder' in job['_class']:
+            if 'Folder' in job.get('_class', ''):
                 all_jobs.update(await self._get_all_jobs(
                     job['url'],
                     parent + job['name'] + '/'

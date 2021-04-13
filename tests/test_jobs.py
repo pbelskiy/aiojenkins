@@ -9,7 +9,7 @@ from aiojenkins.utils import construct_job_config
 from tests import CreateJob
 
 FOLDER_CONFIG_XML = r"""<?xml version='1.1' encoding='UTF-8'?>
-<com.cloudbees.hudson.plugins.folder.Folder plugin="cloudbees-folder@6.15">
+<com.cloudbees.hudson.plugins.folder.Folder plugin="cloudbees-folder">
   <description></description>
   <properties/>
   <folderViews class="com.cloudbees.hudson.plugins.folder.views.DefaultFolderViewHolder">
@@ -140,13 +140,21 @@ async def test_job_exists(jenkins):
 
 @pytest.mark.asyncio
 async def test_folder(jenkins):
+    version = await jenkins.get_version()
+    if not (version.major >= 2 and version.minor >= 129):
+        pytest.skip('Version 1.554 does not have installed Folder plugin by default')
+
+    FOLDER_NAME = '{}_{}'.format('test_folder', time.time())
+    JOB_NAME = '{}/{}_{}'.format(FOLDER_NAME, 'test_job', time.time())
+
     try:
-        await jenkins.jobs.create('test_folder', FOLDER_CONFIG_XML)
-        await jenkins.jobs.create('test_folder/test_job', construct_job_config())
+        await jenkins.jobs.create(FOLDER_NAME, FOLDER_CONFIG_XML)
+        await jenkins.jobs.create(JOB_NAME, construct_job_config())
 
         jobs = await jenkins.jobs.get_all()
-        assert 'test_folder/test_job' in jobs
+        assert JOB_NAME in jobs
 
-        await jenkins.jobs.delete('test_folder/test_job')
+        await jenkins.jobs.delete(JOB_NAME)
     finally:
-        await jenkins.jobs.delete('test_folder')
+        with contextlib.suppress(JenkinsNotFoundError):
+            await jenkins.jobs.delete(FOLDER_NAME)
