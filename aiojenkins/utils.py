@@ -7,7 +7,7 @@ from xml.etree.ElementTree import Element, SubElement, tostring
 from .exceptions import JenkinsError
 
 JOB_BUILD_URL_RE = re.compile(
-    r'/job/(?P<job_name>[^/]+)/(?P<build_number>\d+)'
+    r'/job/(?P<job_name>.+)/(?P<build_number>\d+)'
 )
 
 
@@ -125,7 +125,12 @@ def parse_build_url(build_url: str) -> Tuple[str, int]:
     Extract job name and build number from build url
     """
     match = JOB_BUILD_URL_RE.search(build_url)
-    if match:
-        return str(match.group('job_name')), int(match.group('build_number'))
+    if not match:
+        raise JenkinsError('Invalid URL: {}'.format(build_url))
 
-    raise JenkinsError('Invalid URL: {}'.format(build_url))
+    name = '/'.join(filter(
+        lambda x: x != 'job',
+        match.group('job_name').split('/')
+    ))
+
+    return name, int(match.group('build_number'))

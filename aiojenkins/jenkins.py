@@ -171,6 +171,18 @@ class Jenkins:
 
         return await self._http_request(method, path, **kwargs)
 
+    @staticmethod
+    def _get_folder_and_job_name(name: str) -> Tuple[str, str]:
+        parts = name.split('/')
+
+        job_name = parts[-1]
+        folder_name = ''
+
+        for folder in parts[:-1]:
+            folder_name += 'job/{}/'.format(folder)
+
+        return folder_name, job_name
+
     async def close(self):
         if self._session:
             await self._session.close()

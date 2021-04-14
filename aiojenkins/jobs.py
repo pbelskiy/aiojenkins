@@ -1,4 +1,4 @@
-from typing import Any, Dict, Tuple
+from typing import Any, Dict
 
 from .exceptions import JenkinsNotFoundError
 from .utils import construct_job_config
@@ -8,18 +8,6 @@ class Jobs:
 
     def __init__(self, jenkins):
         self.jenkins = jenkins
-
-    @staticmethod
-    def _get_folder_and_job_names(name: str) -> Tuple[str, str]:
-        parts = name.split('/')
-
-        job_name = parts[-1]
-        folder_name = ''
-
-        for folder in parts[:-1]:
-            folder_name += 'job/{}/'.format(folder)
-
-        return folder_name, job_name
 
     async def _get_all_jobs(self, url: str, parent: str) -> Dict[str, dict]:
         all_jobs = {}
@@ -58,7 +46,7 @@ class Jobs:
         return await self._get_all_jobs('', '')
 
     async def get_info(self, name: str) -> dict:
-        folder_name, job_name = self._get_folder_and_job_names(name)
+        folder_name, job_name = self.jenkins._get_folder_and_job_name(name)
 
         response = await self.jenkins._request(
             'GET',
@@ -68,7 +56,7 @@ class Jobs:
         return await response.json()
 
     async def get_config(self, name: str) -> str:
-        folder_name, job_name = self._get_folder_and_job_names(name)
+        folder_name, job_name = self.jenkins._get_folder_and_job_name(name)
 
         response = await self.jenkins._request(
             'GET',
@@ -104,7 +92,7 @@ class Jobs:
         Returns:
             None
         """
-        folder_name, job_name = self._get_folder_and_job_names(name)
+        folder_name, job_name = self.jenkins._get_folder_and_job_name(name)
 
         headers = {'Content-Type': 'text/xml'}
         params = {'name': job_name}
@@ -118,7 +106,7 @@ class Jobs:
         )
 
     async def reconfigure(self, name: str, config: str) -> None:
-        folder_name, job_name = self._get_folder_and_job_names(name)
+        folder_name, job_name = self.jenkins._get_folder_and_job_name(name)
 
         await self.jenkins._request(
             'POST',
@@ -137,7 +125,7 @@ class Jobs:
         Returns:
             None
         """
-        folder_name, job_name = self._get_folder_and_job_names(name)
+        folder_name, job_name = self.jenkins._get_folder_and_job_name(name)
 
         await self.jenkins._request(
             'POST',
@@ -145,7 +133,7 @@ class Jobs:
         )
 
     async def copy(self, name: str, new_name: str) -> None:
-        folder_name, job_name = self._get_folder_and_job_names(name)
+        folder_name, job_name = self.jenkins._get_folder_and_job_name(name)
 
         params = {
             'mode': 'copy',
@@ -160,7 +148,7 @@ class Jobs:
         )
 
     async def rename(self, name: str, new_name: str) -> None:
-        folder_name, job_name = self._get_folder_and_job_names(name)
+        folder_name, job_name = self.jenkins._get_folder_and_job_name(name)
 
         params = {
             'newName': new_name
@@ -173,7 +161,7 @@ class Jobs:
         )
 
     async def enable(self, name: str) -> None:
-        folder_name, job_name = self._get_folder_and_job_names(name)
+        folder_name, job_name = self.jenkins._get_folder_and_job_name(name)
 
         await self.jenkins._request(
             'POST',
@@ -181,7 +169,7 @@ class Jobs:
         )
 
     async def disable(self, name: str) -> None:
-        folder_name, job_name = self._get_folder_and_job_names(name)
+        folder_name, job_name = self.jenkins._get_folder_and_job_name(name)
 
         await self.jenkins._request(
             'POST',

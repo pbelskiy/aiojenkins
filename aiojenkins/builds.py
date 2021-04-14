@@ -27,9 +27,14 @@ class Builds:
           {'number': 2, 'url': 'http://localhost/job/test/2/'}
         ]
         """
+        folder_name, job_name = self.jenkins._get_folder_and_job_name(name)
+
         response = await self.jenkins._request(
             'GET',
-            '/job/{}/api/json?tree=allBuilds[number,url]'.format(name)
+            '/{}/job/{}/api/json?tree=allBuilds[number,url]'.format(
+                folder_name,
+                job_name
+            )
         )
 
         return (await response.json())['allBuilds']
@@ -38,9 +43,11 @@ class Builds:
         """
         Get detailed information about specified build of job
         """
+        folder_name, job_name = self.jenkins._get_folder_and_job_name(name)
+
         response = await self.jenkins._request(
             'GET',
-            '/job/{}/{}/api/json'.format(name, build_id)
+            '/{}/job/{}/{}/api/json'.format(folder_name, job_name, build_id)
         )
 
         return await response.json()
@@ -56,9 +63,11 @@ class Builds:
         """
         Get console output of specified build
         """
+        folder_name, job_name = self.jenkins._get_folder_and_job_name(name)
+
         response = await self.jenkins._request(
             'GET',
-            '/job/{}/{}/consoleText'.format(name, build_id)
+            '/{}/job/{}/{}/consoleText'.format(folder_name, job_name, build_id)
         )
 
         return await response.text()
@@ -90,10 +99,15 @@ class Builds:
         Note about delay (quiet-period):
         https://www.jenkins.io/blog/2010/08/11/quiet-period-feature/
         """
+        folder_name, job_name = self.jenkins._get_folder_and_job_name(name)
+
         data = None
 
         if parameters:
-            path = '/job/{}/buildWithParameters'.format(name)
+            path = '/{}/job/{}/buildWithParameters'.format(
+                folder_name,
+                job_name
+            )
 
             formatted_parameters = [
                 {'name': k, 'value': str(v)} for k, v in parameters.items()
@@ -129,13 +143,17 @@ class Builds:
             return None
 
     async def stop(self, name: str, build_id: int) -> None:
+        folder_name, job_name = self.jenkins._get_folder_and_job_name(name)
+
         await self.jenkins._request(
             'POST',
-            '/job/{}/{}/stop'.format(name, build_id)
+            '/{}/job/{}/{}/stop'.format(folder_name, job_name, build_id)
         )
 
     async def delete(self, name: str, build_id: int) -> None:
+        folder_name, job_name = self.jenkins._get_folder_and_job_name(name)
+
         await self.jenkins._request(
             'POST',
-            '/job/{}/{}/doDelete'.format(name, build_id)
+            '/{}/job/{}/{}/doDelete'.format(folder_name, job_name, build_id)
         )
