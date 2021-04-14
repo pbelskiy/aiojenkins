@@ -14,18 +14,30 @@ class Builds:
     @staticmethod
     def parse_url(build_url: str) -> Tuple[str, int]:
         """
-        Extract job name and build number from build url
+        Extract job name and build number from url.
+
+        Args:
+            build_url (str): build url.
+
+        Returns:
+            Tuple[str, int]: job name and build id.
         """
         return parse_build_url(build_url)
 
     async def get_all(self, name: str) -> list:
         """
-        Get list of builds for specified job name. Returned example:
+        Get list of builds for specified job.
 
-        builds = [
-          {'number': 1, 'url': 'http://localhost/job/test/1/'},
-          {'number': 2, 'url': 'http://localhost/job/test/2/'}
-        ]
+        Args:
+            name (str): job name or path (if in folder).
+
+        Returns:
+            List: list of build for specified job.
+
+            builds = [
+              {'number': 1, 'url': 'http://localhost/job/test/1/'},
+              {'number': 2, 'url': 'http://localhost/job/test/2/'}
+            ]
         """
         folder_name, job_name = self.jenkins._get_folder_and_job_name(name)
 
@@ -41,7 +53,14 @@ class Builds:
 
     async def get_info(self, name: str, build_id: int) -> dict:
         """
-        Get detailed information about specified build of job
+        Get detailed information about specified build number of job.
+
+        Args:
+            name (str): job name or path (if in folder).
+            build_id (int): build identifier.
+
+        Returns:
+            Dict: information about build.
         """
         folder_name, job_name = self.jenkins._get_folder_and_job_name(name)
 
@@ -54,14 +73,27 @@ class Builds:
 
     async def get_url_info(self, build_url: str) -> dict:
         """
-        Extract job name and build number from url and return info
+        Extract job name and build number from url and return info about build.
+
+        Args:
+            build_url (str): job name or path (if in folder).
+
+        Returns:
+            Dict: information about build.
         """
         job_name, build_id = self.parse_url(build_url)
         return await self.get_info(job_name, build_id)
 
     async def get_output(self, name: str, build_id: int) -> str:
         """
-        Get console output of specified build
+        Get console output of specified build.
+
+        Args:
+            name (str): job name or path (if in folder).
+            build_id (int): build identifier.
+
+        Returns:
+            str: build output.
         """
         folder_name, job_name = self.jenkins._get_folder_and_job_name(name)
 
@@ -73,6 +105,16 @@ class Builds:
         return await response.text()
 
     async def is_exists(self, name: str, build_id: int) -> bool:
+        """
+        Check if specified build id of job exists.
+
+        Args:
+            name (str): job name or path (if in folder).
+            build_id (int): build identifier.
+
+        Returns:
+            bool: exists or not.
+        """
         try:
             await self.get_info(name, build_id)
         except JenkinsNotFoundError:
@@ -91,13 +133,21 @@ class Builds:
     async def start(self,
                     name: str,
                     parameters: Optional[dict] = None,
-                    delay: int = 0
+                    delay: Optional[int] = 0
                     ) -> Optional[int]:
         """
         Enqueue new build with delay (default is 0 seconds, means immediately)
 
         Note about delay (quiet-period):
         https://www.jenkins.io/blog/2010/08/11/quiet-period-feature/
+
+        Args:
+            name (str): job name or path (if in folder).
+            parameters (int): parameters of triggering build.
+            delay (int): delay before start.
+
+        Returns:
+            Optional[int]: queue item id.
         """
         folder_name, job_name = self.jenkins._get_folder_and_job_name(name)
 
@@ -143,6 +193,16 @@ class Builds:
             return None
 
     async def stop(self, name: str, build_id: int) -> None:
+        """
+        Stop specified build.
+
+        Args:
+            name (str): job name or path (if in folder).
+            build_id (int): build identifier.
+
+        Returns:
+            None
+        """
         folder_name, job_name = self.jenkins._get_folder_and_job_name(name)
 
         await self.jenkins._request(
@@ -151,6 +211,16 @@ class Builds:
         )
 
     async def delete(self, name: str, build_id: int) -> None:
+        """
+        Delete specified build.
+
+        Args:
+            name (str): job name or path (if in folder).
+            build_id (int): build identifier.
+
+        Returns:
+            None
+        """
         folder_name, job_name = self.jenkins._get_folder_and_job_name(name)
 
         await self.jenkins._request(

@@ -46,6 +46,15 @@ class Jobs:
         return await self._get_all_jobs('', '')
 
     async def get_info(self, name: str) -> dict:
+        """
+        Get detailed information of specified job.
+
+        Args:
+            name (str): job name.
+
+        Returns:
+            dict: job details.
+        """
         folder_name, job_name = self.jenkins._get_folder_and_job_name(name)
 
         response = await self.jenkins._request(
@@ -56,6 +65,15 @@ class Jobs:
         return await response.json()
 
     async def get_config(self, name: str) -> str:
+        """
+        Get XML config of specified job.
+
+        Args:
+            name (str): job name.
+
+        Returns:
+            str: XML config
+        """
         folder_name, job_name = self.jenkins._get_folder_and_job_name(name)
 
         response = await self.jenkins._request(
@@ -66,6 +84,15 @@ class Jobs:
         return await response.text()
 
     async def is_exists(self, name: str) -> bool:
+        """
+        Check if specified job exists.
+
+        Args:
+            name (str): job name.
+
+        Returns:
+            bool: job exists or not
+        """
         try:
             await self.get_info(name)
         except JenkinsNotFoundError:
@@ -106,6 +133,18 @@ class Jobs:
         )
 
     async def reconfigure(self, name: str, config: str) -> None:
+        """
+        Reconfigure specified job name.
+
+        Args:
+            name (str): job name or path (within folder).
+            config (str): XML config of new job. It`s convenient way to use
+              `get_config()` to get existing job config and change it on your
+              taste, or to use `construct_config()` method.
+
+        Returns:
+            None
+        """
         folder_name, job_name = self.jenkins._get_folder_and_job_name(name)
 
         await self.jenkins._request(
@@ -133,6 +172,16 @@ class Jobs:
         )
 
     async def copy(self, name: str, new_name: str) -> None:
+        """
+        Copy specified job.
+
+        Args:
+            name (str): job name or path (within folder).
+            new_name (str): new job name.
+
+        Returns:
+            None
+        """
         folder_name, job_name = self.jenkins._get_folder_and_job_name(name)
 
         params = {
@@ -148,6 +197,16 @@ class Jobs:
         )
 
     async def rename(self, name: str, new_name: str) -> None:
+        """
+        Rename specified job name.
+
+        Args:
+            name (str): job name or path (within folder).
+            new_name (str): new job name.
+
+        Returns:
+            None
+        """
         folder_name, job_name = self.jenkins._get_folder_and_job_name(name)
 
         params = {
@@ -161,6 +220,15 @@ class Jobs:
         )
 
     async def enable(self, name: str) -> None:
+        """
+        Enable specified job.
+
+        Args:
+            name (str): job name.
+
+        Returns:
+            None
+        """
         folder_name, job_name = self.jenkins._get_folder_and_job_name(name)
 
         await self.jenkins._request(
@@ -169,6 +237,15 @@ class Jobs:
         )
 
     async def disable(self, name: str) -> None:
+        """
+        Disable specified job.
+
+        Args:
+            name (str): job name.
+
+        Returns:
+            None
+        """
         folder_name, job_name = self.jenkins._get_folder_and_job_name(name)
 
         await self.jenkins._request(
