@@ -154,6 +154,25 @@ async def test_folder(jenkins):
         jobs = await jenkins.jobs.get_all()
         assert JOB_NAME in jobs
 
+        info = await jenkins.jobs.get_info(JOB_NAME)
+        assert info['fullName'] == JOB_NAME
+
+        assert (await jenkins.jobs.is_exists(JOB_NAME)) is True
+
+        config = await jenkins.jobs.get_config(JOB_NAME)
+        assert len(config) > 0
+
+        # test rename
+        await jenkins.jobs.rename(JOB_NAME, 'job_renamed')
+        await jenkins.jobs.get_info(FOLDER_NAME + '/' + 'job_renamed')
+        await jenkins.jobs.rename(FOLDER_NAME + '/' + 'job_renamed', JOB_NAME.split('/')[-1])
+
+        # test copy
+        await jenkins.jobs.copy(JOB_NAME, 'job_copied')
+        await jenkins.jobs.get_info(FOLDER_NAME + '/' + 'job_copied')
+
+        await jenkins.jobs.disable(JOB_NAME)
+        await jenkins.jobs.enable(JOB_NAME)
         await jenkins.jobs.delete(JOB_NAME)
     finally:
         with contextlib.suppress(JenkinsNotFoundError):
