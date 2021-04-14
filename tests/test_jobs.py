@@ -148,7 +148,12 @@ async def test_folder(jenkins):
     JOB_NAME = '{}/{}_{}'.format(FOLDER_NAME, 'test_job', time.time())
 
     try:
-        await jenkins.jobs.create(FOLDER_NAME, FOLDER_CONFIG_XML)
+        try:
+            await jenkins.jobs.create(FOLDER_NAME, FOLDER_CONFIG_XML)
+        except Exception:
+            print(await jenkins.plugins.get_all())
+            raise
+
         await jenkins.jobs.create(JOB_NAME, construct_job_config())
 
         jobs = await jenkins.jobs.get_all()

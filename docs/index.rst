@@ -33,6 +33,12 @@ Nodes
 .. autoclass:: aiojenkins.nodes.Nodes
    :members:
 
+Plugins
+~~~~~~~
+
+.. autoclass:: aiojenkins.plugins.Plugins
+   :members:
+
 Views
 ~~~~~
 

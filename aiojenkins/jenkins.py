@@ -9,6 +9,7 @@ from .builds import Builds
 from .exceptions import JenkinsError, JenkinsNotFoundError
 from .jobs import Jobs
 from .nodes import Nodes
+from .plugins import Plugins
 from .views import Views
 
 JenkinsVersion = NamedTuple(
@@ -76,9 +77,10 @@ class Jenkins:
         if login and password:
             self.auth = BasicAuth(login, password)
 
-        self.nodes = Nodes(self)
-        self.jobs = Jobs(self)
         self.builds = Builds(self)
+        self.jobs = Jobs(self)
+        self.nodes = Nodes(self)
+        self.plugins = Plugins(self)
         self.views = Views(self)
 
     async def _get_session(self):
