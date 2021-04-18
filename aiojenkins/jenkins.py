@@ -183,15 +183,33 @@ class Jenkins:
 
         return folder_name, job_name
 
-    async def close(self):
+    async def close(self) -> None:
+        """
+        Finalize client, close http session.
+
+        Returns:
+            None
+        """
         if self._session:
             await self._session.close()
 
     async def get_status(self) -> dict:
+        """
+        Get server status.
+
+        Returns:
+            dict: jenkins server details.
+        """
         response = await self._request('GET', '/api/json')
         return await response.json()
 
     async def get_version(self) -> JenkinsVersion:
+        """
+        Get server version.
+
+        Returns:
+            JenkinsVersion: named tuple with minor, major, patch version.
+        """
         response = await self._request('GET', '/')
         header = response.headers.get('X-Jenkins')
         if not header:
@@ -201,7 +219,10 @@ class Jenkins:
 
     async def is_ready(self) -> bool:
         """
-        Determines is server loaded and ready for work
+        Determines is server loaded and ready for work.
+
+        Returns:
+            bool: ready state.
         """
         try:
             status = await self.get_status()
@@ -209,34 +230,52 @@ class Jenkins:
         except JenkinsError:
             return False
 
-    async def wait_until_ready(self, sleep_interval_sec: float = 1.0) -> None:
+    async def wait_until_ready(self, sleep_interval_sec: Optional[float] = 1.0) -> None:
         """
-        Blocks until server is completely loaded
+        Blocks until server is completely loaded.
+
+        Args:
+            sleep_interval_sec (float): delay between checks.
+
+        Returns:
+            None
         """
         while (await self.is_ready()) is False:
             await asyncio.sleep(sleep_interval_sec)
 
     async def quiet_down(self) -> None:
         """
-        Start server quiet down period, new builds will not be started
+        Start server quiet down period, new builds will not be started.
+
+        Returns:
+            None
         """
         await self._request('POST', '/quietDown')
 
     async def cancel_quiet_down(self) -> None:
         """
-        Cancel server quiet down period
+        Cancel server quiet down period.
+
+        Returns:
+            None
         """
         await self._request('POST', '/cancelQuietDown')
 
     async def restart(self) -> None:
         """
-        Restart server immediately
+        Restart server immediately.
+
+        Returns:
+            None
         """
         await self._request('POST', '/restart')
 
     async def safe_restart(self) -> None:
         """
-        Restart server when installation is complete and no jobs are running
+        Restart server when installation is complete and no jobs are running.
+
+        Returns:
+            None
         """
         await self._request('POST', '/safeRestart')
 
@@ -248,9 +287,12 @@ class Jenkins:
         """
         Generate new API token.
 
-        Returns two values:
-        * tokenValue - uses for authorization
-        * tokenUuid - uses for revoke
+        Args:
+            name (str): name of token.
+
+        Returns:
+            Tuple[str, str]: tokenValue - uses for authorization,
+                             tokenUuid - uses for revoke
         """
         params = {'newTokenName': name}
 
@@ -269,6 +311,12 @@ class Jenkins:
     async def revoke_token(self, token_uuid: str) -> None:
         """
         Revoke API token, please note that uuid is used, not value.
+
+        Args:
+            token_uuid (str): uuid of token to be revoked.
+
+        Returns:
+            None
         """
         params = {'tokenUuid': token_uuid}
 
@@ -281,6 +329,12 @@ class Jenkins:
     async def run_groovy_script(self, script: str) -> str:
         """
         Execute Groovy script on the server.
+
+        Args:
+            script (str): script content.
+
+        Returns:
+            str: output of script.
         """
         response = await self._request(
             'POST',

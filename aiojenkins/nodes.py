@@ -1,7 +1,7 @@
 import json
 import xml.etree.ElementTree
 
-from typing import Any, List
+from typing import Any, Dict, Optional, List
 
 from .exceptions import JenkinsError, JenkinsNotFoundError
 from .utils import construct_node_config, parse_build_url
@@ -39,13 +39,17 @@ class Nodes:
             return '(master)'
         return name
 
-    async def get_all(self) -> dict:
+    async def get_all(self) -> Dict[str, dict]:
         """
-        Get available nodes on server. Example dict result:
-        {
-            "master": dict(...),
-            "buildbot1": dict(...)
-        }
+        Get available nodes on server.
+
+        Returns:
+            Dict[str, dict]: node name, and it`s detailed information.
+
+            Example: {
+                "master": dict(...),
+                "buildbot1": dict(...)
+            }
         """
         response = await self.jenkins._request(
             'GET',
@@ -56,6 +60,15 @@ class Nodes:
         return {v['displayName']: v for v in nodes['computer']}
 
     async def get_info(self, name: str) -> dict:
+        """
+        Get node detailed information.
+
+        Args:
+            name (str): node name.
+
+        Returns:
+            dict: detailed node information.
+        """
         name = self._normalize_name(name)
         response = await self.jenkins._request(
             'GET',
@@ -65,20 +78,27 @@ class Nodes:
 
     async def get_failed_builds(self, name: str) -> List[dict]:
         """
-        Return list of detalizied failed builds for node name, actually it
+        Return list of detalizied failed builds for node name. Actually it
         parsed from RSS feed. usefull for build restart. Ascending builds sort.
 
-        Example: [{
-          'job_name': 'test',
-          'number': 1,
-          'url': 'http://localhost:8080/job/test/1/'
-        }]
+        Args:
+            name (str): node name.
+
+        Returns:
+            List[dict]: builds and their information.
+
+            Example: [{
+              'job_name': 'test',
+              'number': 1,
+              'url': 'http://localhost:8080/job/test/1/'
+            }]
         """
         name = self._normalize_name(name)
         response = await self.jenkins._request(
             'GET',
             '/computer/{}/rssFailed'.format(name),
         )
+
         return _parse_rss(await response.text())
 
     async def get_all_builds(self, name: str) -> List[dict]:
@@ -86,11 +106,17 @@ class Nodes:
         Return list of all detalizied builds for node name, actually it parsed
         from RSS feed. Ascending builds sort.
 
-        Example: [{
-          'job_name': 'test',
-          'number': 1,
-          'url': 'http://localhost:8080/job/test/1/'
-        }]
+        Args:
+            name (str): node name.
+
+        Returns:
+            List[dict]: list of all builds for specified node.
+
+            Example: [{
+              'job_name': 'test',
+              'number': 1,
+              'url': 'http://localhost:8080/job/test/1/'
+            }]
         """
         name = self._normalize_name(name)
         response = await self.jenkins._request(
@@ -101,7 +127,13 @@ class Nodes:
 
     async def get_config(self, name: str) -> str:
         """
-        Return node config in XML format
+        Return node config in XML format.
+
+        Args:
+            name (str): node name.
+
+        Returns:
+            str: node config.
         """
         name = self._normalize_name(name)
         response = await self.jenkins._request(
@@ -112,6 +144,15 @@ class Nodes:
         return await response.text()
 
     async def is_exists(self, name: str) -> bool:
+        """
+        Check is node exist.
+
+        Args:
+            name (str): node name.
+
+        Returns:
+            bool: node existing.
+        """
         if name == '':
             return False
 
@@ -121,13 +162,26 @@ class Nodes:
             return False
         return True
 
-    def construct(self, **kwargs: Any):
+    def construct(self, **kwargs: Any) -> str:
         """
-        Jenkins node constructor, returns dict to be passed to create method.
+        Construct XML node config.
+
+        Returns:
+            bool: node XML config.
         """
         return construct_node_config(**kwargs)
 
     async def create(self, name: str, config: dict) -> None:
+        """
+        Create new node.
+
+        Args:
+            name (str): node name.
+            config (str): XML config for new node.
+
+        Returns:
+            None
+        """
         if name in await self.get_all():
             raise JenkinsError('Node `{}` is already exists'.format(name))
 
@@ -149,6 +203,16 @@ class Nodes:
         )
 
     async def reconfigure(self, name: str, config: str) -> None:
+        """
+        Reconfigure node.
+
+        Args:
+            name (str): node name.
+            config (str): bew XML config for node.
+
+        Returns:
+            None
+        """
         name = self._normalize_name(name)
 
         if name == '(master)':
@@ -162,6 +226,15 @@ class Nodes:
         )
 
     async def delete(self, name: str) -> None:
+        """
+        Delete node.
+
+        Args:
+            name (str): node name.
+
+        Returns:
+            None
+        """
         name = self._normalize_name(name)
         await self.jenkins._request(
             'POST',
@@ -169,6 +242,15 @@ class Nodes:
         )
 
     async def enable(self, name: str) -> None:
+        """
+        Enable node.
+
+        Args:
+            name (str): node name.
+
+        Returns:
+            None
+        """
         info = await self.get_info(name)
         if not info['offline']:
             return
@@ -179,7 +261,17 @@ class Nodes:
             '/computer/{}/toggleOffline'.format(name)
         )
 
-    async def disable(self, name: str, message: str = '') -> None:
+    async def disable(self, name: str, message: Optional[str] = '') -> None:
+        """
+        Disable node.
+
+        Args:
+            name (str): node name.
+            message (Optional[str]): reason message.
+
+        Returns:
+            None
+        """
         info = await self.get_info(name)
         if info['offline']:
             return
@@ -192,6 +284,16 @@ class Nodes:
         )
 
     async def update_offline_reason(self, name: str, message: str) -> None:
+        """
+        Update reason message of disabled node.
+
+        Args:
+            name (str): node name.
+            message (str): reason message.
+
+        Returns:
+            None
+        """
         name = self._normalize_name(name)
         await self.jenkins._request(
             'POST',
