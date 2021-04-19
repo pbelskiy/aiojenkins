@@ -10,7 +10,8 @@ class Plugins:
         """
         Get dict of all existed plugins in the system.
 
-        Returns: Dict[str, dict] - plugin name and plugin properties.
+        Returns:
+            Dict[str, dict] - plugin name and plugin properties.
         """
         response = await self.jenkins._request(
             'GET',
