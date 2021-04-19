@@ -230,7 +230,7 @@ class Jenkins:
         except JenkinsError:
             return False
 
-    async def wait_until_ready(self, sleep_interval_sec: Optional[float] = 1.0) -> None:
+    async def wait_until_ready(self, sleep_interval_sec: float = 1.0) -> None:
         """
         Blocks until server is completely loaded.
 
