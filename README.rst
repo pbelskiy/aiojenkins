@@ -8,6 +8,7 @@ Status
 ------
 
 |Build status|
+|Docs status|
 |Coverage status|
 |Version status|
 |Downloads status|
