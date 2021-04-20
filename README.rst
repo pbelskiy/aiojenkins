@@ -14,6 +14,8 @@ Status
 
 .. |Build Status|
    image:: https://github.com/pbelskiy/aiojenkins/workflows/Tests/badge.svg
+.. |Docs status|
+   image:: https://readthedocs.org/projects/aiojenkins/badge/?version=latest
 .. |Coverage status|
    image:: https://img.shields.io/coveralls/github/pbelskiy/aiojenkins?label=Coverage
 .. |Version status|
