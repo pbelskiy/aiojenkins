@@ -1,7 +1,7 @@
 import json
 import xml.etree.ElementTree
 
-from typing import Any, Dict, Optional, List
+from typing import Any, Dict, List, Optional
 
 from .exceptions import JenkinsError, JenkinsNotFoundError
 from .utils import construct_node_config, parse_build_url
@@ -162,7 +162,7 @@ class Nodes:
             return False
         return True
 
-    def construct(self, **kwargs: Any) -> str:
+    def construct(self, **kwargs: Any) -> dict:
         """
         Construct XML node config.
 
