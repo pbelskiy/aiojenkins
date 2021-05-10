@@ -2,7 +2,9 @@ Async python client for `Jenkins <https://jenkins.io>`_
 =======================================================
 
 Asynchronous python library of Jenkins API endpoints based on aiohttp.
-Initial version of aiojenkins. Public API is still unstable.
+Initial version of aiojenkins. 
+
+Public API is still unstable.
 
 Status
 ------
