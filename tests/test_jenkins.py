@@ -102,7 +102,9 @@ async def test_retry_client(monkeypatch):
             'response', ['status', 'cookies', 'text', 'json']
         )
 
-        if attempts < 3:
+        if attempts == 1:
+            raise asyncio.TimeoutError
+        elif attempts < 3:
             response.status = HTTPStatus.INTERNAL_SERVER_ERROR
         else:
             response.status = HTTPStatus.OK
