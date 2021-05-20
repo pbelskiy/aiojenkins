@@ -3,7 +3,13 @@ import asyncio
 from http import HTTPStatus
 from typing import Any, NamedTuple, Optional, Tuple, Union
 
-from aiohttp import BasicAuth, ClientError, ClientResponse, ClientSession
+from aiohttp import (
+    BasicAuth,
+    ClientError,
+    ClientResponse,
+    ClientSession,
+    ClientTimeout,
+)
 
 from .builds import Builds
 from .exceptions import JenkinsError, JenkinsNotFoundError
@@ -55,6 +61,8 @@ class Jenkins:
                  password: Optional[str] = None,
                  *,
                  loop: Optional[asyncio.AbstractEventLoop] = None,
+                 verify: bool = True,
+                 timeout: Optional[float] = None,
                  retry: Optional[dict] = None):
         """
         Core library class.
@@ -62,12 +70,22 @@ class Jenkins:
         Args:
             host (str):
                 URL of jenkins server.
+
             login (Optional[str]):
                 Login, user name.
+
             password (Optional[str]):
                 Password for login.
+
             loop (Optional[AbstractEventLoop]):
                 Asyncio current event loop.
+
+            verify (Optional[bool]):
+                Verify SSL (default: true).
+
+            timeout (Optional[int]):
+                HTTP request timeout.
+
             retry (Optional[dict]):
                 Retry options to prevent failures if server restarting or
                 temporary network problem.
@@ -87,13 +105,18 @@ class Jenkins:
         """
         self.host = host.rstrip('/')
         self.loop = loop or asyncio.get_event_loop()
+        self.verify = verify
         self.retry = retry
 
         self.auth = None  # type: Any
+        self.timeout = None  # type: Any
         self.crumb = None  # type: Any
 
         if login and password:
             self.auth = BasicAuth(login, password)
+
+        if timeout:
+            self.timeout = ClientTimeout(total=timeout)
 
         self.builds = Builds(self)
         self.jobs = Jobs(self)
@@ -116,8 +139,11 @@ class Jenkins:
                             method: str,
                             path: str,
                             **kwargs: Any) -> ClientResponse:
-        if self.auth and not kwargs.get('auth'):
+        if self.auth and 'auth' not in kwargs:
             kwargs['auth'] = self.auth
+
+        if self.timeout and 'timeout' not in kwargs:
+            kwargs['timeout'] = self.timeout
 
         if self.crumb:
             kwargs.setdefault('headers', {})
@@ -134,6 +160,7 @@ class Jenkins:
                 method,
                 url,
                 allow_redirects=False,
+                ssl=self.verify,
                 **kwargs,
             )
         except ClientError as e:
