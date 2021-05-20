@@ -112,25 +112,16 @@ async def test_retry_client(monkeypatch):
 
         return response
 
-    retry = dict(
-        enabled=True,
-        attempts=5,
-        interval=0.01,
-    )
+    retry = dict(total=5, statuses=[HTTPStatus.INTERNAL_SERVER_ERROR])
 
     try:
-        retry_jenkins = Jenkins(
-            get_host(),
-            get_login(),
-            get_password(),
-            retry=retry
-        )
+        jenkins = Jenkins(get_host(), get_login(), get_password(), retry=retry)
 
-        await retry_jenkins.get_status()
+        await jenkins.get_status()
         monkeypatch.setattr('aiohttp.client.ClientSession.request', request)
-        await retry_jenkins.get_status()
+        await jenkins.get_status()
     finally:
-        await retry_jenkins.close()
+        await jenkins.close()
 
 
 def test_session_close():

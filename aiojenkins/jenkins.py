@@ -18,32 +18,31 @@ JenkinsVersion = NamedTuple(
 
 
 class RetryClientSession:
-    _ATTEMPTS_NUM = 50
-    _INTERVAL_SEC = 0.2
 
-    def __init__(self, retry_options: dict, *args: Any, **kwargs: Any):
-        self.attempts = retry_options.get('attempts', self._ATTEMPTS_NUM)
-        self.interval = retry_options.get('interval', self._INTERVAL_SEC)
-        self.statuses = retry_options.get('statuses', [])
+    def __init__(self, loop: Optional[asyncio.AbstractEventLoop], options: dict):
+        self.total = options.get('total', 1)
+        self.factor = options.get('factor', 0)
+        self.statuses = options.get('statuses', [])
 
-        self.client = ClientSession(*args, **kwargs)
-
-    def _check_status(self, status: int) -> bool:
-        return (HTTPStatus.INTERNAL_SERVER_ERROR <= status <= 599) or \
-            status in self.statuses
+        self.session = ClientSession(loop=loop)
 
     async def request(self, *args: Any, **kwargs: Any) -> ClientResponse:
-        for _ in range(self.attempts):
-            response = await self.client.request(*args, **kwargs)
-            if not self._check_status(response.status):
-                break
+        for total in range(self.total):
+            try:
+                response = await self.session.request(*args, **kwargs)
+            except (ClientError, asyncio.TimeoutError) as e:
+                if total + 1 == self.total:
+                    raise JenkinsError from e
+            else:
+                if response.status not in self.statuses:
+                    break
 
-            await asyncio.sleep(self.interval)
+            await asyncio.sleep(self.factor * (2 ** (total - 1)))
 
         return response
 
-    async def close(self):
-        await self.client.close()
+    async def close(self) -> None:
+        await self.session.close()
 
 
 class Jenkins:
@@ -54,25 +53,44 @@ class Jenkins:
                  host: str,
                  login: Optional[str] = None,
                  password: Optional[str] = None,
-                 *, retry: Optional[dict] = None):
+                 *,
+                 loop: Optional[asyncio.AbstractEventLoop] = None,
+                 retry: Optional[dict] = None):
         """
         Core library class.
 
-        It`s possible to use retry argument to prevent failures if server
-        restarting or temporary network problems, anyway 500 ~ 599 HTTP statues
-        is checked and triggers new retry attempt. To enable retry with
-        default options just pass retry=dict(enabled=True)
-
-        Example: retry = dict(
-            attempts=50,    # total attempts count default is 50
-            interval=0.2,   # interval in seconds between attempts
-            statuses=[403], # additional HTTP statuses for retry
-        )
+        Args:
+            host (str):
+                URL of jenkins server.
+            login (Optional[str]):
+                Login, user name.
+            password (Optional[str]):
+                Password for login.
+            loop (Optional[AbstractEventLoop]):
+                Asyncio current event loop.
+            retry (Optional[dict]):
+                Retry options to prevent failures if server restarting or
+                temporary network problem.
+                - total: ``int`` Total retries count. (default 0)
+                - factor: ``int`` Sleep between retries (default 0)
+                    {factor} * (2 ** ({number of total retries} - 1))
+                - statuses: ``List[int]`` HTTP statues retries on. (default [])
+                Example:
+                .. code-block:: python
+                    retry = dict(
+                        attempts=10,
+                        factor=1,
+                        statuses=[500]
+                    )
+        Returns:
+            Jenkins instance
         """
         self.host = host.rstrip('/')
+        self.loop = loop or asyncio.get_event_loop()
+        self.retry = retry
+
         self.auth = None  # type: Any
         self.crumb = None  # type: Any
-        self.retry = retry
 
         if login and password:
             self.auth = BasicAuth(login, password)
@@ -88,9 +106,9 @@ class Jenkins:
             return self._session
 
         if self.retry:
-            self._session = RetryClientSession(retry_options=self.retry)
+            self._session = RetryClientSession(self.loop, self.retry)
         else:
-            self._session = ClientSession()
+            self._session = ClientSession(loop=self.loop)
 
         return self._session
 
