@@ -126,6 +126,15 @@ async def test_retry_client(monkeypatch):
         await jenkins.close()
 
 
+@pytest.mark.asyncio
+async def test_retry_validation():
+    retry = dict(attempts=5, statuses=[HTTPStatus.INTERNAL_SERVER_ERROR])
+
+    with pytest.raises(JenkinsError):
+        jenkins = Jenkins(get_host(), get_login(), get_password(), retry=retry)
+        await jenkins.get_status()
+
+
 def test_session_close():
 
     def do():
