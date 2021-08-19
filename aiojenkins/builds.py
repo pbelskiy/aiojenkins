@@ -34,10 +34,13 @@ class Builds:
         Returns:
             List: list of build for specified job.
 
-            builds = [
-              {'number': 1, 'url': 'http://localhost/job/test/1/'},
-              {'number': 2, 'url': 'http://localhost/job/test/2/'}
-            ]
+            .. code-block:: python
+
+                builds = [
+                  {'number': 1, 'url': 'http://localhost/job/test/1/'},
+                  {'number': 2, 'url': 'http://localhost/job/test/2/'}
+                ]
+
         """
         folder_name, job_name = self.jenkins._get_folder_and_job_name(name)
 

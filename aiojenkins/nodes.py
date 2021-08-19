@@ -46,10 +46,15 @@ class Nodes:
         Returns:
             Dict[str, dict]: node name, and it`s detailed information.
 
-            Example: {
-                "master": dict(...),
-                "buildbot1": dict(...)
-            }
+            Example:
+
+            .. code-block:: python
+
+                {
+                  "master": dict(...),
+                  "buildbot1": dict(...)
+                }
+
         """
         response = await self.jenkins._request(
             'GET',
@@ -87,11 +92,16 @@ class Nodes:
         Returns:
             List[dict]: builds and their information.
 
-            Example: [{
-              'job_name': 'test',
-              'number': 1,
-              'url': 'http://localhost:8080/job/test/1/'
-            }]
+            Example:
+
+            .. code-block:: python
+
+                [{
+                  'job_name': 'test',
+                  'number': 1,
+                  'url': 'http://localhost:8080/job/test/1/'
+                }]
+
         """
         name = self._normalize_name(name)
         response = await self.jenkins._request(
@@ -112,11 +122,16 @@ class Nodes:
         Returns:
             List[dict]: list of all builds for specified node.
 
-            Example: [{
-              'job_name': 'test',
-              'number': 1,
-              'url': 'http://localhost:8080/job/test/1/'
-            }]
+            Example:
+
+            .. code-block:: python
+
+                [{
+                  'job_name': 'test',
+                  'number': 1,
+                  'url': 'http://localhost:8080/job/test/1/'
+                }]
+
         """
         name = self._normalize_name(name)
         response = await self.jenkins._request(

@@ -37,19 +37,28 @@ def construct_job_config(*, description: str = None,
         - description: Job description
         - parameters: Parameters for job, note that name is mandatory field.
 
-            Example: [
-                dict(name='param1'),
-                dict(name='param2', description='helpfull information'),
-                dict(name='param3', default='default command value'),
-            ]
+            Example:
+
+            .. code-block:: python
+
+                [
+                    dict(name='param1'),
+                    dict(name='param2', description='helpfull information'),
+                    dict(name='param3', default='default command value'),
+                ]
 
         - commands: List of commands which will be joined as one string by note
                     that entire command block will run in one shell instance.
 
-            Example: [
-                'echo 1',
-                'sleep 5',
-            ]
+
+            Example:
+
+            .. code-block:: python
+
+                [
+                    'echo 1',
+                    'sleep 5',
+                ]
 
     Returns:
         - str: Prettified XML ready to submit on Jenkins

@@ -108,12 +108,15 @@ class Jenkins:
                 - statuses: ``List[int]`` HTTP statues retries on. (default [])
 
                 Example:
+
                 .. code-block:: python
+
                     retry = dict(
                         total=10,
                         factor=1,
                         statuses=[500]
                     )
+
         Returns:
             Jenkins instance
         """

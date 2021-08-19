@@ -32,16 +32,21 @@ class Jobs:
 
         Returns: Dict[str, dict] - name and job properties.
 
-        Example: {
-            'test': {
-                'name': 'test',
-                'url': 'http://localhost/job/test/'
-            },
-            'folder/foo': {
-                'name': 'folder/job',
-                'url': 'http://localhost/job/folder/job/foo/'
+        Example:
+
+        .. code-block:: python
+
+            {
+                'test': {
+                    'name': 'test',
+                    'url': 'http://localhost/job/test/'
+                },
+                'folder/foo': {
+                    'name': 'folder/job',
+                    'url': 'http://localhost/job/folder/job/foo/'
+                }
             }
-        }
+
         """
         return await self._get_all_jobs('', '')
 
