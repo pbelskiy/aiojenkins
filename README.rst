@@ -6,6 +6,9 @@ Initial version of aiojenkins.
 
 Public API is still unstable.
 
+**Also pay attention to brand new library with same API set but with sync and async interfaces.**
+https://github.com/pbelskiy/ujenkins
+
 Status
 ------
 
