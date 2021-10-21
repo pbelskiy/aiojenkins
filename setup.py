@@ -31,6 +31,7 @@ setup_args = dict(
         'Programming Language :: Python :: 3.7',
         'Programming Language :: Python :: 3.8',
         'Programming Language :: Python :: 3.9',
+        'Programming Language :: Python :: 3.10',
     ],
     license='MIT',
     packages=['aiojenkins'],
@@ -38,7 +39,6 @@ setup_args = dict(
         '': ['py.typed', '*.pyi'],
     },
     author='Petr Belskiy',
-    author_email='petr.belskiy@gmail.com',
     keywords=['aiojenkins', 'async jenkins api'],
     url='https://github.com/pbelskiy/aiojenkins',
     download_url='https://pypi.org/project/aiojenkins'
