@@ -154,7 +154,7 @@ class Builds:
         """
         folder_name, job_name = self.jenkins._get_folder_and_job_name(name)
 
-        path = '/{}/job/{}/buildWithParameters'.format(
+        path = '/{}/job/{}'.format(
             folder_name,
             job_name
         )
@@ -178,6 +178,10 @@ class Builds:
                 }),
                 **parameters,
             }
+
+            path += "/buildWithParameters"
+        else:
+            path += "/build"
 
         response = await self.jenkins._request(
             'POST',
