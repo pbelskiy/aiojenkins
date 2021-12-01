@@ -154,10 +154,7 @@ class Builds:
         """
         folder_name, job_name = self.jenkins._get_folder_and_job_name(name)
 
-        path = '/{}/job/{}'.format(
-            folder_name,
-            job_name
-        )
+        path = '/{}/job/{}'.format(folder_name, job_name)
 
         data = None
 
