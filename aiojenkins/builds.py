@@ -179,9 +179,9 @@ class Builds:
                 **parameters,
             }
 
-            path += "/buildWithParameters"
+            path += '/buildWithParameters'
         else:
-            path += "/build"
+            path += '/build'
 
         response = await self.jenkins._request(
             'POST',
