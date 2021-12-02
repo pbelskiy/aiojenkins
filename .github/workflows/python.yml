@@ -46,21 +46,21 @@ jobs:
         sleep 5
 
     - name: Testing with tox
-      run: |
-        tox
+      run: tox
 
-    - name: Coveralls Parallel (debug)
+    - name: Coveralls
       uses: coverallsapp/github-action@master
       with:
         github-token: ${{ secrets.github_token }}
-        flag-name: run-${{ matrix.test_number }}
+        path-to-lcov: ./.tox/.coverage
+        flag-name: run-${{ matrix.jenkins-version }}-${{ matrix.python-version }}
         parallel: true
 
   finish:
     needs: tests
     runs-on: ubuntu-latest
     steps:
-    - name: Coveralls Finished
+    - name: Coveralls finished
       uses: coverallsapp/github-action@master
       with:
         github-token: ${{ secrets.github_token }}
