@@ -45,7 +45,7 @@ jobs:
         docker restart jenkins
         sleep 5
 
-    - name: Testing with tox
+    - name: Testing with tox (debug)
       env:
         COVERALLS_PARALLEL: true
         COVERALLS_REPO_TOKEN: ${{ secrets.coveralls }}
