@@ -47,10 +47,11 @@ jobs:
       env:
         COVERALLS_PARALLEL: true
         COVERALLS_REPO_TOKEN: ${{ secrets.coveralls }}
-        GITHUB_TOKEN: $COVERALLS_REPO_TOKEN
+        GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
       run: |
         tox
-        coveralls --service=github-actions
+        coveralls --service=github
+
   finish:
     needs: tests
     runs-on: ubuntu-latest
