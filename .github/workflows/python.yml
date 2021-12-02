@@ -33,7 +33,6 @@ jobs:
       run: |
         python -m pip install --upgrade pip
         pip install tox coveralls
-
     - name: Get Jenkins initial password
       env:
         ACTIONS_ALLOW_UNSECURE_COMMANDS: 'true'
@@ -44,15 +43,14 @@ jobs:
         docker exec jenkins jenkins-plugin-cli --plugins cloudbees-folder || true
         docker restart jenkins
         sleep 5
-
     - name: Testing with tox
       env:
         COVERALLS_PARALLEL: true
         COVERALLS_REPO_TOKEN: ${{ secrets.coveralls }}
-        GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}"
+        GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
       run: |
         tox
-        coveralls -v --service=github-actions
+        coveralls --service=github
 
   finish:
     needs: tests
