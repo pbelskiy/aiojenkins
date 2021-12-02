@@ -11,7 +11,15 @@ jobs:
     runs-on: ubuntu-latest
     strategy:
       matrix:
-        python-version: ['3.6', '3.7', '3.8', '3.9', '3.10']
+        python-version: ['3.5', '3.6', '3.7', '3.8', '3.9', '3.10']
+        jenkins-version: ["jenkins:1.554", "jenkins/jenkins:2.60.3", "jenkins/jenkins:lts"]
+
+    services:
+      jenkins:
+        image: ${{ matrix.jenkins-version }}
+        ports:
+          - 8080:8080
+        options: --name jenkins
 
     steps:
     - uses: actions/checkout@v2
@@ -25,7 +33,16 @@ jobs:
       run: |
         python -m pip install --upgrade pip
         pip install tox coveralls
-
+    - name: Get Jenkins initial password
+      env:
+        ACTIONS_ALLOW_UNSECURE_COMMANDS: 'true'
+      run: |
+        sleep 10
+        echo ::set-env name=login::Admin
+        echo ::set-env name=password::$(docker exec jenkins cat /var/jenkins_home/secrets/initialAdminPassword)
+        docker exec jenkins jenkins-plugin-cli --plugins cloudbees-folder || true
+        docker restart jenkins
+        sleep 5
     - name: Testing with tox
       env:
         COVERALLS_PARALLEL: true
@@ -34,7 +51,6 @@ jobs:
       run: |
         tox
         coveralls --service=github-actions
-
   finish:
     needs: tests
     runs-on: ubuntu-latest
