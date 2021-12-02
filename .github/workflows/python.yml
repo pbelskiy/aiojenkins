@@ -45,19 +45,23 @@ jobs:
         docker restart jenkins
         sleep 5
 
-    - name: Testing with tox (debug)
-      env:
-        COVERALLS_PARALLEL: true
-        COVERALLS_REPO_TOKEN: ${{ secrets.coveralls }}
-        GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}"
+    - name: Testing with tox
       run: |
         tox
-        coveralls -v --service=github-actions
+
+    - name: Coveralls Parallel (debug)
+      uses: coverallsapp/github-action@master
+      with:
+        github-token: ${{ secrets.github_token }}
+        flag-name: run-${{ matrix.test_number }}
+        parallel: true
 
   finish:
     needs: tests
     runs-on: ubuntu-latest
     steps:
     - name: Coveralls Finished
-      run: |
-        curl https://coveralls.io/webhook?repo_token=${{ secrets.coveralls }} -d "payload[build_num]=${{ github.sha }}&payload[status]=done"
+      uses: coverallsapp/github-action@master
+      with:
+        github-token: ${{ secrets.github_token }}
+        parallel-finished: true
