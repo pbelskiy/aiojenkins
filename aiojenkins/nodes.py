@@ -182,7 +182,7 @@ class Nodes:
         Construct XML node config.
 
         Returns:
-            bool: node XML config.
+            dict: node XML config.
         """
         return construct_node_config(**kwargs)
 

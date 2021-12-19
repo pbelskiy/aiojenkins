@@ -27,9 +27,11 @@ def _construct_parameters_block(parent, parameters: List[dict]) -> None:
         SubElement(new_p, 'defaultValue').text = parameter.get('default')
 
 
-def construct_job_config(*, description: str = None,
+def construct_job_config(*,
+                         description: str = None,
                          parameters: List[dict] = None,
-                         commands: List[str] = None) -> str:
+                         commands: List[str] = None
+                         ) -> str:
     """
     Constructs an XML for job creating depends on arguments.
 
@@ -99,10 +101,14 @@ def construct_job_config(*, description: str = None,
     return reparsed.toprettyxml(indent='  ')
 
 
-def construct_node_config(*, name: str,
+def construct_node_config(*,
+                          name: str,
                           remote_fs: str = '/tmp',
-                          executors: int = 2) -> dict:
+                          executors: int = 2
+                          ) -> dict:
     """
+    Construct node config.
+
     Args:
         - name: Node name
         - remote_fs: Remote node root directory
