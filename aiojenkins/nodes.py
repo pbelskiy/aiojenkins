@@ -223,7 +223,7 @@ class Nodes:
 
         Args:
             name (str): node name.
-            config (str): bew XML config for node.
+            config (str): new XML config for node.
 
         Returns:
             None
