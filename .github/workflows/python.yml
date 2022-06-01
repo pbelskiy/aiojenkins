@@ -6,7 +6,7 @@ jobs:
     strategy:
       matrix:
         python-version: ['3.5', '3.6', '3.7', '3.8', '3.9', '3.10']
-        jenkins-version: ['jenkins:1.554', 'jenkins/jenkins:2.60.3', 'jenkins/jenkins:lts']
+        jenkins-version: ['jenkins:1.554', 'jenkins/jenkins:2.60', 'jenkins/jenkins:2.319']
 
     services:
       jenkins:
@@ -41,15 +41,15 @@ jobs:
 
     - name: Testing with tox
       env:
-        COVERALLS_PARALLEL: true
-        GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
-      run: tox && coveralls --service=github
+        GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}"
+      run: |
+        tox
+        COVERALLS_REPO_TOKEN=${{ secrets.coveralls }} COVERALLS_PARALLEL=true coveralls
 
   finish:
     needs: tests
     runs-on: ubuntu-latest
     steps:
-    - name: Coveralls Finished
+    - name: Coveralls finished
       run: |
-        curl https://coveralls.io/webhook?repo_token=${{ secrets.coveralls }} \
-             -d "payload[build_num]=${{ github.sha }}&payload[status]=done"
+        curl https://coveralls.io/webhook?repo_token=${{ secrets.coveralls }} -d "payload[build_num]=${{ github.sha }}&payload[status]=done"
