@@ -277,7 +277,13 @@ class Jenkins:
         if not header:
             raise JenkinsError('Header `X-Jenkins` isn`t found in response')
 
-        return JenkinsVersion(*map(int, header.split('.')))
+        versions = header.split('.')
+
+        # no patch version
+        if len(versions) == 2:
+            versions.append('0')
+
+        return JenkinsVersion(*map(int, versions))
 
     async def is_ready(self) -> bool:
         """
