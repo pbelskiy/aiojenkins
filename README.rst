@@ -1,17 +1,6 @@
 Async python client for `Jenkins <https://jenkins.io>`_
 =======================================================
 
-Asynchronous python package of Jenkins API endpoints based on aiohttp.
-Initial version of aiojenkins. 
-
-Public API is still unstable.
-
-**Also pay attention to brand new package with same API set but with sync and async interfaces.**
-https://github.com/pbelskiy/ujenkins
-
-Status
-------
-
 |Build status|
 |Docs status|
 |Coverage status|
@@ -28,6 +17,14 @@ Status
    image:: https://img.shields.io/pypi/pyversions/aiojenkins?label=Python
 .. |Downloads status|
    image:: https://img.shields.io/pypi/dm/aiojenkins?color=1&label=Downloads
+
+
+Asynchronous python package of Jenkins API endpoints based on aiohttp.
+
+----
+
+**Also pay attention to brand new package with same API set but with sync and async interfaces.**
+https://github.com/pbelskiy/ujenkins
 
 Installation
 ------------
