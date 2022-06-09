@@ -176,7 +176,6 @@ class Jenkins:
             response = await session.request(
                 method,
                 url,
-                allow_redirects=False,
                 ssl=self.verify,
                 **kwargs,
             )
