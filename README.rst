@@ -29,15 +29,9 @@ https://github.com/pbelskiy/ujenkins
 Installation
 ------------
 
-::
+.. code:: shell
 
     pip3 install -U aiojenkins
-
-
-Documentation
--------------
-
-`Read the Docs <https://aiojenkins.readthedocs.io/en/latest/>`_
 
 Usage
 -----
@@ -62,6 +56,11 @@ Start new build:
         loop.close()
 
 `Please look at tests directory for more examples. <https://github.com/pbelskiy/aiojenkins/tree/master/tests>`_
+
+Documentation
+-------------
+
+`Read the Docs <https://aiojenkins.readthedocs.io/en/latest/>`_
 
 Testing
 -------
