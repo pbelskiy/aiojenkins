@@ -187,12 +187,12 @@ class Builds:
             data=data,
         )
 
-        # FIXME: on Jenkins 1.554 there is problem, no queue id returned
-        queue_item_url = response.headers['location']
         try:
+            # FIXME: on Jenkins 1.554 there is problem, no queue id returned
+            queue_item_url = response.headers['location']
             queue_id = queue_item_url.rstrip('/').split('/')[-1]
             return int(queue_id)
-        except ValueError:
+        except (KeyError, ValueError):
             return None
 
     async def stop(self, name: str, build_id: int) -> None:
