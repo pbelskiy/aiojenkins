@@ -34,6 +34,7 @@ async def test_quiet_down(jenkins):
     assert server_status['quietingDown'] is False
 
 
+@pytest.mark.skip
 @pytest.mark.asyncio
 async def test_restart(jenkins):
     if not is_ci_server():
