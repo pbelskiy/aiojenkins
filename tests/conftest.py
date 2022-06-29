@@ -3,7 +3,7 @@ import asyncio
 import pytest
 
 from aiojenkins.jenkins import Jenkins
-from tests import get_host, get_login, get_password
+from tests import get_host, get_user, get_password
 
 
 @pytest.fixture
@@ -16,7 +16,7 @@ def event_loop():
 @pytest.fixture
 def jenkins(event_loop):
     async def _create_jenkins():
-        return Jenkins(get_host(), get_login(), get_password())
+        return Jenkins(get_host(), get_user(), get_password())
 
     jenkins = event_loop.run_until_complete(_create_jenkins())
     yield jenkins

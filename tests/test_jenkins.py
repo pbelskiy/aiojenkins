@@ -8,7 +8,7 @@ import pytest
 
 from aiojenkins.exceptions import JenkinsError
 from aiojenkins.jenkins import Jenkins
-from tests import CreateJob, get_host, get_login, get_password, is_ci_server
+from tests import CreateJob, get_host, get_user, get_password, is_ci_server
 
 
 @pytest.mark.asyncio
@@ -67,7 +67,7 @@ async def test_tokens(jenkins):
         await jenkins.nodes.enable('master')
 
         # instance without credentials
-        jenkins_tokened = Jenkins(get_host(), get_login(), token_value)
+        jenkins_tokened = Jenkins(get_host(), get_user(), token_value)
         await jenkins_tokened.builds.start(job_name)
 
         await jenkins.revoke_token(token_uuid)
@@ -118,7 +118,7 @@ async def test_retry_client(monkeypatch):
     retry = dict(total=5, statuses=[HTTPStatus.INTERNAL_SERVER_ERROR])
 
     try:
-        jenkins = Jenkins(get_host(), get_login(), get_password(), retry=retry)
+        jenkins = Jenkins(get_host(), get_user(), get_password(), retry=retry)
 
         await jenkins.get_status()
         monkeypatch.setattr('aiohttp.client.ClientSession.request', request)
@@ -132,7 +132,7 @@ async def test_retry_validation():
     retry = dict(attempts=5, statuses=[HTTPStatus.INTERNAL_SERVER_ERROR])
 
     with pytest.raises(JenkinsError):
-        jenkins = Jenkins(get_host(), get_login(), get_password(), retry=retry)
+        jenkins = Jenkins(get_host(), get_user(), get_password(), retry=retry)
         await jenkins.get_status()
 
 
@@ -141,7 +141,7 @@ def test_session_close():
     def do():
         Jenkins(
             get_host(),
-            get_login(),
+            get_user(),
             get_password(),
             retry=dict(enabled=True)
         )

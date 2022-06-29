@@ -44,7 +44,7 @@ Start new build:
     import asyncio
     import aiojenkins
 
-    jenkins = aiojenkins.Jenkins('http://your_server/jenkins', 'login', 'password')
+    jenkins = aiojenkins.Jenkins('http://your_server/jenkins', 'user', 'password')
 
     async def example():
         await jenkins.builds.start('job_name', dict(parameter='test'))

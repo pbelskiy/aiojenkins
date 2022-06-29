@@ -68,7 +68,7 @@ class Jenkins:
 
     def __init__(self,
                  host: str,
-                 login: Optional[str] = None,
+                 user: Optional[str] = None,
                  password: Optional[str] = None,
                  *,
                  loop: Optional[asyncio.AbstractEventLoop] = None,
@@ -82,11 +82,11 @@ class Jenkins:
             host (str):
                 URL of jenkins server.
 
-            login (Optional[str]):
-                Login, user name.
+            user (Optional[str]):
+                User name.
 
             password (Optional[str]):
-                Password for login.
+                Password for user.
 
             loop (Optional[AbstractEventLoop]):
                 Asyncio current event loop.
@@ -129,8 +129,8 @@ class Jenkins:
         self.timeout = None  # type: Any
         self.crumb = None  # type: Any
 
-        if login and password:
-            self.auth = BasicAuth(login, password)
+        if user and password:
+            self.auth = BasicAuth(user, password)
 
         if timeout:
             self.timeout = ClientTimeout(total=timeout)

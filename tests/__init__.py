@@ -27,8 +27,8 @@ def get_host():
     return os.environ.get('host', 'http://localhost:8080')
 
 
-def get_login():
-    return os.environ.get('login', 'admin')
+def get_user():
+    return os.environ.get('user', 'admin')
 
 
 def get_password():
