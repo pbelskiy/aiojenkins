@@ -32,7 +32,7 @@ Installation
 
 .. code:: shell
 
-    pip3 install -U aiojenkins
+    pip3 install aiojenkins
 
 Usage
 -----
