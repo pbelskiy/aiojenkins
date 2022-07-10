@@ -106,7 +106,7 @@ def construct_job_config(*,
 
 def construct_node_config(*,
                           name: str,
-                          remote_fs:  Optional[str] = '/tmp',
+                          remote_fs: Optional[str] = '/tmp',
                           executors: Optional[int] = 2
                           ) -> dict:
     """
