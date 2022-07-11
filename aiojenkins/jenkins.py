@@ -18,9 +18,12 @@ from .nodes import Nodes
 from .plugins import Plugins
 from .views import Views
 
-JenkinsVersion = NamedTuple(
-    'JenkinsVersion', [('major', int), ('minor', int), ('patch', int)]
-)
+
+class JenkinsVersion(NamedTuple):
+    major: int
+    minor: int
+    patch: int = 0
+    build: int = 0
 
 
 class RetryClientSession:
@@ -277,10 +280,6 @@ class Jenkins:
             raise JenkinsError('Header `X-Jenkins` isn`t found in response')
 
         versions = header.split('.')
-
-        # no patch version
-        if len(versions) == 2:
-            versions.append('0')
 
         return JenkinsVersion(*map(int, versions))
 
