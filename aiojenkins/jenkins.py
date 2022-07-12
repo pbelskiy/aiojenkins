@@ -286,7 +286,7 @@ class Jenkins:
 
         versions = header.split('.')
 
-        return make_jenkins_version(*versions)
+        return make_jenkins_version(*map(int, versions))
 
     async def is_ready(self) -> bool:
         """
