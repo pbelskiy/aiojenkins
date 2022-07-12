@@ -20,8 +20,8 @@ from .views import Views
 
 
 JenkinsVersion = NamedTuple(
-    "JenkinsVersion",
-    [("major", int), ("minor", int), ("patch", int), ("build", int)],
+    'JenkinsVersion',
+    [('major', int), ('minor', int), ('patch', int), ('build', int)],
 )
 
 
