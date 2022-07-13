@@ -8,7 +8,7 @@ import pytest
 
 from aiojenkins.exceptions import JenkinsError
 from aiojenkins.jenkins import Jenkins, JenkinsVersion, make_jenkins_version
-from tests import CreateJob, get_host, get_user, get_password, is_ci_server
+from tests import CreateJob, get_host, get_password, get_user, is_ci_server
 
 
 @pytest.mark.asyncio

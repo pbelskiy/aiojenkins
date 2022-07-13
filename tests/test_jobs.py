@@ -5,7 +5,6 @@ import pytest
 
 from aiojenkins.exceptions import JenkinsNotFoundError
 from aiojenkins.utils import construct_job_config
-
 from tests import CreateJob
 
 FOLDER_CONFIG_XML = r"""<?xml version='1.1' encoding='UTF-8'?>

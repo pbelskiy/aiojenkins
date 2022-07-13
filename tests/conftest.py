@@ -3,7 +3,7 @@ import asyncio
 import pytest
 
 from aiojenkins.jenkins import Jenkins
-from tests import get_host, get_user, get_password
+from tests import get_host, get_password, get_user
 
 
 @pytest.fixture
