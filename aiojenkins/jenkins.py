@@ -1,5 +1,4 @@
 import asyncio
-from ensurepip import version
 
 from http import HTTPStatus
 from typing import Any, NamedTuple, Optional, Tuple, Union
