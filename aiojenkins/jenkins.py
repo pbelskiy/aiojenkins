@@ -18,9 +18,17 @@ from .nodes import Nodes
 from .plugins import Plugins
 from .views import Views
 
+
 JenkinsVersion = NamedTuple(
-    'JenkinsVersion', [('major', int), ('minor', int), ('patch', int)]
+    'JenkinsVersion',
+    [('major', int), ('minor', int), ('patch', int), ('build', int)],
 )
+
+
+def make_jenkins_version(
+    major: int, minor: int, patch: int = 0, build: int = 0
+) -> JenkinsVersion:
+    return JenkinsVersion(major, minor, patch, build)
 
 
 class RetryClientSession:
@@ -269,7 +277,7 @@ class Jenkins:
         Get server version.
 
         Returns:
-            JenkinsVersion: named tuple with minor, major, patch version.
+            JenkinsVersion: named tuple with minor, major, patch, build version.
         """
         response = await self._request('GET', '/')
         header = response.headers.get('X-Jenkins')
@@ -278,11 +286,7 @@ class Jenkins:
 
         versions = header.split('.')
 
-        # no patch version
-        if len(versions) == 2:
-            versions.append('0')
-
-        return JenkinsVersion(*map(int, versions))
+        return make_jenkins_version(*map(int, versions))
 
     async def is_ready(self) -> bool:
         """

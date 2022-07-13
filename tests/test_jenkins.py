@@ -7,7 +7,7 @@ from http import HTTPStatus
 import pytest
 
 from aiojenkins.exceptions import JenkinsError
-from aiojenkins.jenkins import Jenkins
+from aiojenkins.jenkins import Jenkins, JenkinsVersion, make_jenkins_version
 from tests import CreateJob, get_host, get_password, get_user, is_ci_server
 
 
@@ -151,3 +151,15 @@ def test_session_close():
     # just check for no exceptions
     import gc
     gc.collect()
+
+
+def test_make_jenkins_version():
+    assert make_jenkins_version(2, 358) == JenkinsVersion(
+        major=2, minor=358, patch=0, build=0
+    )
+    assert make_jenkins_version(2, 358, 5) == JenkinsVersion(
+        major=2, minor=358, patch=5, build=0
+    )
+    assert make_jenkins_version(2, 346, 1, 4) == JenkinsVersion(
+        major=2, minor=346, patch=1, build=4
+    )
