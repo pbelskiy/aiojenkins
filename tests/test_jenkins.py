@@ -152,6 +152,7 @@ def test_session_close():
     import gc
     gc.collect()
 
+
 def test_make_jenkins_version():
     assert make_jenkins_version(2, 358) == JenkinsVersion(
         major=2, minor=358, patch=0, build=0
