@@ -1,4 +1,5 @@
 import asyncio
+from ensurepip import version
 
 from http import HTTPStatus
 from typing import Any, NamedTuple, Optional, Tuple, Union
@@ -18,17 +19,10 @@ from .nodes import Nodes
 from .plugins import Plugins
 from .views import Views
 
-
 JenkinsVersion = NamedTuple(
     'JenkinsVersion',
     [('major', int), ('minor', int), ('patch', int), ('build', int)],
 )
-
-
-def make_jenkins_version(
-    major: int, minor: int, patch: int = 0, build: int = 0
-) -> JenkinsVersion:
-    return JenkinsVersion(major, minor, patch, build)
 
 
 class RetryClientSession:
@@ -285,8 +279,10 @@ class Jenkins:
             raise JenkinsError('Header `X-Jenkins` isn`t found in response')
 
         versions = header.split('.')
+        while len(versions) != 4:
+            versions.append('0')
 
-        return make_jenkins_version(*map(int, versions))
+        return JenkinsVersion(*map(int, versions))
 
     async def is_ready(self) -> bool:
         """

@@ -2,6 +2,8 @@ import asyncio
 
 import pytest
 
+from aioresponses import aioresponses
+
 from aiojenkins.jenkins import Jenkins
 from tests import get_host, get_password, get_user
 
@@ -25,3 +27,9 @@ def jenkins(event_loop):
         await jenkins.close()
 
     event_loop.run_until_complete(_close_jenkins())
+
+
+@pytest.fixture
+def aiohttp_mock():
+    with aioresponses() as mock:
+        yield mock
