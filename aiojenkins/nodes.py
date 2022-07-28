@@ -267,7 +267,7 @@ class Nodes:
             None
         """
         info = await self.get_info(name)
-        if not info['offline']:
+        if not info['temporarilyOffline']:
             return
 
         name = self._normalize_name(name)
@@ -288,7 +288,7 @@ class Nodes:
             None
         """
         info = await self.get_info(name)
-        if info['offline']:
+        if info['temporarilyOffline']:
             return
 
         name = self._normalize_name(name)
