@@ -1,13 +1,23 @@
 import json
 
-from typing import Any, Optional, Tuple
+from typing import Any, Optional, Tuple, Union
 
 from .exceptions import JenkinsNotFoundError
 from .utils import parse_build_url
 
 
 class Builds:
+    """
+    List of Jenkins tags which can be used insted of build_id number.
 
+    - lastBuild
+    - lastCompletedBuild
+    - lastFailedBuild
+    - lastStableBuild
+    - lastSuccessfulBuild
+    - lastUnstableBuild
+    - lastUnsuccessfulBuild
+    """
     def __init__(self, jenkins):
         self.jenkins = jenkins
 
@@ -17,7 +27,8 @@ class Builds:
         Extract job name and build number from url.
 
         Args:
-            build_url (str): build url.
+            build_url (str):
+                Build url.
 
         Returns:
             Tuple[str, int]: job name and build id.
@@ -28,11 +39,7 @@ class Builds:
         """
         Get list of builds for specified job.
 
-        Args:
-            name (str): job name or path (if in folder).
-
-        Returns:
-            List: list of build for specified job.
+        Example
 
             .. code-block:: python
 
@@ -41,6 +48,12 @@ class Builds:
                   {'number': 2, 'url': 'http://localhost/job/test/2/'}
                 ]
 
+        Args:
+            name (str):
+                Job name or path (if in folder).
+
+        Returns:
+            List: list of build for specified job.
         """
         folder_name, job_name = self.jenkins._get_folder_and_job_name(name)
 
@@ -54,13 +67,16 @@ class Builds:
 
         return (await response.json())['allBuilds']
 
-    async def get_info(self, name: str, build_id: int) -> dict:
+    async def get_info(self, name: str, build_id: Union[int, str]) -> dict:
         """
         Get detailed information about specified build number of job.
 
         Args:
-            name (str): job name or path (if in folder).
-            build_id (int): build identifier.
+            name (str):
+                Job name or path (if in folder).
+
+            build_id (int):
+                Build number or some of standard tags like `lastBuild`.
 
         Returns:
             Dict: information about build.
@@ -79,7 +95,8 @@ class Builds:
         Extract job name and build number from url and return info about build.
 
         Args:
-            build_url (str): job name or path (if in folder).
+            build_url (str):
+                Job name or path (if in folder).
 
         Returns:
             Dict: information about build.
@@ -87,13 +104,16 @@ class Builds:
         job_name, build_id = self.parse_url(build_url)
         return await self.get_info(job_name, build_id)
 
-    async def get_output(self, name: str, build_id: int) -> str:
+    async def get_output(self, name: str, build_id: Union[int, str]) -> str:
         """
         Get console output of specified build.
 
         Args:
-            name (str): job name or path (if in folder).
-            build_id (int): build identifier.
+            name (str):
+                Job name or path (if in folder).
+
+            build_id (int):
+                Build number or some of standard tags like `lastBuild`.
 
         Returns:
             str: build output.
@@ -107,13 +127,16 @@ class Builds:
 
         return await response.text()
 
-    async def is_exists(self, name: str, build_id: int) -> bool:
+    async def is_exists(self, name: str, build_id: Union[int, str]) -> bool:
         """
         Check if specified build id of job exists.
 
         Args:
-            name (str): job name or path (if in folder).
-            build_id (int): build identifier.
+            name (str):
+                Job name or path (if in folder).
+
+            build_id (int):
+                Build number or some of standard tags like `lastBuild`.
 
         Returns:
             bool: exists or not.
@@ -145,9 +168,14 @@ class Builds:
         https://www.jenkins.io/blog/2010/08/11/quiet-period-feature/
 
         Args:
-            name (str): job name or path (if in folder).
-            parameters (int): parameters of triggering build.
-            delay (int): delay before start.
+            name (str):
+                Job name or path (if in folder).
+
+            parameters (int):
+                Parameters of triggering build.
+
+            delay (Optional[int]):
+                Delay before start.
 
         Returns:
             Optional[int]: queue item id.
@@ -195,13 +223,16 @@ class Builds:
         except (KeyError, ValueError):
             return None
 
-    async def stop(self, name: str, build_id: int) -> None:
+    async def stop(self, name: str, build_id: Union[int, str]) -> None:
         """
         Stop specified build.
 
         Args:
-            name (str): job name or path (if in folder).
-            build_id (int): build identifier.
+            name (str):
+                Job name or path (if in folder).
+
+            build_id (int):
+                Build number or some of standard tags like `lastBuild`.
 
         Returns:
             None
@@ -213,13 +244,16 @@ class Builds:
             '/{}/job/{}/{}/stop'.format(folder_name, job_name, build_id)
         )
 
-    async def delete(self, name: str, build_id: int) -> None:
+    async def delete(self, name: str, build_id: Union[int, str]) -> None:
         """
         Delete specified build.
 
         Args:
-            name (str): job name or path (if in folder).
-            build_id (int): build identifier.
+            name (str):
+                Job name or path (if in folder).
+
+            build_id (int):
+                Build number or some of standard tags like `lastBuild`.
 
         Returns:
             None
