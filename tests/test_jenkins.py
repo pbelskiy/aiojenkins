@@ -95,7 +95,7 @@ async def test_retry_client(monkeypatch):
     async def text():
         return 'error'
 
-    async def request(*args, **kwargs):
+    async def request(*args, **kwargs):  # pylint: disable=unused-argument
         nonlocal attempts
 
         attempts += 1
@@ -105,7 +105,8 @@ async def test_retry_client(monkeypatch):
 
         if attempts == 1:
             raise asyncio.TimeoutError
-        elif attempts < 3:
+
+        if attempts < 3:
             response.status = HTTPStatus.INTERNAL_SERVER_ERROR
         else:
             response.status = HTTPStatus.OK

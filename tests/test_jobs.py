@@ -169,7 +169,10 @@ async def test_folder(jenkins):
         # test rename
         await jenkins.jobs.rename(JOB_NAME, 'job_renamed')
         await jenkins.jobs.get_info(FOLDER_NAME + '/' + 'job_renamed')
-        await jenkins.jobs.rename(FOLDER_NAME + '/' + 'job_renamed', JOB_NAME.split('/')[-1])
+        await jenkins.jobs.rename(
+            FOLDER_NAME + '/' + 'job_renamed',
+            JOB_NAME.rsplit('/', maxsplit=1)[-1]
+        )
 
         # test copy
         await jenkins.jobs.copy(JOB_NAME, 'job_copied')

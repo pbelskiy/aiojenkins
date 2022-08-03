@@ -292,7 +292,7 @@ class Jenkins:
         """
         try:
             status = await self.get_status()
-            return ('mode' in status)
+            return 'mode' in status
         except JenkinsError:
             return False
 
