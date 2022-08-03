@@ -105,7 +105,8 @@ class Jobs:
         else:
             return True
 
-    def construct_config(self, **kwargs: Any) -> str:
+    @staticmethod
+    def construct_config(**kwargs: Any) -> str:
         """
         Jenkins job XML constructor, cannot be used for folder creating yet.
         """

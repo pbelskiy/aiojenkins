@@ -177,7 +177,8 @@ class Nodes:
             return False
         return True
 
-    def construct(self, **kwargs: Any) -> dict:
+    @staticmethod
+    def construct(**kwargs: Any) -> dict:
         """
         Construct XML node config.
 
