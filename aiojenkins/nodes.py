@@ -177,7 +177,8 @@ class Nodes:
             return False
         return True
 
-    def construct(self, **kwargs: Any) -> dict:
+    @staticmethod
+    def construct(**kwargs: Any) -> dict:
         """
         Construct XML node config.
 
@@ -314,4 +315,22 @@ class Nodes:
             'POST',
             '/computer/{}/changeOfflineCause'.format(name),
             params={'offlineMessage': message}
+        )
+
+    async def launch_agent(self, name: str) -> None:
+        """
+        Launch agent on node, for example in case when disconnected.
+
+        Args:
+            name (str):
+                Node name.
+
+        Returns:
+            None
+        """
+        name = self._normalize_name(name)
+
+        await self.jenkins._request(
+            'POST',
+            '/computer/{}/launchSlaveAgent'.format(name),
         )

@@ -16,17 +16,16 @@ def event_loop():
 
 
 @pytest.fixture
-def jenkins(event_loop):
-    async def _create_jenkins():
+def jenkins(event_loop):  # pylint: disable=redefined-outer-name
+    async def _create_client():
         return Jenkins(get_host(), get_user(), get_password())
 
-    jenkins = event_loop.run_until_complete(_create_jenkins())
-    yield jenkins
+    async def _close_client():
+        await client.close()
 
-    async def _close_jenkins():
-        await jenkins.close()
-
-    event_loop.run_until_complete(_close_jenkins())
+    client = event_loop.run_until_complete(_create_client())
+    yield client
+    event_loop.run_until_complete(_close_client())
 
 
 @pytest.fixture
