@@ -259,7 +259,7 @@ class Nodes:
 
     async def enable(self, name: str) -> None:
         """
-        Enable node.
+        Enable node if disabled.
 
         Args:
             name (str): node name.
@@ -268,7 +268,7 @@ class Nodes:
             None
         """
         info = await self.get_info(name)
-        if not info['temporarilyOffline']:
+        if info['temporarilyOffline'] is False:
             return
 
         name = self._normalize_name(name)
@@ -279,7 +279,7 @@ class Nodes:
 
     async def disable(self, name: str, message: Optional[str] = '') -> None:
         """
-        Disable node.
+        Disable node if enabled.
 
         Args:
             name (str): node name.
@@ -289,7 +289,7 @@ class Nodes:
             None
         """
         info = await self.get_info(name)
-        if info['temporarilyOffline']:
+        if info['temporarilyOffline'] is True:
             return
 
         name = self._normalize_name(name)
