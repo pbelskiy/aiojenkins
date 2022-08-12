@@ -69,7 +69,8 @@ class Nodes:
         Get node detailed information.
 
         Args:
-            name (str): node name.
+            name (str):
+                Node name.
 
         Returns:
             dict: detailed node information.
@@ -87,7 +88,8 @@ class Nodes:
         parsed from RSS feed. usefull for build restart. Ascending builds sort.
 
         Args:
-            name (str): node name.
+            name (str):
+                Node name.
 
         Returns:
             List[dict]: builds and their information.
@@ -117,7 +119,8 @@ class Nodes:
         from RSS feed. Ascending builds sort.
 
         Args:
-            name (str): node name.
+            name (str):
+                Node name.
 
         Returns:
             List[dict]: list of all builds for specified node.
@@ -145,7 +148,8 @@ class Nodes:
         Return node config in XML format.
 
         Args:
-            name (str): node name.
+            name (str):
+                Node name.
 
         Returns:
             str: node config.
@@ -163,7 +167,8 @@ class Nodes:
         Check is node exist.
 
         Args:
-            name (str): node name.
+            name (str):
+                Node name.
 
         Returns:
             bool: node existing.
@@ -192,8 +197,11 @@ class Nodes:
         Create new node.
 
         Args:
-            name (str): node name.
-            config (str): XML config for new node.
+            name (str):
+                Node name.
+
+            config (str):
+                XML config for new node.
 
         Returns:
             None
@@ -223,8 +231,11 @@ class Nodes:
         Reconfigure node.
 
         Args:
-            name (str): node name.
-            config (str): new XML config for node.
+            name (str):
+                Node name.
+
+            config (str):
+                New XML config for node.
 
         Returns:
             None
@@ -246,7 +257,8 @@ class Nodes:
         Delete node.
 
         Args:
-            name (str): node name.
+            name (str):
+                Node name.
 
         Returns:
             None
@@ -262,7 +274,8 @@ class Nodes:
         Enable node if disabled.
 
         Args:
-            name (str): node name.
+            name (str):
+                Node name.
 
         Returns:
             None
@@ -282,8 +295,11 @@ class Nodes:
         Disable node if enabled.
 
         Args:
-            name (str): node name.
-            message (Optional[str]): reason message.
+            name (str):
+                Node name.
+
+            message (Optional[str]):
+                Reason message.
 
         Returns:
             None
@@ -304,8 +320,11 @@ class Nodes:
         Update reason message of disabled node.
 
         Args:
-            name (str): node name.
-            message (str): reason message.
+            name (str):
+                Node name.
+
+            message (str):
+                Reason message.
 
         Returns:
             None
