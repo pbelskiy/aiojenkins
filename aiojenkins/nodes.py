@@ -80,7 +80,15 @@ class Nodes:
             'GET',
             '/computer/{}/api/json'.format(name),
         )
-        return await response.json()
+
+        info = await response.json()
+
+        info['_disconnected'] = (
+            response['offline'] is True and
+            response['temporarilyOffline'] is False
+        )
+
+        return info
 
     async def get_failed_builds(self, name: str) -> List[dict]:
         """
@@ -339,6 +347,9 @@ class Nodes:
     async def launch_agent(self, name: str) -> None:
         """
         Launch agent on node, for example in case when disconnected.
+
+        State of connection can be determinated by `get_info(...)` method, which
+        contains custom property defined by packages: `_disconnected`.
 
         Args:
             name (str):
