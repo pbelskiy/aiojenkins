@@ -55,7 +55,8 @@ class Jobs:
         Get detailed information of specified job.
 
         Args:
-            name (str): job name.
+            name (str):
+                Job name.
 
         Returns:
             dict: job details.
@@ -74,7 +75,8 @@ class Jobs:
         Get XML config of specified job.
 
         Args:
-            name (str): job name.
+            name (str):
+                Job name.
 
         Returns:
             str: XML config
@@ -93,7 +95,8 @@ class Jobs:
         Check if specified job exists.
 
         Args:
-            name (str): job name.
+            name (str):
+                Job name.
 
         Returns:
             bool: job exists or not
@@ -117,10 +120,13 @@ class Jobs:
         Create new jenkins job (project).
 
         Args:
-            name (str): job name.
-            config (str): XML config of new job. It`s convenient way to use
-              `get_config()` to get existing job config and change it on your
-              taste, or to use `construct_config()` method.
+            name (str):
+                Job name.
+
+            config (str):
+                XML config of new job. It`s convenient way to use `get_config()`
+                to get existing job config and change it on your taste, or to
+                use `construct_config()` method.
 
         Returns:
             None
@@ -143,10 +149,13 @@ class Jobs:
         Reconfigure specified job name.
 
         Args:
-            name (str): job name or path (within folder).
-            config (str): XML config of new job. It`s convenient way to use
-              `get_config()` to get existing job config and change it on your
-              taste, or to use `construct_config()` method.
+            name (str):
+                Job name or path (within folder).
+
+            config (str):
+                XML config of new job. It`s convenient way to use `get_config()`
+                to get existing job config and change it on your taste, or to
+                use `construct_config()` method.
 
         Returns:
             None
@@ -165,7 +174,8 @@ class Jobs:
         Delete existed jenkins job (project).
 
         Args:
-            name (str): job name. For job in folder just use `/`.
+            name (str):
+                Job name. For job in folder just use `/`.
 
         Returns:
             None
@@ -182,8 +192,11 @@ class Jobs:
         Copy specified job.
 
         Args:
-            name (str): job name or path (within folder).
-            new_name (str): new job name.
+            name (str):
+                Job name or path (within folder).
+
+            new_name (str):
+                New job name.
 
         Returns:
             None
@@ -207,8 +220,11 @@ class Jobs:
         Rename specified job name.
 
         Args:
-            name (str): job name or path (within folder).
-            new_name (str): new job name.
+            name (str):
+                Job name or path (within folder).
+
+            new_name (str):
+                New job name.
 
         Returns:
             None
@@ -230,7 +246,8 @@ class Jobs:
         Enable specified job.
 
         Args:
-            name (str): job name.
+            name (str):
+                Job name.
 
         Returns:
             None
@@ -247,7 +264,8 @@ class Jobs:
         Disable specified job.
 
         Args:
-            name (str): job name.
+            name (str):
+                Job name.
 
         Returns:
             None

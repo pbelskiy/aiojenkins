@@ -296,12 +296,13 @@ class Jenkins:
         except JenkinsError:
             return False
 
-    async def wait_until_ready(self, sleep_interval_sec: float = 1.0) -> None:
+    async def wait_until_ready(self, sleep_interval_sec: Optional[float] = 1.0) -> None:
         """
         Blocks until server is completely loaded.
 
         Args:
-            sleep_interval_sec (float): delay between checks.
+            sleep_interval_sec (Optional[float]):
+                Delay between checks.
 
         Returns:
             None
@@ -354,7 +355,8 @@ class Jenkins:
         Generate new API token.
 
         Args:
-            name (str): name of token.
+            name (str):
+                Name of token.
 
         Returns:
             Tuple[str, str]: tokenValue - uses for authorization,
@@ -379,7 +381,8 @@ class Jenkins:
         Revoke API token, please note that uuid is used, not value.
 
         Args:
-            token_uuid (str): uuid of token to be revoked.
+            token_uuid (str):
+                UUID of token to be revoked.
 
         Returns:
             None
@@ -397,7 +400,8 @@ class Jenkins:
         Execute Groovy script on the server.
 
         Args:
-            script (str): script content.
+            script (str):
+                Script content.
 
         Returns:
             str: output of script.

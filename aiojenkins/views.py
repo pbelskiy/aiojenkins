@@ -23,7 +23,8 @@ class Views:
         Check if view exists.
 
         Args:
-            name (str): view name.
+            name (str):
+                View name.
 
         Returns:
             bool: view existing
@@ -36,7 +37,8 @@ class Views:
         Return view config in XML format.
 
         Args:
-            name (str): view name.
+            name (str):
+                View name.
 
         Returns:
             str: XML config of view.
@@ -53,8 +55,11 @@ class Views:
         Create view using XML config.
 
         Args:
-            name (str): view name.
-            config (str): XML config.
+            name (str):
+                View name.
+
+            config (str):
+                XML config.
 
         Returns:
             None
@@ -78,8 +83,11 @@ class Views:
         Reconfigure view.
 
         Args:
-            name (str): view name.
-            config (str): XML config.
+            name (str):
+                View name.
+
+            config (str):
+                XML config.
 
         Returns:
             None
@@ -96,7 +104,8 @@ class Views:
         Delete view.
 
         Args:
-            name (str): view name.
+            name (str):
+                Иiew name.
 
         Returns:
             None
