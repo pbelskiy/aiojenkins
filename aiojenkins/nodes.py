@@ -84,8 +84,8 @@ class Nodes:
         info = await response.json()
 
         info['_disconnected'] = (
-            response['offline'] is True and
-            response['temporarilyOffline'] is False
+            info['offline'] is True and
+            info['temporarilyOffline'] is False
         )
 
         return info
