@@ -105,7 +105,7 @@ class Views:
 
         Args:
             name (str):
-                Иiew name.
+                View name.
 
         Returns:
             None
