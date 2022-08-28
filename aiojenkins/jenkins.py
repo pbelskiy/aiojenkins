@@ -26,14 +26,14 @@ JenkinsVersion = NamedTuple(
 
 class RetryClientSession:
 
-    def __init__(self, loop: Optional[asyncio.AbstractEventLoop], options: dict) -> None:
+    def __init__(self, options: dict) -> None:
         self._validate_retry_argument(options)
 
         self.total = options['total']
         self.factor = options.get('factor', 1)
         self.statuses = options.get('statuses', [])
 
-        self.session = ClientSession(loop=loop)
+        self.session = ClientSession()
 
     @staticmethod
     def _validate_retry_argument(retry: dict) -> None:
@@ -72,7 +72,6 @@ class Jenkins:
                  user: Optional[str] = None,
                  password: Optional[str] = None,
                  *,
-                 loop: Optional[asyncio.AbstractEventLoop] = None,
                  verify: bool = True,
                  timeout: Optional[float] = None,
                  retry: Optional[dict] = None
@@ -89,9 +88,6 @@ class Jenkins:
 
             password (Optional[str]):
                 Password for user.
-
-            loop (Optional[AbstractEventLoop]):
-                Asyncio current event loop.
 
             verify (Optional[bool]):
                 Verify SSL (default: true).
@@ -123,7 +119,6 @@ class Jenkins:
             Jenkins instance
         """
         self.host = host.rstrip('/')
-        self.loop = loop or asyncio.get_event_loop()
         self.verify = verify
         self.retry = retry
 
@@ -148,9 +143,9 @@ class Jenkins:
             return self._session
 
         if self.retry:
-            self._session = RetryClientSession(self.loop, self.retry)
+            self._session = RetryClientSession(self.retry)
         else:
-            self._session = ClientSession(loop=self.loop)
+            self._session = ClientSession()
 
         return self._session
 
