@@ -3,7 +3,7 @@ from typing import Dict, Optional
 
 class Plugins:
 
-    def __init__(self, jenkins):
+    def __init__(self, jenkins) -> None:
         self.jenkins = jenkins
 
     async def get_all(self, depth: Optional[int] = 2) -> Dict[str, dict]:

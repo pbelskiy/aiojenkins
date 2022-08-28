@@ -6,7 +6,7 @@ from .utils import construct_job_config
 
 class Jobs:
 
-    def __init__(self, jenkins):
+    def __init__(self, jenkins) -> None:
         self.jenkins = jenkins
 
     async def _get_all_jobs(self, url: str, parent: str) -> Dict[str, dict]:

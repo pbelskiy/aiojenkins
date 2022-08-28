@@ -18,7 +18,7 @@ class Builds:
     - lastUnstableBuild
     - lastUnsuccessfulBuild
     """
-    def __init__(self, jenkins):
+    def __init__(self, jenkins) -> None:
         self.jenkins = jenkins
 
     @staticmethod

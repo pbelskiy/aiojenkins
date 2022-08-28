@@ -26,7 +26,7 @@ JenkinsVersion = NamedTuple(
 
 class RetryClientSession:
 
-    def __init__(self, loop: Optional[asyncio.AbstractEventLoop], options: dict):
+    def __init__(self, loop: Optional[asyncio.AbstractEventLoop], options: dict) -> None:
         self._validate_retry_argument(options)
 
         self.total = options['total']
@@ -75,7 +75,8 @@ class Jenkins:
                  loop: Optional[asyncio.AbstractEventLoop] = None,
                  verify: bool = True,
                  timeout: Optional[float] = None,
-                 retry: Optional[dict] = None):
+                 retry: Optional[dict] = None
+                 ) -> None:
         """
         Core library class.
 

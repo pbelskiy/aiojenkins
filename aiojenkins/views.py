@@ -5,7 +5,7 @@ from .exceptions import JenkinsError
 
 class Views:
 
-    def __init__(self, jenkins):
+    def __init__(self, jenkins) -> None:
         self.jenkins = jenkins
 
     async def get_all(self) -> Dict[str, dict]:

@@ -29,7 +29,7 @@ def _parse_rss(rss: str) -> list:
 
 class Nodes:
 
-    def __init__(self, jenkins):
+    def __init__(self, jenkins) -> None:
         self.jenkins = jenkins
 
     @staticmethod
