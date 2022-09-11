@@ -39,6 +39,12 @@ Plugins
 .. autoclass:: aiojenkins.plugins.Plugins
    :members:
 
+Queue
+~~~~~
+
+.. autoclass:: aiojenkins.queue.Queue
+   :members:
+
 Views
 ~~~~~
 

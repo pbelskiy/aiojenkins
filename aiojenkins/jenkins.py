@@ -16,6 +16,7 @@ from .exceptions import JenkinsError, JenkinsNotFoundError
 from .jobs import Jobs
 from .nodes import Nodes
 from .plugins import Plugins
+from .queue import Queue
 from .views import Views
 
 JenkinsVersion = NamedTuple(
@@ -136,6 +137,7 @@ class Jenkins:
         self.jobs = Jobs(self)
         self.nodes = Nodes(self)
         self.plugins = Plugins(self)
+        self.queue = Queue(self)
         self.views = Views(self)
 
     async def _get_session(self):
