@@ -106,8 +106,8 @@ def construct_job_config(*,
 
 def construct_node_config(*,
                           name: str,
-                          remote_fs: Optional[str] = '/tmp',
-                          executors: Optional[int] = 2
+                          remote_fs: str = '/tmp',
+                          executors: int = 2
                           ) -> dict:
     """
     Construct node config.
@@ -116,10 +116,10 @@ def construct_node_config(*,
         name:
             Node name.
 
-        remote_fs (Optional[str]):
+        remote_fs (str):
             Remote node root directory.
 
-        executors (Optional[int]):
+        executors (int):
             Number of node executors.
 
     Returns:

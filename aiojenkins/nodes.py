@@ -298,7 +298,7 @@ class Nodes:
             '/computer/{}/toggleOffline'.format(name)
         )
 
-    async def disable(self, name: str, message: Optional[str] = '') -> None:
+    async def disable(self, name: str, message: str = '') -> None:
         """
         Disable node if enabled.
 
@@ -306,7 +306,7 @@ class Nodes:
             name (str):
                 Node name.
 
-            message (Optional[str]):
+            message (str):
                 Reason message.
 
         Returns:

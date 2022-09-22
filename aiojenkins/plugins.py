@@ -1,4 +1,4 @@
-from typing import Dict, Optional
+from typing import Dict
 
 
 class Plugins:
@@ -6,7 +6,7 @@ class Plugins:
     def __init__(self, jenkins) -> None:
         self.jenkins = jenkins
 
-    async def get_all(self, depth: Optional[int] = 2) -> Dict[str, dict]:
+    async def get_all(self, depth: int = 2) -> Dict[str, dict]:
         """
         Get dict of all existed plugins in the system.
 
