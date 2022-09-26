@@ -1,7 +1,7 @@
 import json
 import xml.etree.ElementTree
 
-from typing import Any, Dict, List, Optional
+from typing import Any, Dict, List
 
 from .exceptions import JenkinsError, JenkinsNotFoundError
 from .utils import construct_node_config, parse_build_url
