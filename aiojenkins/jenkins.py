@@ -182,7 +182,7 @@ class Jenkins:
             raise JenkinsError from e
 
         if response.status == HTTPStatus.NOT_FOUND:
-            text  = await response.text()
+            text = await response.text()
             raise JenkinsNotFoundError(
                 'Request error [{}], {}'.format(response.status, text),
                 status=response.status,
