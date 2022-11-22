@@ -171,7 +171,7 @@ class Builds:
             name (str):
                 Job name or path (if in folder).
 
-            parameters (int):
+            parameters (Optional[dict]):
                 Parameters of triggering build.
 
             delay (Optional[int]):
