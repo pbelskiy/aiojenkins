@@ -2,7 +2,6 @@ import re
 
 import pytest
 
-
 QUEUE_JSON = """
 {
   "_class" : "hudson.model.Queue",

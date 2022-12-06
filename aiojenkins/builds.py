@@ -159,7 +159,8 @@ class Builds:
     async def start(self,
                     name: str,
                     parameters: Optional[dict] = None,
-                    delay: int = 0
+                    delay: int = 0,
+                    **kwargs: Any
                     ) -> Optional[int]:
         """
         Enqueue new build with delay (default is 0 seconds, means immediately)
@@ -171,22 +172,37 @@ class Builds:
             name (str):
                 Job name or path (if in folder).
 
-            parameters (Optional[dict]):
-                Parameters of triggering build.
+            parameters (Optional[Any]):
+                Parameters of triggering build as dict or argument, also
+                parameters can be passed as kwargs.
 
-            delay (Optional[int]):
-                Delay before start.
+                Examples:
+
+                .. code-block:: python
+
+                    start(..., parameters=dict(a=1, b='string'))
+                    start(..., a=1, b='string')
+                    start(..., parameters=1)
+                    start(..., parameters(a=1, b='string'), c=3)
+
+            delay (int):
+                Delay before start, default is 0, no delay.
 
         Returns:
             Optional[int]: queue item id.
         """
-        folder_name, job_name = self.jenkins._get_folder_and_job_name(name)
+        def format_data(parameters: Optional[dict], kwargs: Any) -> Optional[dict]:
+            if not (parameters or kwargs):
+                return None
 
-        path = '/{}/job/{}'.format(folder_name, job_name)
-
-        data = None
-
-        if parameters:
+            # backward compatibility
+            if isinstance(parameters, dict):
+                parameters.update(**kwargs)
+            elif parameters is None:
+                parameters = kwargs
+            else:
+                parameters = dict(parameters=parameters)
+                parameters.update(**kwargs)
 
             formatted_parameters = [
                 {'name': k, 'value': str(v)} for k, v in parameters.items()
@@ -204,6 +220,13 @@ class Builds:
                 **parameters,
             }
 
+            return data
+
+        folder_name, job_name = self.jenkins._get_folder_and_job_name(name)
+        path = '/{}/job/{}'.format(folder_name, job_name)
+
+        data = format_data(parameters, kwargs)
+        if data:
             path += '/buildWithParameters'
         else:
             path += '/build'
@@ -216,7 +239,7 @@ class Builds:
         )
 
         try:
-            # FIXME: on Jenkins 1.554 there is problem, no queue id returned
+            # no queue id returned on Jenkins 1.554
             queue_item_url = response.headers['location']
             queue_id = queue_item_url.rstrip('/').split('/')[-1]
             return int(queue_id)
