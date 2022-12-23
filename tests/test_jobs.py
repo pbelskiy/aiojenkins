@@ -148,8 +148,8 @@ async def test_folder(jenkins):
     if not (version.major >= 2 and version.minor >= 129):
         pytest.skip('Version 1.554 does not have installed Folder plugin by default')
 
-    FOLDER_NAME = '{}_{}'.format('test_folder', time.time())
-    JOB_NAME = '{}/{}_{}'.format(FOLDER_NAME, 'test_job', time.time())
+    FOLDER_NAME = f'test_folder_{time.time()}'
+    JOB_NAME = f'{FOLDER_NAME}/test_job_{time.time()}'
 
     try:
         await jenkins.jobs.create(FOLDER_NAME, FOLDER_CONFIG_XML)

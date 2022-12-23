@@ -45,7 +45,7 @@ class Views:
         """
         response = await self.jenkins._request(
             'GET',
-            '/view/{}/config.xml'.format(name)
+            f'/view/{name}/config.xml'
         )
 
         return await response.text()
@@ -65,7 +65,7 @@ class Views:
             None
         """
         if name in await self.get_all():
-            raise JenkinsError('View `{}` is already exists'.format(name))
+            raise JenkinsError(f'View `{name}` is already exists')
 
         headers = {'Content-Type': 'text/xml'}
         params = {'name': name}
@@ -94,7 +94,7 @@ class Views:
         """
         await self.jenkins._request(
             'POST',
-            '/view/{}/config.xml'.format(name),
+            f'/view/{name}/config.xml',
             data=config,
             headers={'Content-Type': 'text/xml'},
         )
@@ -110,4 +110,4 @@ class Views:
         Returns:
             None
         """
-        await self.jenkins._request('POST', '/view/{}/doDelete'.format(name))
+        await self.jenkins._request('POST', f'/view/{name}/doDelete')

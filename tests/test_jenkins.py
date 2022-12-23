@@ -80,7 +80,7 @@ async def test_tokens(jenkins):
 async def test_run_groovy_script(jenkins):
     # TC: compare with expected result
     text = 'test'
-    response = await jenkins.run_groovy_script('print("{}")'.format(text))
+    response = await jenkins.run_groovy_script(f'print("{text}")')
     assert response == text
 
     # TC: invalid script

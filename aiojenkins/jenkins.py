@@ -184,7 +184,7 @@ class Jenkins:
         if response.status == HTTPStatus.NOT_FOUND:
             text = await response.text()
             raise JenkinsNotFoundError(
-                'Request error [{}], {}'.format(response.status, text),
+                f'Request error [{response.status}], {text}',
                 status=response.status,
             )
 
@@ -200,7 +200,7 @@ class Jenkins:
                 details = '\n' + text
 
             raise JenkinsError(
-                'Request error [{}], {}'.format(response.status, details),
+                f'Request error [{response.status}], {details}',
                 status=response.status,
             )
 
@@ -243,7 +243,7 @@ class Jenkins:
         folder_name = ''
 
         for folder in parts[:-1]:
-            folder_name += 'job/{}/'.format(folder)
+            folder_name += f'job/{folder}/'
 
         return folder_name, job_name
 

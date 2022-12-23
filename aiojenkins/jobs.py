@@ -65,7 +65,7 @@ class Jobs:
 
         response = await self.jenkins._request(
             'GET',
-            '/{}/job/{}/api/json'.format(folder_name, job_name)
+            f'/{folder_name}/job/{job_name}/api/json'
         )
 
         return await response.json()
@@ -85,7 +85,7 @@ class Jobs:
 
         response = await self.jenkins._request(
             'GET',
-            '/{}/job/{}/config.xml'.format(folder_name, job_name)
+            f'/{folder_name}/job/{job_name}/config.xml'
         )
 
         return await response.text()
@@ -138,7 +138,7 @@ class Jobs:
 
         await self.jenkins._request(
             'POST',
-            '/{}/createItem'.format(folder_name),
+            f'/{folder_name}/createItem',
             params=params,
             data=config,
             headers=headers
@@ -164,7 +164,7 @@ class Jobs:
 
         await self.jenkins._request(
             'POST',
-            '/{}/job/{}/config.xml'.format(folder_name, job_name),
+            f'/{folder_name}/job/{job_name}/config.xml',
             data=config,
             headers={'Content-Type': 'text/xml'},
         )
@@ -184,7 +184,7 @@ class Jobs:
 
         await self.jenkins._request(
             'POST',
-            '/{}/job/{}/doDelete'.format(folder_name, job_name)
+            f'/{folder_name}/job/{job_name}/doDelete',
         )
 
     async def copy(self, name: str, new_name: str) -> None:
@@ -211,7 +211,7 @@ class Jobs:
 
         await self.jenkins._request(
             'POST',
-            '/{}/createItem'.format(folder_name),
+            f'/{folder_name}/createItem',
             params=params
         )
 
@@ -237,7 +237,7 @@ class Jobs:
 
         await self.jenkins._request(
             'POST',
-            '/{}/job/{}/doRename'.format(folder_name, job_name),
+            f'/{folder_name}/job/{job_name}/doRename',
             params=params
         )
 
@@ -256,7 +256,7 @@ class Jobs:
 
         await self.jenkins._request(
             'POST',
-            '/{}/job/{}/enable'.format(folder_name, job_name)
+            f'/{folder_name}/job/{job_name}/enable'
         )
 
     async def disable(self, name: str) -> None:
@@ -274,5 +274,5 @@ class Jobs:
 
         await self.jenkins._request(
             'POST',
-            '/{}/job/{}/disable'.format(folder_name, job_name)
+            f'/{folder_name}/job/{job_name}/disable'
         )

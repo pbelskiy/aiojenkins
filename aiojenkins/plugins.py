@@ -15,7 +15,7 @@ class Plugins:
         """
         response = await self.jenkins._request(
             'GET',
-            '/pluginManager/api/json?depth={}'.format(depth)
+            f'/pluginManager/api/json?depth={depth}'
         )
 
         plugins = (await response.json())['plugins']

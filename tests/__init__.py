@@ -6,10 +6,10 @@ from aiojenkins.utils import construct_job_config
 
 
 class CreateJob:
-    # cannot use contextlib.asynccontextmanager now due Python 3.6 support
+    # FIXME: cannot use contextlib.asynccontextmanager now due Python 3.6 support
     def __init__(self, jenkins, *args, **kwargs):
         function_name = inspect.stack()[1].function
-        self.name = '{}_{}'.format(function_name, time.time())
+        self.name = f'{function_name}_{time.time()}'
         self.jenkins = jenkins
         self.args = args
         self.kwargs = kwargs

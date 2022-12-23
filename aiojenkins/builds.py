@@ -59,10 +59,7 @@ class Builds:
 
         response = await self.jenkins._request(
             'GET',
-            '/{}/job/{}/api/json?tree=allBuilds[number,url]'.format(
-                folder_name,
-                job_name
-            )
+            f'/{folder_name}/job/{job_name}/api/json?tree=allBuilds[number,url]'
         )
 
         return (await response.json())['allBuilds']
@@ -85,7 +82,7 @@ class Builds:
 
         response = await self.jenkins._request(
             'GET',
-            '/{}/job/{}/{}/api/json'.format(folder_name, job_name, build_id)
+            f'/{folder_name}/job/{job_name}/{build_id}/api/json',
         )
 
         return await response.json()
@@ -122,7 +119,7 @@ class Builds:
 
         response = await self.jenkins._request(
             'GET',
-            '/{}/job/{}/{}/consoleText'.format(folder_name, job_name, build_id)
+            f'/{folder_name}/job/{job_name}/{build_id}/consoleText'
         )
 
         return await response.text()
@@ -151,7 +148,7 @@ class Builds:
     async def get_queue_id_info(self, queue_id: int) -> dict:
         response = await self.jenkins._request(
             'GET',
-            '/queue/item/{}/api/json'.format(queue_id)
+            f'/queue/item/{queue_id}/api/json'
         )
 
         return await response.json()
@@ -223,7 +220,7 @@ class Builds:
             return data
 
         folder_name, job_name = self.jenkins._get_folder_and_job_name(name)
-        path = '/{}/job/{}'.format(folder_name, job_name)
+        path = f'/{folder_name}/job/{job_name}'
 
         data = format_data(parameters, kwargs)
         if data:
@@ -264,7 +261,7 @@ class Builds:
 
         await self.jenkins._request(
             'POST',
-            '/{}/job/{}/{}/stop'.format(folder_name, job_name, build_id)
+            f'/{folder_name}/job/{job_name}/{build_id}/stop'
         )
 
     async def delete(self, name: str, build_id: Union[int, str]) -> None:
@@ -285,5 +282,5 @@ class Builds:
 
         await self.jenkins._request(
             'POST',
-            '/{}/job/{}/{}/doDelete'.format(folder_name, job_name, build_id)
+            f'/{folder_name}/job/{job_name}/{build_id}/doDelete'
         )

@@ -34,7 +34,7 @@ class Queue:
         """
         response = await self.jenkins._request(
             'GET',
-            '/queue/item/{}/api/json'.format(item_id),
+            f'/queue/item/{item_id}/api/json',
         )
 
         return await response.json()
