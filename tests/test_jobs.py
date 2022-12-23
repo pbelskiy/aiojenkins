@@ -144,9 +144,9 @@ async def test_job_exists(jenkins):
 
 @pytest.mark.asyncio
 async def test_folder(jenkins):
-    version = await jenkins.get_version()
-    if not (version.major >= 2 and version.minor >= 129):
-        pytest.skip('Version 1.554 does not have installed Folder plugin by default')
+    plugins = await jenkins.plugins.get_all()
+    if 'coudbees-folder' not in plugins:
+        pytest.skip('folder plugin is not installed')
 
     FOLDER_NAME = f'test_folder_{time.time_ns()}'
     JOB_NAME = f'{FOLDER_NAME}/test_job_{time.time_ns()}'
