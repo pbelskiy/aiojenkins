@@ -9,7 +9,7 @@ class CreateJob:
     # FIXME: cannot use contextlib.asynccontextmanager now due Python 3.6 support
     def __init__(self, jenkins, *args, **kwargs):
         function_name = inspect.stack()[1].function
-        self.name = f'{function_name}_{time.time()}'
+        self.name = f'{function_name}_{time.time_ns()}'
         self.jenkins = jenkins
         self.args = args
         self.kwargs = kwargs

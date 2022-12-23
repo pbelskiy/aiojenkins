@@ -61,7 +61,7 @@ async def test_tokens(jenkins):
     async with CreateJob(jenkins) as job_name:
         token_value, token_uuid = await jenkins.generate_token('')
 
-        token_name = str(time.time())
+        token_name = str(time.time_ns())
         token_value, token_uuid = await jenkins.generate_token(token_name)
 
         await jenkins.nodes.enable('master')

@@ -135,7 +135,7 @@ def test_construct_job_config(jenkins):
 @pytest.mark.asyncio
 async def test_job_exists(jenkins):
     # TC: unavailable job must not exist
-    assert (await jenkins.jobs.is_exists(str(time.time()))) is False
+    assert (await jenkins.jobs.is_exists(str(time.time_ns()))) is False
 
     # TC: just created job must exist
     async with CreateJob(jenkins) as job_name:
@@ -148,8 +148,8 @@ async def test_folder(jenkins):
     if not (version.major >= 2 and version.minor >= 129):
         pytest.skip('Version 1.554 does not have installed Folder plugin by default')
 
-    FOLDER_NAME = f'test_folder_{time.time()}'
-    JOB_NAME = f'{FOLDER_NAME}/test_job_{time.time()}'
+    FOLDER_NAME = f'test_folder_{time.time_ns()}'
+    JOB_NAME = f'{FOLDER_NAME}/test_job_{time.time_ns()}'
 
     try:
         await jenkins.jobs.create(FOLDER_NAME, FOLDER_CONFIG_XML)
