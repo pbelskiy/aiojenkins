@@ -119,3 +119,15 @@ async def test_build_get_url_info(jenkins):
 
         build_info = await jenkins.builds.get_url_info(build_url)
         assert isinstance(build_info, dict) is True
+
+
+@pytest.mark.asyncio
+async def test_build_delay(jenkins):
+    async with CreateJob(jenkins) as job_name:
+        await jenkins.nodes.enable('master')
+        await jenkins.builds.start(job_name, delay=2)
+
+        await asyncio.sleep(1.5)
+        info = await jenkins.jobs.get_info(job_name)
+        builds = await jenkins.builds.get_all(job_name)
+        assert (info['inQueue'] is True and len(builds) == 0)
