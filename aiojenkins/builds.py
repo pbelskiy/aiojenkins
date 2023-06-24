@@ -231,7 +231,7 @@ class Builds:
         response = await self.jenkins._request(
             'POST',
             path,
-            params={'delay': '{0}sec'.format(delay)},
+            params={'delay': f'{delay}sec'},
             data=data,
         )
 
