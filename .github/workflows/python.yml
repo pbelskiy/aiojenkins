@@ -32,7 +32,7 @@ jobs:
       env:
         ACTIONS_ALLOW_UNSECURE_COMMANDS: 'true'
       run: |
-        sleep 10
+        sleep 15
         echo ::set-env name=user::Admin
         echo ::set-env name=password::$(docker exec jenkins cat /var/jenkins_home/secrets/initialAdminPassword)
         docker exec jenkins jenkins-plugin-cli --plugins cloudbees-folder || true
