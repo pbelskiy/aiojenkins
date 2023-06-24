@@ -90,11 +90,6 @@ async def test_build_exists(jenkins):
 
 @pytest.mark.asyncio
 async def test_build_queue_id(jenkins):
-    version = await jenkins.get_version()
-    # was introduced  default admin with password
-    if version.major < 2:
-        pytest.skip('there is problem, probably queue id was not implemented')
-
     async with CreateJob(jenkins) as job_name:
         queue_id = await jenkins.builds.start(job_name)
         assert queue_id > 0

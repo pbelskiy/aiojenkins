@@ -78,13 +78,6 @@ Prerequisites: `docker, tox`
     chromium http://localhost:8080  # create admin:admin
     tox
 
-
-Or Jenkins 1.554
-
-::
-
-    docker run -d --name jenkins-1.554 --restart always -p 8081:8080 jenkins:1.554
-
 Contributing
 ------------
 

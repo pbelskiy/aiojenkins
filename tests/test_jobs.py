@@ -99,11 +99,6 @@ async def test_get_job_info(jenkins):
 
 @pytest.mark.asyncio
 async def test_copy_job(jenkins):
-    version = await jenkins.get_version()
-    if version.major < 2:
-        # FIXME: need to investigate
-        pytest.skip('Jenkins version < 2 somehow freezed here')
-
     async with CreateJob(jenkins) as job_name:
         job_name_new = job_name + '_new'
         await jenkins.jobs.copy(job_name, job_name_new)
