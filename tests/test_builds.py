@@ -29,7 +29,7 @@ async def test_build_start(jenkins):
 @pytest.mark.asyncio
 async def test_build_list(jenkins):
     async with CreateJob(jenkins, parameters=[{'name': 'arg'}]) as job_name:
-        # TC: just created job must not has any builds
+        # TC: just created job must not have any builds
         builds = await jenkins.builds.get_all(job_name)
         assert len(builds) == 0
 
