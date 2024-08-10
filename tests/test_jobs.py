@@ -29,7 +29,6 @@ FOLDER_CONFIG_XML = r"""<?xml version='1.1' encoding='UTF-8'?>
 """
 
 
-@pytest.mark.asyncio
 async def test_delete_job(jenkins):
     with contextlib.suppress(JenkinsNotFoundError):
         async with CreateJob(jenkins) as job_name:
@@ -38,21 +37,18 @@ async def test_delete_job(jenkins):
             assert job_name not in available_jobs
 
 
-@pytest.mark.asyncio
 async def test_create_job(jenkins):
     async with CreateJob(jenkins) as job_name:
         available_jobs = await jenkins.jobs.get_all()
         assert job_name in available_jobs
 
 
-@pytest.mark.asyncio
 async def test_get_job_config(jenkins):
     async with CreateJob(jenkins) as job_name:
         config = await jenkins.jobs.get_config(job_name)
         assert len(config) > 0
 
 
-@pytest.mark.asyncio
 async def test_get_job_reconfigure(jenkins):
     async with CreateJob(jenkins) as job_name:
         config_old = await jenkins.jobs.get_config(job_name)
@@ -67,7 +63,6 @@ async def test_get_job_reconfigure(jenkins):
         assert '<concurrentBuild>true</concurrentBuild>' in config
 
 
-@pytest.mark.asyncio
 async def test_disable_job(jenkins):
     async with CreateJob(jenkins) as job_name:
         await jenkins.jobs.disable(job_name)
@@ -75,13 +70,11 @@ async def test_disable_job(jenkins):
         assert job_info['color'] == 'disabled'
 
 
-@pytest.mark.asyncio
 async def test_disable_unavailable_job(jenkins):
     with pytest.raises(JenkinsNotFoundError):
         await jenkins.jobs.disable('unavailable')
 
 
-@pytest.mark.asyncio
 async def test_enable_job(jenkins):
     async with CreateJob(jenkins) as job_name:
         await jenkins.jobs.disable(job_name)
@@ -90,14 +83,12 @@ async def test_enable_job(jenkins):
         assert job_info['color'] != 'disabled'
 
 
-@pytest.mark.asyncio
 async def test_get_job_info(jenkins):
     async with CreateJob(jenkins) as job_name:
         info = await jenkins.jobs.get_info(job_name)
         assert isinstance(info, dict)
 
 
-@pytest.mark.asyncio
 async def test_copy_job(jenkins):
     async with CreateJob(jenkins) as job_name:
         job_name_new = job_name + '_new'
@@ -109,7 +100,6 @@ async def test_copy_job(jenkins):
             await jenkins.jobs.delete(job_name_new)
 
 
-@pytest.mark.asyncio
 async def test_rename_job(jenkins):
     async with CreateJob(jenkins) as job_name:
         job_name_new = job_name + '_new'
@@ -127,7 +117,6 @@ def test_construct_job_config(jenkins):
     assert len(jenkins.jobs.construct_config()) > 0
 
 
-@pytest.mark.asyncio
 async def test_job_exists(jenkins):
     # TC: unavailable job must not exist
     assert (await jenkins.jobs.is_exists(str(time.time_ns()))) is False
@@ -137,7 +126,6 @@ async def test_job_exists(jenkins):
         assert (await jenkins.jobs.is_exists(job_name)) is True
 
 
-@pytest.mark.asyncio
 async def test_folder(jenkins):
     plugins = await jenkins.plugins.get_all()
     if 'coudbees-folder' not in plugins:

@@ -6,7 +6,6 @@ from aiojenkins.exceptions import JenkinsError
 from tests import CreateJob
 
 
-@pytest.mark.asyncio
 async def test_build_start(jenkins):
     arg_name = 'arg'
     arg_value = 'arg'
@@ -26,7 +25,6 @@ async def test_build_start(jenkins):
         assert build_info['actions'][0]['parameters'][0]['value'] == arg_value
 
 
-@pytest.mark.asyncio
 async def test_build_list(jenkins):
     async with CreateJob(jenkins, parameters=[{'name': 'arg'}]) as job_name:
         # TC: just created job must not have any builds
@@ -47,7 +45,6 @@ async def test_build_list(jenkins):
             assert len(output) > 0
 
 
-@pytest.mark.asyncio
 async def test_build_stop_delete(jenkins):
     job_config = {
         'parameters': [{'name': 'arg'}],
@@ -75,7 +72,6 @@ async def test_build_stop_delete(jenkins):
         await jenkins.builds.delete(job_name, 1)
 
 
-@pytest.mark.asyncio
 async def test_build_exists(jenkins):
     async with CreateJob(jenkins) as job_name:
         # TC: just created job hasn't any builds yet
@@ -88,7 +84,6 @@ async def test_build_exists(jenkins):
         assert (await jenkins.builds.is_exists(job_name, 1)) is True
 
 
-@pytest.mark.asyncio
 async def test_build_queue_id(jenkins):
     async with CreateJob(jenkins) as job_name:
         queue_id = await jenkins.builds.start(job_name)
@@ -98,7 +93,6 @@ async def test_build_queue_id(jenkins):
         assert isinstance(queue_id_info, dict) is True
 
 
-@pytest.mark.asyncio
 async def test_build_get_url_info(jenkins):
     # TC: invalid URL must raise the exception
     with pytest.raises(JenkinsError):

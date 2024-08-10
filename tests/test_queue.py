@@ -1,7 +1,5 @@
 import re
 
-import pytest
-
 QUEUE_JSON = """
 {
   "_class" : "hudson.model.Queue",
@@ -44,7 +42,6 @@ QUEUE_JSON = """
 }
 """
 
-
 QUEUE_ITEM_JSON = """
 {
   "_class" : "hudson.model.Queue$BlockedItem",
@@ -80,7 +77,6 @@ QUEUE_ITEM_JSON = """
 """
 
 
-@pytest.mark.asyncio
 async def test_get(jenkins, aiohttp_mock):
     aiohttp_mock.get(
         re.compile(r'.+/queue/api/json'),
@@ -93,7 +89,6 @@ async def test_get(jenkins, aiohttp_mock):
     assert len(queue) == 1
 
 
-@pytest.mark.asyncio
 async def test_get_info(jenkins, aiohttp_mock):
     aiohttp_mock.get(
         re.compile(r'.+/queue/item/\d+/api/json'),
@@ -106,7 +101,6 @@ async def test_get_info(jenkins, aiohttp_mock):
     assert item['stuck'] is False
 
 
-@pytest.mark.asyncio
 async def test_cancel(jenkins, aiohttp_mock):
     aiohttp_mock.post(
         re.compile(r'.+/queue/cancelItem'),
