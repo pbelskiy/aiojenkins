@@ -19,10 +19,12 @@ from .plugins import Plugins
 from .queue import Queue
 from .views import Views
 
-JenkinsVersion = NamedTuple(
-    'JenkinsVersion',
-    [('major', int), ('minor', int), ('patch', int), ('build', int)],
-)
+
+class JenkinsVersion(NamedTuple):
+    major: int
+    minor: int
+    patch: int
+    build: int
 
 
 class RetryClientSession:
