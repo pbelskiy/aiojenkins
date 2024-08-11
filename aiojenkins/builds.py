@@ -142,8 +142,8 @@ class Builds:
             await self.get_info(name, build_id)
         except JenkinsNotFoundError:
             return False
-        else:
-            return True
+
+        return True
 
     async def get_queue_id_info(self, queue_id: int) -> dict:
         response = await self.jenkins._request(
@@ -198,7 +198,7 @@ class Builds:
             elif parameters is None:
                 parameters = kwargs
             else:
-                parameters = dict(parameters=parameters)
+                parameters = {'parameters': parameters}
                 parameters.update(**kwargs)
 
             formatted_parameters = [

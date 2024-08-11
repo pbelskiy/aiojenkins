@@ -105,8 +105,8 @@ class Jobs:
             await self.get_info(name)
         except JenkinsNotFoundError:
             return False
-        else:
-            return True
+
+        return True
 
     @staticmethod
     def construct_config(**kwargs: Any) -> str:

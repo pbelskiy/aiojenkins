@@ -11,9 +11,9 @@ async def test_build_start(jenkins):
     arg_name = 'arg'
     arg_value = 'arg'
 
-    config = dict(
-        parameters=[dict(name=arg_name)]
-    )
+    config = {
+        'parameters': [{'name': arg_name}]
+    }
 
     async with CreateJob(jenkins, **config) as job_name:
         await jenkins.builds.start(job_name, {arg_name: arg_value})
@@ -28,14 +28,14 @@ async def test_build_start(jenkins):
 
 @pytest.mark.asyncio
 async def test_build_list(jenkins):
-    async with CreateJob(jenkins, parameters=[dict(name='arg')]) as job_name:
+    async with CreateJob(jenkins, parameters=[{'name': 'arg'}]) as job_name:
         # TC: just created job must not has any builds
         builds = await jenkins.builds.get_all(job_name)
         assert len(builds) == 0
 
         # TC: build list must contain something after build triggered
         await jenkins.nodes.enable('master')
-        await jenkins.builds.start(job_name, dict(arg=0))
+        await jenkins.builds.start(job_name, {'arg': 0})
 
         info = await jenkins.jobs.get_info(job_name)
         builds = await jenkins.builds.get_all(job_name)
@@ -49,15 +49,15 @@ async def test_build_list(jenkins):
 
 @pytest.mark.asyncio
 async def test_build_stop_delete(jenkins):
-    job_config = dict(
-        parameters=[dict(name='arg')],
-        commands=['echo 1', 'echo 2']
-    )
+    job_config = {
+        'parameters': [{'name': 'arg'}],
+        'commands': ['echo 1', 'echo 2']
+    }
 
     async with CreateJob(jenkins, **job_config) as job_name:
         await jenkins.nodes.enable('master')
 
-        await jenkins.builds.start(job_name, dict(arg='test'))
+        await jenkins.builds.start(job_name, {'arg': 'test'})
         await asyncio.sleep(1)
 
         info = await jenkins.jobs.get_info(job_name)

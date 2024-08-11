@@ -245,7 +245,7 @@ class Jenkins:
         folder_name = ''
 
         for folder in parts[:-1]:
-            folder_name += f'job/{folder}/'
+            folder_name += f'job/{folder}/'  # pylint: disable=consider-using-join
 
         return folder_name, job_name
 
