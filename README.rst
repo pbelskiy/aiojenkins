@@ -46,7 +46,7 @@ Start new build:
 
     async def example():
         async with aiojenkins.Jenkins('http://your_server/jenkins', 'user', 'password') as jenkins:
-            await jenkins.builds.start('job_name', {'parameter':'test'})
+            await jenkins.builds.start('job_name', {'parameter': 'test'})
 
     asyncio.run(example())
 

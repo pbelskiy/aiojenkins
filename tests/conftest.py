@@ -7,7 +7,7 @@ from tests import get_host, get_password, get_user
 
 
 @pytest.fixture
-async def jenkins():  # pylint: disable=redefined-outer-name
+async def jenkins():
     async with Jenkins(get_host(), get_user(), get_password()) as client:
         yield client
 
