@@ -37,7 +37,7 @@ Installation
 Usage
 -----
 
-Start new build:
+Start new build using `aiojenkins.Jenkins` as an async context manager (preferred):
 
 .. code:: python
 
@@ -47,6 +47,23 @@ Start new build:
     async def example():
         async with aiojenkins.Jenkins('http://your_server/jenkins', 'user', 'password') as jenkins:
             await jenkins.builds.start('job_name', {'parameter': 'test'})
+
+    asyncio.run(example())
+
+Or without an async context manager:
+
+.. code:: python
+
+    import asyncio
+    import aiojenkins
+
+    jenkins = aiojenkins.Jenkins('http://your_server/jenkins', 'user', 'password')
+
+    async def example():
+        try:
+            await jenkins.builds.start('job_name', {'parameter': 'test'})
+        finally:
+            jenkins.close()
 
     asyncio.run(example())
 
