@@ -111,10 +111,22 @@ async def test_retry_client(monkeypatch):
 
     retry = {'total': 5, 'statuses': [HTTPStatus.INTERNAL_SERVER_ERROR]}
 
+    # Test using async context manager
     async with Jenkins(get_host(), get_user(), get_password(), retry=retry) as jenkins:
         await jenkins.get_status()
         monkeypatch.setattr('aiohttp.client.ClientSession.request', request)
         await jenkins.get_status()
+
+    monkeypatch.undo()
+
+    # Test using manual close
+    try:
+        jenkins = Jenkins(get_host(), get_user(), get_password(), retry=retry)
+        await jenkins.get_status()
+        monkeypatch.setattr('aiohttp.client.ClientSession.request', request)
+        await jenkins.get_status()
+    finally:
+        await jenkins.close()
 
 
 async def test_retry_validation():
