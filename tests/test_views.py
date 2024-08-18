@@ -28,14 +28,12 @@ VIEW_CONFIG_XML = """<?xml version="1.0" encoding="UTF-8"?>
 """
 
 
-@pytest.mark.asyncio
 async def test_get_views(jenkins):
     views = await jenkins.views.get_all()
     assert len(views) > 0
     assert 'all' in map(lambda s: s.lower(), views)
 
 
-@pytest.mark.asyncio
 async def test_is_exists(jenkins):
     version = await jenkins.get_version()
 
@@ -45,7 +43,6 @@ async def test_is_exists(jenkins):
         assert await jenkins.views.is_exists('all') is True
 
 
-@pytest.mark.asyncio
 async def test_get_config(jenkins):
     version = await jenkins.get_version()
 
@@ -55,7 +52,6 @@ async def test_get_config(jenkins):
         assert len(await jenkins.views.get_config('all')) > 0
 
 
-@pytest.mark.asyncio
 async def test_view_create_delete(jenkins):
     await jenkins.views.create('test', VIEW_CONFIG_XML.format(name='test'))
 
@@ -70,7 +66,6 @@ async def test_view_create_delete(jenkins):
     assert 'test' not in views
 
 
-@pytest.mark.asyncio
 async def test_view_reconfigure(jenkins):
     with contextlib.suppress(JenkinsError):
         await jenkins.views.delete('test2')

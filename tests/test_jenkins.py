@@ -11,19 +11,16 @@ from aiojenkins.jenkins import Jenkins, JenkinsVersion
 from tests import CreateJob, get_host, get_password, get_user, is_ci_server
 
 
-@pytest.mark.asyncio
 async def test_invalid_host(jenkins):
     with pytest.raises(JenkinsError):
         jenkins = Jenkins('@#$')
         await jenkins.get_version()
 
 
-@pytest.mark.asyncio
 async def test_get_status(jenkins):
     await jenkins.get_status()
 
 
-@pytest.mark.asyncio
 async def test_quiet_down(jenkins):
     await jenkins.quiet_down()
     server_status = await jenkins.get_status()
@@ -35,7 +32,6 @@ async def test_quiet_down(jenkins):
 
 
 @pytest.mark.skip
-@pytest.mark.asyncio
 async def test_restart(jenkins):
     if not is_ci_server():
         pytest.skip('takes too much time +40 seconds')
@@ -51,7 +47,6 @@ async def test_restart(jenkins):
     assert (await jenkins.is_ready()) is True
 
 
-@pytest.mark.asyncio
 async def test_tokens(jenkins):
     version = await jenkins.get_version()
 
@@ -76,7 +71,6 @@ async def test_tokens(jenkins):
             await jenkins_tokened.builds.start(job_name)
 
 
-@pytest.mark.asyncio
 async def test_run_groovy_script(jenkins):
     # TC: compare with expected result
     text = 'test'
@@ -88,7 +82,6 @@ async def test_run_groovy_script(jenkins):
     assert 'No such property' in response
 
 
-@pytest.mark.asyncio
 async def test_retry_client(monkeypatch):
     attempts = 0
 
@@ -118,9 +111,17 @@ async def test_retry_client(monkeypatch):
 
     retry = {'total': 5, 'statuses': [HTTPStatus.INTERNAL_SERVER_ERROR]}
 
+    # Test using async context manager
+    async with Jenkins(get_host(), get_user(), get_password(), retry=retry) as jenkins:
+        await jenkins.get_status()
+        monkeypatch.setattr('aiohttp.client.ClientSession.request', request)
+        await jenkins.get_status()
+
+    monkeypatch.undo()
+
+    # Test using manual close
     try:
         jenkins = Jenkins(get_host(), get_user(), get_password(), retry=retry)
-
         await jenkins.get_status()
         monkeypatch.setattr('aiohttp.client.ClientSession.request', request)
         await jenkins.get_status()
@@ -128,7 +129,6 @@ async def test_retry_client(monkeypatch):
         await jenkins.close()
 
 
-@pytest.mark.asyncio
 async def test_retry_validation():
     retry = {'attempts': 5, 'statuses': [HTTPStatus.INTERNAL_SERVER_ERROR]}
 
@@ -154,7 +154,6 @@ def test_session_close():
     gc.collect()
 
 
-@pytest.mark.asyncio
 async def test_make_jenkins_version(jenkins, aiohttp_mock):
     jenkins.crumb = False
 
@@ -184,5 +183,3 @@ async def test_make_jenkins_version(jenkins, aiohttp_mock):
     )
     version = await jenkins.get_version()
     assert version == JenkinsVersion(major=2, minor=346, patch=1, build=4)
-
-    await jenkins.close()

@@ -37,7 +37,20 @@ Installation
 Usage
 -----
 
-Start new build:
+Start new build using `aiojenkins.Jenkins` as an async context manager (preferred):
+
+.. code:: python
+
+    import asyncio
+    import aiojenkins
+
+    async def example():
+        async with aiojenkins.Jenkins('http://your_server/jenkins', 'user', 'password') as jenkins:
+            await jenkins.builds.start('job_name', {'parameter': 'test'})
+
+    asyncio.run(example())
+
+Or without an async context manager:
 
 .. code:: python
 
@@ -47,14 +60,12 @@ Start new build:
     jenkins = aiojenkins.Jenkins('http://your_server/jenkins', 'user', 'password')
 
     async def example():
-        await jenkins.builds.start('job_name', dict(parameter='test'))
+        try:
+            await jenkins.builds.start('job_name', {'parameter': 'test'})
+        finally:
+            jenkins.close()
 
-    loop = asyncio.get_event_loop()
-    try:
-        loop.run_until_complete(example())
-    finally:
-        loop.run_until_complete(jenkins.close())
-        loop.close()
+    asyncio.run(example())
 
 `Please look at tests directory for more examples. <https://github.com/pbelskiy/aiojenkins/tree/master/tests>`_
 

@@ -8,12 +8,10 @@ from aiojenkins.utils import construct_node_config
 from tests import CreateJob
 
 
-@pytest.mark.asyncio
 async def test_get_nodes(jenkins):
     await jenkins.nodes.get_all()
 
 
-@pytest.mark.asyncio
 async def test_get_node_info(jenkins):
     info = await jenkins.nodes.get_info('(master)')
     assert isinstance(info, dict)
@@ -21,7 +19,6 @@ async def test_get_node_info(jenkins):
     assert isinstance(info, dict)
 
 
-@pytest.mark.asyncio
 async def test_is_node_exists(jenkins):
     is_exists = await jenkins.nodes.is_exists('master')
     assert is_exists is True
@@ -33,7 +30,6 @@ async def test_is_node_exists(jenkins):
     assert is_exists is False
 
 
-@pytest.mark.asyncio
 async def test_disable_node(jenkins):
     for _ in range(2):
         await jenkins.nodes.disable('master')
@@ -41,7 +37,6 @@ async def test_disable_node(jenkins):
         assert info['offline'] is True
 
 
-@pytest.mark.asyncio
 async def test_enable_node(jenkins):
     for _ in range(2):
         await jenkins.nodes.enable('master')
@@ -49,7 +44,6 @@ async def test_enable_node(jenkins):
         assert info['offline'] is False
 
 
-@pytest.mark.asyncio
 async def test_update_node_offline_reason(jenkins):
     await jenkins.nodes.update_offline_reason('master', 'maintenance1')
     info = await jenkins.nodes.get_info('master')
@@ -60,7 +54,6 @@ async def test_update_node_offline_reason(jenkins):
     assert info['offlineCauseReason'] == 'maintenance2'
 
 
-@pytest.mark.asyncio
 async def test_get_node_config(jenkins):
     TEST_NODE_NAME = test_get_node_config.__name__
 
@@ -83,7 +76,6 @@ async def test_get_node_config(jenkins):
     await jenkins.nodes.delete(TEST_NODE_NAME)
 
 
-@pytest.mark.asyncio
 async def test_node_reconfigure(jenkins):
     TEST_NODE_NAME = test_node_reconfigure.__name__
 
@@ -110,7 +102,6 @@ async def test_node_reconfigure(jenkins):
     await jenkins.nodes.delete(TEST_NODE_NAME)
 
 
-@pytest.mark.asyncio
 async def test_node_reconfigure_master(jenkins):
     config = jenkins.nodes.construct(name='reconfigure_master')
 
@@ -118,7 +109,6 @@ async def test_node_reconfigure_master(jenkins):
         await jenkins.nodes.reconfigure('master', config)
 
 
-@pytest.mark.asyncio
 async def test_create_delete_node(jenkins):
     TEST_NODE_NAME = test_create_delete_node.__name__
 
@@ -141,7 +131,6 @@ async def test_create_delete_node(jenkins):
     assert TEST_NODE_NAME not in nodes_list
 
 
-@pytest.mark.asyncio
 async def test_get_all_builds(jenkins):
     node_name = 'master'
     await jenkins.nodes.enable(node_name)
@@ -156,7 +145,6 @@ async def test_get_all_builds(jenkins):
         assert builds[-1]['job_name'] == job_name
 
 
-@pytest.mark.asyncio
 async def test_get_failed_builds(jenkins):
     node_name = 'master'
     await jenkins.nodes.enable(node_name)

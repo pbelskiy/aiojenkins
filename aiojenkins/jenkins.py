@@ -1,5 +1,6 @@
 import asyncio
 
+from contextlib import AbstractAsyncContextManager
 from http import HTTPStatus
 from typing import Any, NamedTuple, Optional, Tuple, Union
 
@@ -66,7 +67,7 @@ class RetryClientSession:
         await self.session.close()
 
 
-class Jenkins:
+class Jenkins(AbstractAsyncContextManager):
 
     _session = None
 
@@ -417,3 +418,9 @@ class Jenkins:
         )
 
         return await response.text()
+
+    async def __aexit__(self, exc_type, exc_val, exc_tb) -> None:
+        """
+        Automatically close the client when being used as an async context manager.
+        """
+        await self.close()
